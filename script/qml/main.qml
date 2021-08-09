@@ -18,16 +18,54 @@ Window {
 
     flags: Qt.Window | Qt.FramelessWindowHint
 
+    property int windowStatus: 0
+    property int windowMargin: 10
+
+    QtObject{
+        id: internal
+
+        function maximizeRestore(){
+            if(windowStatus == 0){
+                mainWindow.showMaximized()
+                windowStatus = 1
+                windowMargin = 0
+                maximizeRestoreButton.buttonIconSource = "../../data/restore_icon.svg"
+            }
+            else{
+                mainWindow.showNormal()
+                windowStatus = 0
+                windowMargin = 10
+                maximizeRestoreButton.buttonIconSource = "../../data/maximize_icon.svg"
+            }
+        }
+
+        function ifMaximizedWindowRestore(){
+            if(windowStatus == 1){
+                mainWindow.showNormal()
+                windowStatus = 0
+                windowMargin = 10
+                maximizeRestoreButton.buttonIconSource = "../../data/maximize_icon.svg"
+            }
+        }
+
+        function restoreMargins(){
+             windowStatus = 0
+             windowMargin = 10
+             maximizeRestoreButton.buttonIconSource = "../../data/maximize_icon.svg"
+        }
+    }
+
     Rectangle {
         id: bg
         color: "#2c313c"
         border.color: "#383e4c"
         border.width: 1
         anchors.fill: parent
-        anchors.rightMargin: 10
-        anchors.leftMargin: 10
-        anchors.bottomMargin: 10
-        anchors.topMargin: 10
+        anchors.rightMargin: windowMargin
+        anchors.leftMargin: windowMargin
+        anchors.bottomMargin: windowMargin
+        anchors.topMargin: windowMargin
+        z:1
 
         Rectangle {
             id: appContainer
@@ -121,6 +159,7 @@ Window {
                     DragHandler{
                         onActiveChanged: if(active){
                                              mainWindow.startSystemMove()
+                                             internal.ifMaximizedWindowRestore()
                                          }
                     }
 
@@ -167,17 +206,25 @@ Window {
 
                     TopBarButton{
                         id: minimizeButton
+                        onClicked: {
+                            internal.restoreMargins()
+                            mainWindow.showMinimized()
+                        }
                     }
 
                     TopBarButton{
                         id: maximizeRestoreButton
                         buttonIconSource: "../../data/maximize_icon.svg"
+
+                        onClicked: internal.maximizeRestore()
                     }
 
                     TopBarButton{
                         id: closeButton
                         pressedColor: "#ff007f"
                         buttonIconSource: "../../data/close_icon.svg"
+
+                        onClicked: mainWindow.close()
                     }
                 }
             }
