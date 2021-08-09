@@ -109,7 +109,7 @@ Window {
                         anchors.left: parent.left
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
-                        //source: "qrc:/qtquickplugin/images/template_image.png"
+                        source: "../../data/icon_app_top.svg"
                         anchors.leftMargin: 0
                         anchors.bottomMargin: 0
                         anchors.topMargin: 0
@@ -174,24 +174,48 @@ Window {
 
                 Rectangle {
                     id: leftMenu
-                    width: 70
+                    width: 250
                     color: "#1c1d20"
                     anchors.left: parent.left
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
+                    clip: true
                     anchors.topMargin: 0
                     anchors.bottomMargin: 0
                     anchors.leftMargin: 0
 
                     Column {
                         id: columnMenus
+                        width: leftMenu.border.width
                         anchors.fill: parent
                         anchors.bottomMargin: 90
 
-                        Button {
-                            id: button
-                            text: qsTr("Button")
+                        LeftMenuButton {
+                            id: homeButton
+                            text: qsTr("Home")
+
+                            isActiveMenu: true
                         }
+
+                        LeftMenuButton {
+                            id: openButton
+                            text: qsTr("Open")
+                            buttonIconSource: "../../data/open_icon.svg"
+                        }
+
+                        LeftMenuButton {
+                            id: saveButton
+                            text: qsTr("Save")
+                            buttonIconSource: "../../data/save_icon.svg"
+                        }
+                    }
+
+                    LeftMenuButton {
+                        id: settingsButton
+                        text: qsTr("Save")
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 25
+                        buttonIconSource: "../../data/settings_icon.svg"
                     }
                 }
 
@@ -234,9 +258,3 @@ Window {
         }
     }
 }
-
-/*##^##
-Designer {
-    D{i:0;formeditorZoom:0.9}
-}
-##^##*/
