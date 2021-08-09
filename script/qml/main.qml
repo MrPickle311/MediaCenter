@@ -1,15 +1,22 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
+import QtGraphicalEffects 1.15
+
 
 import "controls"
 
 Window {
+
+    id: mainWindow
+
     width: 1000
     height: 580
     visible: true
     color: "#00000000"
     title: qsTr("Hello World")
+
+    flags: Qt.Window | Qt.FramelessWindowHint
 
     Rectangle {
         id: bg
@@ -44,6 +51,8 @@ Window {
 
                 ToggleButton {
                     id: toggleBtn
+
+                    onClicked: animationMenu.running = true
 
                 }
 
@@ -100,12 +109,25 @@ Window {
                     anchors.leftMargin: 70
                     anchors.topMargin: 0
 
+                    PropertyAnimation{
+                        id: animationMenu
+                        target: leftMenu
+                        property: "width"
+                        to: leftMenu.width == 65 ? 250 : 65
+                        duration: 500
+                        easing.type: Easing.InOutQuint
+                    }
+
+                    DragHandler{
+                        onActiveChanged: if(active){
+                                             mainWindow.startSystemMove()
+                                         }
+                    }
+
                     Image {
                         id: iconApp
-                        x: 0
-                        y: 0
-                        width: 28
-                        height: 35
+                        width: 22
+                        height: 22
                         anchors.left: parent.left
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
@@ -174,7 +196,7 @@ Window {
 
                 Rectangle {
                     id: leftMenu
-                    width: 250
+                    width: 65
                     color: "#1c1d20"
                     anchors.left: parent.left
                     anchors.top: parent.top
@@ -257,4 +279,18 @@ Window {
             }
         }
     }
+
+    DropShadow{
+        anchors.fill: bg
+
+        horizontalOffset: 0
+        verticalOffset: 0
+        radius: 10
+        samples: 16
+        color: "#80000000"
+        source: bg
+        z: 0
+    }
+
+
 }
