@@ -16,6 +16,9 @@ Window {
     color: "#00000000"
     title: qsTr("Hello World")
 
+    minimumWidth: 800
+    minimumHeight: 500
+
     flags: Qt.Window | Qt.FramelessWindowHint
 
     property int windowStatus: 0
@@ -24,17 +27,33 @@ Window {
     QtObject{
         id: internal
 
+        function resetResizeBorders(){
+            resizeLeft.visible = true
+            resizeRight.visible = true
+            resizeBottom.visible = true
+            resizeRightCorner.visible = true
+        }
+
         function maximizeRestore(){
             if(windowStatus == 0){
                 mainWindow.showMaximized()
                 windowStatus = 1
                 windowMargin = 0
+
+                resizeLeft.visible = false
+                resizeRight.visible = false
+                resizeBottom.visible = false
+                resizeRightCorner.visible = false
+
                 maximizeRestoreButton.buttonIconSource = "../../data/restore_icon.svg"
             }
             else{
                 mainWindow.showNormal()
                 windowStatus = 0
                 windowMargin = 10
+
+                resetResizeBorders()
+
                 maximizeRestoreButton.buttonIconSource = "../../data/maximize_icon.svg"
             }
         }
@@ -44,14 +63,20 @@ Window {
                 mainWindow.showNormal()
                 windowStatus = 0
                 windowMargin = 10
+
+                resetResizeBorders()
+
                 maximizeRestoreButton.buttonIconSource = "../../data/maximize_icon.svg"
             }
         }
 
         function restoreMargins(){
-             windowStatus = 0
-             windowMargin = 10
-             maximizeRestoreButton.buttonIconSource = "../../data/maximize_icon.svg"
+            windowStatus = 0
+            windowMargin = 10
+
+            resetResizeBorders()
+
+            maximizeRestoreButton.buttonIconSource = "../../data/maximize_icon.svg"
         }
     }
 
@@ -322,6 +347,35 @@ Window {
                         anchors.leftMargin: 10
                         anchors.bottomMargin: 0
                     }
+
+                    MouseArea {
+                        id: resizeRightCorner
+                        x: 884
+                        y: 0
+                        width: 25
+                        height: 25
+                        opacity: 0.5
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        anchors.rightMargin: 0
+                        cursorShape: Qt.SizeFDiagCursor
+                        anchors.bottomMargin: 0
+
+                        Image {
+                            id: image
+                            anchors.fill: parent
+                            source: "../../data/resize_icon.svg"
+                            anchors.leftMargin: 5
+                            anchors.topMargin: 5
+                            fillMode: Image.PreserveAspectFit
+                        }
+
+                        DragHandler{
+                            target: null
+                            onActiveChanged: if(active) { mainWindow.startSystemResize(Qt.RightEdge | Qt.BottomEdge) }
+                        }
+
+                    }
                 }
             }
         }
@@ -339,5 +393,64 @@ Window {
         z: 0
     }
 
+    MouseArea {
+        id: resizeLeft
+        width: 10
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        cursorShape: Qt.SizeHorCursor
+        anchors.leftMargin: 0
+        anchors.bottomMargin: 10
+        anchors.topMargin: 10
+
+        DragHandler{
+            target: null
+            onActiveChanged: if(active) { mainWindow.startSystemResize(Qt.LeftEdge) }
+        }
+    }
+
+    MouseArea {
+        id: resizeRight
+        width: 10
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.rightMargin: 0
+        cursorShape: Qt.SizeHorCursor
+        anchors.bottomMargin: 10
+        anchors.topMargin: 10
+
+        DragHandler{
+            target: null
+            onActiveChanged: if(active) { mainWindow.startSystemResize(Qt.RightEdge) }
+        }
+    }
+
+    MouseArea {
+        id: resizeBottom
+        height: 10
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: 10
+        anchors.rightMargin: 10
+        cursorShape: Qt.SizeVerCursor
+        anchors.bottomMargin: 0
+
+        DragHandler{
+            target: null
+            onActiveChanged: if(active) { mainWindow.startSystemResize(Qt.BottomEdge) }
+        }
+    }
+
+
+
 
 }
+
+/*##^##
+Designer {
+    D{i:0;formeditorZoom:0.9}D{i:29}D{i:36}
+}
+##^##*/
