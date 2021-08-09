@@ -2,5 +2,19 @@
     <qresource prefix="/">
         <file>script/qml/main.qml</file>
         <file>script/qml/controls/CustomButton.qml</file>
+        <file>script/qml/controls/ToggleButton.qml</file>
+        <file>data/close_icon.svg</file>
+        <file>data/home_icon.svg</file>
+        <file>data/icon_app_top.svg</file>
+        <file>data/maximize_icon.svg</file>
+        <file>data/menu_icon.svg</file>
+        <file>data/minimize_icon.svg</file>
+        <file>data/open_icon.svg</file>
+        <file>data/resize_icon.svg</file>
+        <file>data/restore_icon.svg</file>
+        <file>data/save_icon.svg</file>
+        <file>data/settings_icon.svg</file>
+        <file>script/qml/controls/TopBarButton.qml</file>
+        <file>script/qml/controls/LeftMenuButton.qml</file>
     </qresource>
 </RCC>

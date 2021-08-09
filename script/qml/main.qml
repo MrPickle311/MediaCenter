@@ -2,6 +2,8 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 
+import "controls"
+
 Window {
     width: 1000
     height: 580
@@ -40,15 +42,9 @@ Window {
                 anchors.leftMargin: 0
                 anchors.topMargin: 0
 
-                Button {
+                ToggleButton {
                     id: toggleBtn
-                    width: 70
-                    height: 60
-                    text: qsTr("Toggle")
-                    anchors.left: parent.left
-                    anchors.top: parent.top
-                    anchors.topMargin: 0
-                    anchors.leftMargin: 0
+
                 }
 
                 Rectangle {
@@ -113,7 +109,7 @@ Window {
                         anchors.left: parent.left
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
-                        source: "qrc:/qtquickplugin/images/template_image.png"
+                        //source: "qrc:/qtquickplugin/images/template_image.png"
                         anchors.leftMargin: 0
                         anchors.bottomMargin: 0
                         anchors.topMargin: 0
@@ -147,11 +143,19 @@ Window {
                     anchors.topMargin: 0
                     anchors.rightMargin: 0
 
-                    Button {
-                        id: buttonMinimize
-                        width: 35
-                        height: 35
-                        text: qsTr("Button")
+                    TopBarButton{
+                        id: minimizeButton
+                    }
+
+                    TopBarButton{
+                        id: maximizeRestoreButton
+                        buttonIconSource: "../../data/maximize_icon.svg"
+                    }
+
+                    TopBarButton{
+                        id: closeButton
+                        pressedColor: "#ff007f"
+                        buttonIconSource: "../../data/close_icon.svg"
                     }
                 }
             }
@@ -233,7 +237,6 @@ Window {
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:0.9}D{i:4}D{i:6}D{i:7}D{i:5}D{i:9}D{i:10}D{i:8}D{i:11}D{i:15}
-D{i:17}D{i:19}D{i:18}
+    D{i:0;formeditorZoom:0.9}
 }
 ##^##*/
