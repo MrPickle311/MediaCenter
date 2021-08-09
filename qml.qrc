@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>script/qml/main.qml</file>
+        <file>script/qml/controls/CustomButton.qml</file>
     </qresource>
 </RCC>
