@@ -349,10 +349,9 @@ Window {
 
                         }
 
-                        SettingsPage{
+                        VideoPage{
 
                         }
-
                     }
                 }
 

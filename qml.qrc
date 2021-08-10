@@ -18,5 +18,6 @@
         <file>script/qml/controls/LeftMenuButton.qml</file>
         <file>script/qml/pages/HomePage.qml</file>
         <file>script/qml/pages/SettingsPage.qml</file>
+        <file>script/qml/pages/VideoPage.qml</file>
     </qresource>
 </RCC>

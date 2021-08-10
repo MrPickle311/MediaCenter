@@ -2,40 +2,21 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.15
 
-Button {
+CustomButton {
 
     id : leftMenuButton
 
     implicitWidth: 250
     implicitHeight: 60
 
-    text: "Left Menu Text"
+    buttonIconSource: "../../../data/home_icon.svg"
 
-    property url buttonIconSource: "../../../data/home_icon.svg"
-
-    property color defaultColor: "#1c1d20"
-    property color mouseOverColor: "#23273E"
-    property color pressedColor: "#00a1f1"
-    antialiasing: true
-
-    property int iconWidth:  18
-    property int iconHeight: 18
+    iconWidth:  18
+    iconHeight: 18
 
     property color activeMenuColor: "#55aaff"
-
     property bool isActiveMenu: false
-
     property color activeMenuColorRight: "#2c313c"
-
-    QtObject{
-        id: internal
-
-        property color dynamicColor: if(leftMenuButton.down){
-                                       leftMenuButton.down ? pressedColor : defaultColor
-                                   } else {
-                                       leftMenuButton.hovered ? mouseOverColor : defaultColor
-                                   }
-    }
 
     background: Rectangle{
         id: background
@@ -113,7 +94,4 @@ Button {
 
         }
     }
-
-
-
 }

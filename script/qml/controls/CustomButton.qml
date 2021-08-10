@@ -3,14 +3,24 @@ import QtQuick.Controls 2.15
 
 Button {
     id: customButton
-    text: qsTr("Custom button")
+    text: qsTr("")
 
     implicitHeight: 40
     implicitWidth: 200
 
-    property color defaultColor: "#55aaff"
-    property color mouseOverColor: "#cccccc"
-    property color pressedColor: "#333333"
+    //properties
+    property color defaultColor: "#1c1d20"
+    property color mouseOverColor: "#23273E"
+    property color pressedColor: "#00a1f1"
+    property url   buttonIconSource: ""
+
+    antialiasing: true
+
+    property int iconWidth:  18
+    property int iconHeight: 18
+
+    //expose internal implementation
+    property alias internal: internal
 
     QtObject{
         id: internal
@@ -26,6 +36,8 @@ Button {
     background: Rectangle{
         color: internal.dynamicColor
         radius: 10
+
+
     }
 
     contentItem: Item{
