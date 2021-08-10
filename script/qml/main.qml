@@ -261,10 +261,11 @@ Window {
                 anchors.right: parent.right
                 anchors.top: topBar.bottom
                 anchors.bottom: parent.bottom
+                clip: true
                 anchors.rightMargin: 0
-                anchors.bottomMargin: -6
+                anchors.bottomMargin: 0
                 anchors.leftMargin: 0
-                anchors.topMargin: 6
+                anchors.topMargin: 0
 
                 Rectangle {
                     id: leftMenu
@@ -289,6 +290,12 @@ Window {
                             text: qsTr("Home")
 
                             isActiveMenu: true
+
+                            onClicked: {
+                                homeButton.isActiveMenu = true
+                                settingsButton.isActiveMenu = false
+                                stackView.replace(Qt.resolvedUrl("pages/homePage.qml"))
+                            }
                         }
 
                         LeftMenuButton {
@@ -310,6 +317,13 @@ Window {
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 25
                         buttonIconSource: "../../data/settings_icon.svg"
+
+                        onClicked: {
+                            homeButton.isActiveMenu = false
+                            settingsButton.isActiveMenu = true
+                            stackView.replace(Qt.resolvedUrl("pages/settingsPage.qml"))
+                            console.log(stackView.depth)
+                        }
                     }
                 }
 
@@ -322,6 +336,13 @@ Window {
                     anchors.bottom: parent.bottom
                     anchors.bottomMargin: 25
                     anchors.leftMargin: 0
+
+                    StackView {
+                        id: stackView
+                        anchors.fill: parent
+
+                        initialItem: Qt.resolvedUrl("pages/homePage.qml")
+                    }
                 }
 
                 Rectangle {
@@ -451,6 +472,6 @@ Window {
 
 /*##^##
 Designer {
-    D{i:0;formeditorZoom:0.9}D{i:29}D{i:36}
+    D{i:0;formeditorZoom:0.9}D{i:26}
 }
 ##^##*/

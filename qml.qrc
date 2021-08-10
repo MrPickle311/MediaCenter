@@ -16,5 +16,7 @@
         <file>data/settings_icon.svg</file>
         <file>script/qml/controls/TopBarButton.qml</file>
         <file>script/qml/controls/LeftMenuButton.qml</file>
+        <file>script/qml/pages/homePage.qml</file>
+        <file>script/qml/pages/settingsPage.qml</file>
     </qresource>
 </RCC>
