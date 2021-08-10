@@ -14,7 +14,7 @@ Window {
     height: 580
     visible: true
     color: "#00000000"
-    title: qsTr("Hello World")
+    title: qsTr("Media Center")
 
     minimumWidth: 800
     minimumHeight: 500
@@ -24,64 +24,70 @@ Window {
     property int windowStatus: 0
     property int windowMargin: 10
 
+    property url restoreIcon:  "../../data/restore_icon.svg"
+    property url maximizeIcon: "../../data/maximize_icon.svg"
+
     QtObject{
         id: internal
 
-        function resetResizeBorders(){
-            resizeLeft.visible = true
-            resizeRight.visible = true
-            resizeBottom.visible = true
-            resizeRightCorner.visible = true
+        //theses 2 functions set top-left bar maximize icon
+        function setRestoreIcon(){
+            maximizeRestoreButton.buttonIconSource = restoreIcon
+        }
+
+        function setMaximizeIcon(){
+            maximizeRestoreButton.buttonIconSource = maximizeIcon
+        }
+
+        //it sets the following content to true or false at once
+        function resetResizeBorders(bool){
+            resizeLeft.visible = bool
+            resizeRight.visible = bool
+            resizeBottom.visible = bool
+            resizeRightCorner.visible = bool
+        }
+
+        //sets window to non maximized state
+        function setNormalState(){
+            windowStatus = 0
+            windowMargin = 10
+            resetResizeBorders(true)
+            setMaximizeIcon()
+        }
+
+        //sets window to maximized state
+        function setMaximizedState(){
+            windowStatus = 1
+            windowMargin = 0
+            resetResizeBorders(false)
+            setRestoreIcon()
         }
 
         function maximizeRestore(){
             if(windowStatus == 0){
                 mainWindow.showMaximized()
-                windowStatus = 1
-                windowMargin = 0
-
-                resizeLeft.visible = false
-                resizeRight.visible = false
-                resizeBottom.visible = false
-                resizeRightCorner.visible = false
-
-                maximizeRestoreButton.buttonIconSource = "../../data/restore_icon.svg"
+                setMaximizedState()
             }
             else{
                 mainWindow.showNormal()
-                windowStatus = 0
-                windowMargin = 10
-
-                resetResizeBorders()
-
-                maximizeRestoreButton.buttonIconSource = "../../data/maximize_icon.svg"
+                setNormalState()
             }
         }
 
         function ifMaximizedWindowRestore(){
             if(windowStatus == 1){
                 mainWindow.showNormal()
-                windowStatus = 0
-                windowMargin = 10
-
-                resetResizeBorders()
-
-                maximizeRestoreButton.buttonIconSource = "../../data/maximize_icon.svg"
+                setNormalState()
             }
         }
 
         function restoreMargins(){
-            windowStatus = 0
-            windowMargin = 10
-
-            resetResizeBorders()
-
-            maximizeRestoreButton.buttonIconSource = "../../data/maximize_icon.svg"
+            setNormalState()
         }
     }
 
     Rectangle {
-        id: bg
+        id: background
         color: "#2c313c"
         border.color: "#383e4c"
         border.width: 1
@@ -114,51 +120,8 @@ Window {
 
                 ToggleButton {
                     id: toggleBtn
-
+                    width: 65
                     onClicked: animationMenu.running = true
-
-                }
-
-                Rectangle {
-                    id: topBarDescription
-                    y: 8
-                    height: 24
-                    color: "#282c34"
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    anchors.rightMargin: 0
-                    anchors.leftMargin: 70
-                    anchors.bottomMargin: 0
-
-                    Label {
-                        id: labelTopInfo
-                        color: "#5f6a82"
-                        text: qsTr("App description")
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.bottomMargin: 0
-                        anchors.rightMargin: 300
-                        anchors.leftMargin: 10
-                        anchors.topMargin: 0
-                    }
-
-                    Label {
-                        id: labelRightInfo
-                        color: "#5f6a82"
-                        text: qsTr("Home")
-                        anchors.left: labelTopInfo.right
-                        anchors.right: parent.right
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        horizontalAlignment: Text.AlignRight
-                        verticalAlignment: Text.AlignVCenter
-                        font.pointSize: 10
-                        anchors.rightMargin: 10
-                        anchors.leftMargin: 0
-                    }
                 }
 
                 Rectangle {
@@ -335,7 +298,7 @@ Window {
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 25
+                    anchors.bottomMargin: 0
                     anchors.leftMargin: 0
                     clip: true
 
@@ -354,73 +317,19 @@ Window {
                         }
                     }
                 }
-
-                Rectangle {
-                    id: rectangle
-                    color: "#282c34"
-                    anchors.left: leftMenu.right
-                    anchors.right: parent.right
-                    anchors.top: contentPages.bottom
-                    anchors.bottom: parent.bottom
-                    anchors.leftMargin: 0
-                    anchors.topMargin: 0
-
-                    Label {
-                        id: labelTopInfo1
-                        color: "#5f6a82"
-                        text: qsTr("App description")
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.rightMargin: 30
-                        anchors.topMargin: 0
-                        anchors.leftMargin: 10
-                        anchors.bottomMargin: 0
-                    }
-
-                    MouseArea {
-                        id: resizeRightCorner
-                        x: 884
-                        y: 0
-                        width: 25
-                        height: 25
-                        opacity: 0.5
-                        anchors.right: parent.right
-                        anchors.bottom: parent.bottom
-                        anchors.rightMargin: 0
-                        cursorShape: Qt.SizeFDiagCursor
-                        anchors.bottomMargin: 0
-
-                        Image {
-                            id: image
-                            anchors.fill: parent
-                            source: "../../data/resize_icon.svg"
-                            anchors.leftMargin: 5
-                            anchors.topMargin: 5
-                            fillMode: Image.PreserveAspectFit
-                        }
-
-                        DragHandler{
-                            target: null
-                            onActiveChanged: if(active) { mainWindow.startSystemResize(Qt.RightEdge | Qt.BottomEdge) }
-                        }
-
-                    }
-                }
             }
         }
     }
 
     DropShadow{
-        anchors.fill: bg
+        anchors.fill: background
 
         horizontalOffset: 0
         verticalOffset: 0
         radius: 10
         samples: 16
         color: "#80000000"
-        source: bg
+        source: background
         z: 0
     }
 
@@ -459,6 +368,24 @@ Window {
     }
 
     MouseArea {
+        id: resizeRightCorner
+        x: 950
+        y: 527
+        width: 40
+        height: 43
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.rightMargin: 10
+        anchors.bottomMargin: 10
+        cursorShape: Qt.SizeFDiagCursor
+
+        DragHandler{
+            target: null
+            onActiveChanged: if(active) { mainWindow.startSystemResize(Qt.RightEdge | Qt.BottomEdge) }
+        }
+    }
+
+    MouseArea {
         id: resizeBottom
         height: 10
         anchors.left: parent.left
@@ -473,15 +400,7 @@ Window {
             target: null
             onActiveChanged: if(active) { mainWindow.startSystemResize(Qt.BottomEdge) }
         }
+
     }
 
-
-
-
 }
-
-/*##^##
-Designer {
-    D{i:0;formeditorZoom:0.9}D{i:26}
-}
-##^##*/
