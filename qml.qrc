@@ -19,5 +19,9 @@
         <file>script/qml/pages/HomePage.qml</file>
         <file>script/qml/pages/SettingsPage.qml</file>
         <file>script/qml/pages/VideoPage.qml</file>
+        <file>data/media-center.svg</file>
+        <file>data/music.svg</file>
+        <file>data/video.svg</file>
+        <file>data/image.svg</file>
     </qresource>
 </RCC>

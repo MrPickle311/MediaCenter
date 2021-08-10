@@ -158,11 +158,21 @@ Window {
                         anchors.left: parent.left
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
-                        source: "../../data/icon_app_top.svg"
+                        source: "../../data/media-center.svg"
                         anchors.leftMargin: 0
                         anchors.bottomMargin: 0
                         anchors.topMargin: 0
                         fillMode: Image.PreserveAspectFit
+                    }
+
+                    ColorOverlay{
+                        anchors.fill:  iconApp
+                        source: iconApp
+                        color: "white"
+                        antialiasing: true
+
+                        width: iconApp.width
+                        height: iconApp.height
                     }
 
                     Label {
@@ -170,7 +180,7 @@ Window {
                         x: 38
                         width: 765
                         color: "#c3cbdd"
-                        text: qsTr("My App Title")
+                        text: qsTr("Media Center v0.1")
                         anchors.left: iconApp.right
                         anchors.right: parent.right
                         anchors.top: parent.top
@@ -246,11 +256,12 @@ Window {
                         id: columnMenus
                         width: leftMenu.border.width
                         anchors.fill: parent
-                        anchors.bottomMargin: 90
+                        spacing: 0
+                        anchors.bottomMargin: 0
 
                         LeftMenuButton {
                             id: homeButton
-                            text: qsTr("Home")
+                            text: qsTr("Home page")
 
                             isActiveMenu: true
 
@@ -263,30 +274,37 @@ Window {
                         }
 
                         LeftMenuButton {
-                            id: openButton
-                            text: qsTr("Open")
-                            buttonIconSource: "../../data/open_icon.svg"
+                            id: musicButton
+                            text: qsTr("Play music")
+                            buttonIconSource: "../../data/music.svg"
                         }
 
                         LeftMenuButton {
-                            id: saveButton
-                            text: qsTr("Save")
-                            buttonIconSource: "../../data/save_icon.svg"
+                            id: videoButton
+                            text: qsTr("Play video")
+                            buttonIconSource: "../../data/video.svg"
                         }
-                    }
 
-                    LeftMenuButton {
-                        id: settingsButton
-                        text: qsTr("Save")
-                        anchors.bottom: parent.bottom
-                        anchors.bottomMargin: 25
-                        buttonIconSource: "../../data/settings_icon.svg"
+                        LeftMenuButton {
+                            id: imagesButton
+                            text: qsTr("Browse photos")
+                            checkable: false
+                            checked: false
+                            buttonIconSource: "../../data/image.svg"
+                        }
 
-                        onClicked: {
-                            homeButton.isActiveMenu = false
-                            settingsButton.isActiveMenu = true
+                        LeftMenuButton {
+                            id: settingsButton
+                            text: qsTr("Open settings")
+                            padding: 6
+                            buttonIconSource: "../../data/settings_icon.svg"
 
-                            swipeView.setCurrentIndex(1)
+                            onClicked: {
+                                homeButton.isActiveMenu = false
+                                settingsButton.isActiveMenu = true
+
+                                swipeView.setCurrentIndex(1)
+                            }
                         }
                     }
                 }
@@ -404,3 +422,9 @@ Window {
     }
 
 }
+
+/*##^##
+Designer {
+    D{i:0;formeditorZoom:0.9}D{i:22}D{i:23}
+}
+##^##*/
