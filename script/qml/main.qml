@@ -3,8 +3,8 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.15
 
-
 import "controls"
+import "pages"
 
 Window {
 
@@ -294,7 +294,8 @@ Window {
                             onClicked: {
                                 homeButton.isActiveMenu = true
                                 settingsButton.isActiveMenu = false
-                                stackView.replace(Qt.resolvedUrl("pages/homePage.qml"))
+
+                                swipeView.setCurrentIndex(0)
                             }
                         }
 
@@ -321,8 +322,8 @@ Window {
                         onClicked: {
                             homeButton.isActiveMenu = false
                             settingsButton.isActiveMenu = true
-                            stackView.replace(Qt.resolvedUrl("pages/settingsPage.qml"))
-                            console.log(stackView.depth)
+
+                            swipeView.setCurrentIndex(1)
                         }
                     }
                 }
@@ -336,12 +337,22 @@ Window {
                     anchors.bottom: parent.bottom
                     anchors.bottomMargin: 25
                     anchors.leftMargin: 0
+                    clip: true
 
-                    StackView {
-                        id: stackView
+                    SwipeView {
+                        id: swipeView
                         anchors.fill: parent
 
-                        initialItem: Qt.resolvedUrl("pages/homePage.qml")
+                        orientation: Qt.Vertical
+
+                        HomePage{
+
+                        }
+
+                        SettingsPage{
+
+                        }
+
                     }
                 }
 
