@@ -5,6 +5,8 @@ import QtGraphicalEffects 1.15
 
 import "controls"
 import "pages"
+import "menu"
+
 
 Window {
 
@@ -24,20 +26,8 @@ Window {
     property int windowStatus: 0
     property int windowMargin: 10
 
-    property url restoreIcon:  "../../data/restore_icon.svg"
-    property url maximizeIcon: "../../data/maximize_icon.svg"
-
     QtObject{
         id: internal
-
-        //theses 2 functions set top-left bar maximize icon
-        function setRestoreIcon(){
-            maximizeRestoreButton.buttonIconSource = restoreIcon
-        }
-
-        function setMaximizeIcon(){
-            maximizeRestoreButton.buttonIconSource = maximizeIcon
-        }
 
         //it sets the following content to true or false at once
         function resetResizeBorders(bool){
@@ -52,7 +42,6 @@ Window {
             windowStatus = 0
             windowMargin = 10
             resetResizeBorders(true)
-            setMaximizeIcon()
         }
 
         //sets window to maximized state
@@ -60,7 +49,6 @@ Window {
             windowStatus = 1
             windowMargin = 0
             resetResizeBorders(false)
-            setRestoreIcon()
         }
 
         function maximizeRestore(){
@@ -107,124 +95,25 @@ Window {
             anchors.bottomMargin: 1
             anchors.topMargin: 1
 
-            Rectangle {
+            TopBar{
                 id: topBar
-                height: 60
-                color: "#1c1d20"
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.rightMargin: 0
-                anchors.leftMargin: 0
-                anchors.topMargin: 0
 
-                ToggleButton {
-                    id: toggleBtn
-                    width: 65
-                    onClicked: animationMenu.running = true
+                onToggleButtonClicked: animationMenu.running = true
+
+                onDragging: if(isActive){
+                                mainWindow.startSystemMove()
+                                internal.ifMaximizedWindowRestore()
+                            }
+
+
+                onMinimize: {
+                    internal.restoreMargins()
+                    mainWindow.showMinimized()
                 }
 
-                Rectangle {
-                    id: titleBar
-                    height: 35
-                    color: "#00000000"
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-                    anchors.rightMargin: 105
-                    anchors.leftMargin: 70
-                    anchors.topMargin: 0
+                onMaximizeRestore: internal.maximizeRestore()
 
-                    PropertyAnimation{
-                        id: animationMenu
-                        target: leftMenu
-                        property: "width"
-                        to: leftMenu.width == 65 ? 250 : 65
-                        duration: 500
-                        easing.type: Easing.InOutQuint
-                    }
-
-                    DragHandler{
-                        onActiveChanged: if(active){
-                                             mainWindow.startSystemMove()
-                                             internal.ifMaximizedWindowRestore()
-                                         }
-                    }
-
-                    Image {
-                        id: iconApp
-                        width: 22
-                        height: 22
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        source: "../../data/media-center.svg"
-                        anchors.leftMargin: 0
-                        anchors.bottomMargin: 0
-                        anchors.topMargin: 0
-                        fillMode: Image.PreserveAspectFit
-                    }
-
-                    ColorOverlay{
-                        anchors.fill:  iconApp
-                        source: iconApp
-                        color: "white"
-                        antialiasing: true
-
-                        width: iconApp.width
-                        height: iconApp.height
-                    }
-
-                    Label {
-                        id: label
-                        x: 38
-                        width: 765
-                        color: "#c3cbdd"
-                        text: qsTr("Media Center v0.1")
-                        anchors.left: iconApp.right
-                        anchors.right: parent.right
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        horizontalAlignment: Text.AlignLeft
-                        verticalAlignment: Text.AlignVCenter
-                        font.pointSize: 10
-                        anchors.leftMargin: 5
-                    }
-                }
-
-                Row {
-                    id: rowButtons
-                    x: 863
-                    width: 105
-                    height: 35
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-                    anchors.topMargin: 0
-                    anchors.rightMargin: 0
-
-                    TopBarButton{
-                        id: minimizeButton
-                        onClicked: {
-                            internal.restoreMargins()
-                            mainWindow.showMinimized()
-                        }
-                    }
-
-                    TopBarButton{
-                        id: maximizeRestoreButton
-                        buttonIconSource: "../../data/maximize_icon.svg"
-
-                        onClicked: internal.maximizeRestore()
-                    }
-
-                    TopBarButton{
-                        id: closeButton
-                        pressedColor: "#ff007f"
-                        buttonIconSource: "../../data/close_icon.svg"
-
-                        onClicked: mainWindow.close()
-                    }
-                }
+                onClosing: mainWindow.close()
             }
 
             Rectangle {
@@ -251,6 +140,15 @@ Window {
                     anchors.topMargin: 0
                     anchors.bottomMargin: 0
                     anchors.leftMargin: 0
+
+                    PropertyAnimation{
+                        id: animationMenu
+                        target: leftMenu
+                        property: "width"
+                        to: leftMenu.width === 65 ? 250 : 65
+                        duration: 500
+                        easing.type: Easing.InOutQuint
+                    }
 
                     Column {
                         id: columnMenus
@@ -357,6 +255,8 @@ Window {
 
     DropShadow{
         anchors.fill: background
+
+        cached: true
 
         horizontalOffset: 0
         verticalOffset: 0

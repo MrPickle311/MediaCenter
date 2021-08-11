@@ -25,5 +25,6 @@
         <file>data/image.svg</file>
         <file>script/qml/pages/AudioPage.qml</file>
         <file>script/qml/pages/ImagePage.qml</file>
+        <file>script/qml/menu/TopBar.qml</file>
     </qresource>
 </RCC>
