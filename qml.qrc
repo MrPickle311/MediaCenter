@@ -32,5 +32,8 @@
         <file>script/qml/controls/SearchBar.qml</file>
         <file>data/search.svg</file>
         <file>data/clear.svg</file>
+        <file>data/left-arrow.svg</file>
+        <file>data/play.svg</file>
+        <file>data/right-arrow.svg</file>
     </qresource>
 </RCC>

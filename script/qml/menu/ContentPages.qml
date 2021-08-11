@@ -35,7 +35,7 @@ Rectangle {
         }
 
         AudioPage{
-
+            id: audioPage
         }
 
         VideoPage{

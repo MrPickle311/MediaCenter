@@ -25,6 +25,13 @@ Window {
     property int windowStatus: 0
     property int windowMargin: 10
 
+    onHeightChanged: {
+        if(visibility !== Window.Maximized ){
+            topBar.setMaximizeIcon()
+            internal.setNormalState()
+        }
+    }
+
     QtObject{
         id: internal
 
@@ -71,6 +78,7 @@ Window {
         function restoreMargins(){
             setNormalState()
         }
+
     }
 
     Rectangle {

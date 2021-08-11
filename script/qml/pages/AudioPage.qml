@@ -8,7 +8,7 @@ Rectangle {
     color: "#191919"
 
     Slider {
-        id: slider
+        id: musicSlider
         y: 413
         anchors.left: parent.left
         anchors.right: parent.right
@@ -21,20 +21,30 @@ Rectangle {
     }
 
     SearchBar{
-        x: 570
-        y: 391
+        id: searchBar
+        anchors.left: playListArea.left
+        anchors.top: playListArea.top
+        anchors.rightMargin: 40
+        anchors.leftMargin: 10
+        anchors.topMargin: 10
+
+        currentWidth: playListArea.width - 20
+
+        onSearchRequested: console.log(what)
+
+        z: 2
 
     }
 
     Label {
-        id: label
+        id: musicTitle
         y: 395
         width: 52
         height: 19
         color: "#dcdfe2"
         text: qsTr("Music Title")
-        anchors.left: slider.left
-        anchors.bottom: slider.top
+        anchors.left: musicSlider.left
+        anchors.bottom: musicSlider.top
         wrapMode: Text.NoWrap
         anchors.leftMargin: 0
         anchors.bottomMargin: 10
@@ -43,17 +53,18 @@ Rectangle {
     }
 
     Rectangle {
-        id: rectangle
+        id: playListArea
         radius: 7
         border.width: 1
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.bottom: label.top
+        anchors.bottom: musicTitle.top
         anchors.rightMargin: 30
         anchors.leftMargin: 30
         anchors.bottomMargin: 20
         anchors.topMargin: 30
+
         gradient: Gradient {
             GradientStop {
                 position: 0

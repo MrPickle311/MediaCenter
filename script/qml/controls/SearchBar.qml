@@ -13,6 +13,8 @@ TextField{
     property color colorMouseOver: "#2B2F38"
     property color colorBorderOnFocus: "#ff007f"
 
+    property int currentWidth: width
+
     //sending signal when user wants to search something
     signal searchRequested(string what)
     Keys.onReturnPressed: searchRequested(textField.text)
@@ -126,9 +128,11 @@ TextField{
         id: onTextFocus
         target: textField
         properties: "width"
-        to: 300
+        to: currentWidth
         duration: 500
         easing.type: Easing.OutQuint
+
+        onFinished: textField.anchors.right = parent.right
     }
 
     PropertyAnimation{
@@ -138,6 +142,8 @@ TextField{
         to: 40
         duration: 500
         easing.type: Easing.OutQuint
+
+        onStarted: textField.anchors.right = undefined
     }
 
 }
