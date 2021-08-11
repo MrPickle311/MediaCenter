@@ -29,5 +29,8 @@
         <file>script/qml/menu/LeftMenu.qml</file>
         <file>script/qml/menu/ContentPages.qml</file>
         <file>script/qml/menu/MouseDragHandler.qml</file>
+        <file>script/qml/controls/SearchBar.qml</file>
+        <file>data/search.svg</file>
+        <file>data/clear.svg</file>
     </qresource>
 </RCC>
