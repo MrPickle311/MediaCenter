@@ -27,5 +27,7 @@
         <file>script/qml/pages/ImagePage.qml</file>
         <file>script/qml/menu/TopBar.qml</file>
         <file>script/qml/menu/LeftMenu.qml</file>
+        <file>script/qml/menu/ContentPages.qml</file>
+        <file>script/qml/menu/MouseDragHandler.qml</file>
     </qresource>
 </RCC>

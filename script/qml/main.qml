@@ -7,7 +7,6 @@ import "controls"
 import "pages"
 import "menu"
 
-
 Window {
 
     id: mainWindow
@@ -97,21 +96,16 @@ Window {
 
             TopBar{
                 id: topBar
-
                 onToggleButtonClicked: leftMenu.runAnimation()
-
                 onDragging: if(isActive){
                                 mainWindow.startSystemMove()
                                 internal.ifMaximizedWindowRestore()
                             }
-
                 onMinimize: {
                     internal.restoreMargins()
                     mainWindow.showMinimized()
                 }
-
                 onMaximizeRestore: internal.maximizeRestore()
-
                 onClosing: mainWindow.close()
             }
 
@@ -130,59 +124,21 @@ Window {
 
                 LeftMenu{
                     id: leftMenu
-
-                    onButtonClicked: swipeView.setCurrentIndex(id)
-
-                    onSettingsButtonClicked: swipeView.setCurrentIndex(swipeView.count - 1)
+                    onButtonClicked: contentPages.setCurrentPage(id)
+                    onSettingsButtonClicked: contentPages.setSettingsPage()
                 }
 
-                Rectangle {
+                ContentPages{
                     id: contentPages
-                    color: "#2c313c"
-                    anchors.left: leftMenu.right
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 0
-                    anchors.leftMargin: 0
-                    clip: true
-
-                    SwipeView {
-                        id: swipeView
-                        anchors.fill: parent
-
-                        orientation: Qt.Vertical
-
-                        HomePage{
-
-                        }
-
-                        AudioPage{
-
-                        }
-
-                        VideoPage{
-
-                        }
-
-                        ImagePage{
-
-                        }
-
-                        SettingsPage{
-
-                        }
-                    }
                 }
+
             }
         }
     }
 
     DropShadow{
         anchors.fill: background
-
         cached: true
-
         horizontalOffset: 0
         verticalOffset: 0
         radius: 10
@@ -192,9 +148,8 @@ Window {
         z: 0
     }
 
-    MouseArea {
+    MouseDragHandler {
         id: resizeLeft
-        width: 10
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
@@ -202,16 +157,11 @@ Window {
         anchors.leftMargin: 0
         anchors.bottomMargin: 10
         anchors.topMargin: 10
-
-        DragHandler{
-            target: null
-            onActiveChanged: if(active) { mainWindow.startSystemResize(Qt.LeftEdge) }
-        }
+        edge: Qt.LeftEdge
     }
 
-    MouseArea {
+    MouseDragHandler {
         id: resizeRight
-        width: 10
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.bottom: parent.bottom
@@ -219,14 +169,10 @@ Window {
         cursorShape: Qt.SizeHorCursor
         anchors.bottomMargin: 10
         anchors.topMargin: 10
-
-        DragHandler{
-            target: null
-            onActiveChanged: if(active) { mainWindow.startSystemResize(Qt.RightEdge) }
-        }
+        edge: Qt.RightEdge
     }
 
-    MouseArea {
+    MouseDragHandler {
         id: resizeRightCorner
         x: 950
         y: 527
@@ -237,14 +183,10 @@ Window {
         anchors.rightMargin: 10
         anchors.bottomMargin: 10
         cursorShape: Qt.SizeFDiagCursor
-
-        DragHandler{
-            target: null
-            onActiveChanged: if(active) { mainWindow.startSystemResize(Qt.RightEdge | Qt.BottomEdge) }
-        }
+        edge: Qt.RightEdge | Qt.BottomEdge
     }
 
-    MouseArea {
+    MouseDragHandler {
         id: resizeBottom
         height: 10
         anchors.left: parent.left
@@ -254,18 +196,9 @@ Window {
         anchors.rightMargin: 10
         cursorShape: Qt.SizeVerCursor
         anchors.bottomMargin: 0
-
-        DragHandler{
-            target: null
-            onActiveChanged: if(active) { mainWindow.startSystemResize(Qt.BottomEdge) }
-        }
-
+        edge: Qt.BottomEdge
     }
 
 }
 
-/*##^##
-Designer {
-    D{i:0;formeditorZoom:0.9}D{i:22}D{i:23}
-}
-##^##*/
+
