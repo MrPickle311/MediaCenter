@@ -7,11 +7,11 @@ Item {
         id: video
         anchors.fill: parent
 
-        property url vidSrc: "file:///C:/Users/Damian/Desktop/Projects/C++ Projects/Qt/MediaCenter/script/qml/pages/video.mp4"
+        //property url vidSrc: "file:///C:/Users/Damian/Desktop/Projects/C++ Projects/Qt/MediaCenter/script/qml/pages/video.mp4"
 
-        source: vidSrc
+        //source: vidSrc
 
-        autoLoad: true
+        //autoLoad: true
 
         focus: true
 

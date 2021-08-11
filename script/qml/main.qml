@@ -98,13 +98,12 @@ Window {
             TopBar{
                 id: topBar
 
-                onToggleButtonClicked: animationMenu.running = true
+                onToggleButtonClicked: leftMenu.runAnimation()
 
                 onDragging: if(isActive){
                                 mainWindow.startSystemMove()
                                 internal.ifMaximizedWindowRestore()
                             }
-
 
                 onMinimize: {
                     internal.restoreMargins()
@@ -129,86 +128,12 @@ Window {
                 anchors.leftMargin: 0
                 anchors.topMargin: 0
 
-                Rectangle {
+                LeftMenu{
                     id: leftMenu
-                    width: 65
-                    color: "#1c1d20"
-                    anchors.left: parent.left
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    clip: true
-                    anchors.topMargin: 0
-                    anchors.bottomMargin: 0
-                    anchors.leftMargin: 0
 
-                    PropertyAnimation{
-                        id: animationMenu
-                        target: leftMenu
-                        property: "width"
-                        to: leftMenu.width === 65 ? 250 : 65
-                        duration: 500
-                        easing.type: Easing.InOutQuint
-                    }
+                    onButtonClicked: swipeView.setCurrentIndex(id)
 
-                    Column {
-                        id: columnMenus
-                        width: leftMenu.border.width
-                        anchors.fill: parent
-                        spacing: 0
-                        anchors.bottomMargin: 70
-
-                        LeftMenuButton {
-                            id: homeButton
-                            text: qsTr("Home page")
-
-                            isActiveMenu: true
-
-                            onClicked: {
-                                homeButton.isActiveMenu = true
-                                settingsButton.isActiveMenu = false
-
-                                swipeView.setCurrentIndex(0)
-                            }
-                        }
-
-                        LeftMenuButton {
-                            id: musicButton
-                            text: qsTr("Play music")
-                            buttonIconSource: "../../data/music.svg"
-                        }
-
-                        LeftMenuButton {
-                            id: videoButton
-                            text: qsTr("Play video")
-                            buttonIconSource: "../../data/video.svg"
-                        }
-
-                        LeftMenuButton {
-                            id: imagesButton
-                            text: qsTr("Browse photos")
-                            checkable: false
-                            checked: false
-                            buttonIconSource: "../../data/image.svg"
-                        }
-                    }
-
-                    LeftMenuButton {
-                        id: settingsButton
-                        x: 0
-                        y: 240
-                        text: qsTr("Open settings")
-                        anchors.bottom: parent.bottom
-                        anchors.bottomMargin: 20
-                        padding: 6
-                        buttonIconSource: "../../data/settings_icon.svg"
-
-                        onClicked: {
-                            homeButton.isActiveMenu = false
-                            settingsButton.isActiveMenu = true
-
-                            swipeView.setCurrentIndex(1)
-                        }
-                    }
+                    onSettingsButtonClicked: swipeView.setCurrentIndex(swipeView.count - 1)
                 }
 
                 Rectangle {

@@ -26,5 +26,6 @@
         <file>script/qml/pages/AudioPage.qml</file>
         <file>script/qml/pages/ImagePage.qml</file>
         <file>script/qml/menu/TopBar.qml</file>
+        <file>script/qml/menu/LeftMenu.qml</file>
     </qresource>
 </RCC>
