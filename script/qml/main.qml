@@ -257,7 +257,7 @@ Window {
                         width: leftMenu.border.width
                         anchors.fill: parent
                         spacing: 0
-                        anchors.bottomMargin: 0
+                        anchors.bottomMargin: 70
 
                         LeftMenuButton {
                             id: homeButton
@@ -292,19 +292,23 @@ Window {
                             checked: false
                             buttonIconSource: "../../data/image.svg"
                         }
+                    }
 
-                        LeftMenuButton {
-                            id: settingsButton
-                            text: qsTr("Open settings")
-                            padding: 6
-                            buttonIconSource: "../../data/settings_icon.svg"
+                    LeftMenuButton {
+                        id: settingsButton
+                        x: 0
+                        y: 240
+                        text: qsTr("Open settings")
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 20
+                        padding: 6
+                        buttonIconSource: "../../data/settings_icon.svg"
 
-                            onClicked: {
-                                homeButton.isActiveMenu = false
-                                settingsButton.isActiveMenu = true
+                        onClicked: {
+                            homeButton.isActiveMenu = false
+                            settingsButton.isActiveMenu = true
 
-                                swipeView.setCurrentIndex(1)
-                            }
+                            swipeView.setCurrentIndex(1)
                         }
                     }
                 }
@@ -330,7 +334,19 @@ Window {
 
                         }
 
+                        AudioPage{
+
+                        }
+
                         VideoPage{
+
+                        }
+
+                        ImagePage{
+
+                        }
+
+                        SettingsPage{
 
                         }
                     }
