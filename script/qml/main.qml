@@ -144,17 +144,17 @@ Window {
         }
     }
 
-    DropShadow{
-        anchors.fill: background
-        cached: true
-        horizontalOffset: 0
-        verticalOffset: 0
-        radius: 10
-        samples: 16
-        color: "#80000000"
-        source: background
-        z: 0
-    }
+    //DropShadow{
+    //    anchors.fill: background
+    //    cached: true
+    //    horizontalOffset: 0
+    //    verticalOffset: 0
+    //    radius: 10
+    //    samples: 16
+    //    color: "#80000000"
+    //    source: background
+    //    z: 0
+    //}
 
     MouseDragHandler {
         id: resizeLeft

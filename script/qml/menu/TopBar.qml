@@ -21,8 +21,8 @@ Rectangle {
     signal dragging(bool isActive)
     signal toggleButtonClicked()
 
-    property url restoreIcon:  "../../../data/restore_icon.svg"
-    property url maximizeIcon: "../../../data/maximize_icon.svg"
+    property url restoreIcon:  "qrc:/data/restore_icon.svg"
+    property url maximizeIcon: "qrc:/data/maximize_icon.svg"
 
     //theses 2 functions set top-left bar maximize icon
     function setRestoreIcon(){
@@ -39,10 +39,10 @@ Rectangle {
         else setMaximizeIcon()
     }
 
-    ToggleButton {
+    SquareButton {
         id: toggleBtn
-        width: 65
         onClicked: toggleButtonClicked()
+        buttonIconSource: "qrc:/data/menu_icon.svg"
     }
 
     Rectangle {
@@ -67,7 +67,7 @@ Rectangle {
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            source: "../../../data/media-center.svg"
+            source: "qrc:/data/media-center.svg"
             anchors.leftMargin: 0
             anchors.bottomMargin: 0
             anchors.topMargin: 0
@@ -111,12 +111,20 @@ Rectangle {
         anchors.topMargin: 0
         anchors.rightMargin: 0
 
-        TopBarButton{
+        SquareButton{
+            iconSize: 16
+            implicitWidth: 35
+            implicitHeight: 35
             id: minimizeButton
             onClicked: minimize()
+
+            buttonIconSource: "qrc:/data/minimize_icon.svg"
         }
 
-        TopBarButton{
+        SquareButton{
+            iconSize: 16
+            implicitWidth: 35
+            implicitHeight: 35
             id: maximizeRestoreButton
             buttonIconSource: maximizeIcon
 
@@ -126,10 +134,13 @@ Rectangle {
             }
         }
 
-        TopBarButton{
+        SquareButton{
+            iconSize: 16
+            implicitWidth: 35
+            implicitHeight: 35
             id: closeButton
             pressedColor: "#ff007f"
-            buttonIconSource: "../../../data/close_icon.svg"
+            buttonIconSource: "qrc:/data/close_icon.svg"
             onClicked: closing()
         }
     }

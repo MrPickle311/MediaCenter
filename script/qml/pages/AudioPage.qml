@@ -36,6 +36,21 @@ Rectangle {
 
     }
 
+    SquareButton{
+        id: playButton
+        x: 295
+        width: 56
+        anchors.top: playListArea.bottom
+        anchors.bottom: musicSlider.top
+        defaultColor: "#00000000"
+        anchors.topMargin: 10
+        anchors.bottomMargin: 10
+        anchors.horizontalCenter: musicSlider.horizontalCenter
+
+
+        buttonIconSource: "qrc:/data/play.svg"
+    }
+
     Label {
         id: musicTitle
         y: 395
@@ -62,7 +77,7 @@ Rectangle {
         anchors.bottom: musicTitle.top
         anchors.rightMargin: 30
         anchors.leftMargin: 30
-        anchors.bottomMargin: 20
+        anchors.bottomMargin: 30
         anchors.topMargin: 30
 
         gradient: Gradient {
@@ -76,13 +91,43 @@ Rectangle {
                 color: "#000000"
             }
         }
+
+        ListView{
+            anchors.fill: parent
+        }
     }
 
+    SquareButton {
+        id: nextButton
+        width: 56
+        anchors.verticalCenter: playButton.verticalCenter
+        anchors.left: playButton.right
+        anchors.leftMargin: 10
+        buttonIconSource: "qrc:/data/right-arrow.svg"
+        defaultColor: "#00000000"
+    }
 
-}
+    SquareButton {
+        id: prevButton
+        width: 56
+        anchors.verticalCenter: playButton.verticalCenter
+        anchors.right: playButton.left
+        anchors.rightMargin: 10
+        buttonIconSource: "qrc:/data/left-arrow.svg"
+        defaultColor: "#00000000"
+    }
 
-/*##^##
-Designer {
-    D{i:0;autoSize:true;height:480;width:640}D{i:1}D{i:2}D{i:3}
+    Label {
+        id: musicTimeLabel
+        x: 567
+        y: 398
+        width: 53
+        height: 16
+        color: "#f2f2f2"
+        text: qsTr("Ms")
+        anchors.right: musicSlider.right
+        anchors.bottom: musicSlider.top
+        anchors.bottomMargin: 10
+        anchors.rightMargin: 0
+    }
 }
-##^##*/

@@ -4,12 +4,12 @@ import QtGraphicalEffects 1.15
 
 CustomButton {
 
-    id : topBarButton
+    id : toggleButton
 
-    implicitWidth: 35
-    implicitHeight: 35
+    implicitWidth: 70
+    implicitHeight: 60
 
-    buttonIconSource: "../../../data/minimize_icon.svg"
+    property int iconSize: 25
 
     background: Rectangle{
         id: background
@@ -23,8 +23,8 @@ CustomButton {
             anchors.verticalCenter: parent.verticalCenter
             anchors.horizontalCenter: parent.horizontalCenter
 
-            height: 16
-            width: 16
+            height: iconSize
+            width: iconSize
 
             fillMode: Image.PreserveAspectFit
         }
