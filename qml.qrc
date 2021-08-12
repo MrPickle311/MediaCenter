@@ -35,5 +35,7 @@
         <file>data/play.svg</file>
         <file>data/right-arrow.svg</file>
         <file>data/pause.svg</file>
+        <file>script/qml/controls/PlaylistDelegate.qml</file>
+        <file>data/song.svg</file>
     </qresource>
 </RCC>

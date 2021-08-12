@@ -1,5 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtMultimedia 5.15
+import QtQml.Models 2.12
 
 import "../controls"
 
@@ -17,8 +19,14 @@ Rectangle {
         anchors.rightMargin: 20
         anchors.leftMargin: 20
         anchors.bottomMargin: 20
-        value: 0.5
+        value: player.position / player.duration
+
+        onMoved: player.seek(musicSlider.position * player.duration )
+
+        onPositionChanged: musicTimeLabel.setTime(position * player.duration)
     }
+
+    signal searchInPlaylist(string src)
 
     SearchBar{
         id: searchBar
@@ -30,25 +38,10 @@ Rectangle {
 
         currentWidth: playListArea.width - 20
 
-        onSearchRequested: console.log(what)
+        onSearchRequested: searchInPlaylist(src)
 
         z: 2
 
-    }
-
-    SquareButton{
-        id: playButton
-        x: 295
-        width: 56
-        anchors.top: playListArea.bottom
-        anchors.bottom: musicSlider.top
-        defaultColor: "#00000000"
-        anchors.topMargin: 10
-        anchors.bottomMargin: 10
-        anchors.horizontalCenter: musicSlider.horizontalCenter
-
-
-        buttonIconSource: "qrc:/data/play.svg"
     }
 
     Label {
@@ -65,6 +58,10 @@ Rectangle {
         anchors.bottomMargin: 10
         textFormat: Text.AutoText
         font.pointSize: 12
+
+        function setTitle(title){
+            text = title
+        }
     }
 
     Rectangle {
@@ -92,9 +89,66 @@ Rectangle {
             }
         }
 
-        ListView{
-            anchors.fill: parent
+        ScrollView {
+                anchors.fill: playListArea
+                clip: true
+                ListView {
+                        anchors.fill: parent
+                        model: playlistModel
+                }
         }
+
+        DelegateModel {
+                id: playlistModel
+                model: player.playlist
+                delegate: PlaylistDelegate {
+                    height: 60
+                    width: playListArea.width
+                    songSource: source.toString()
+                    onPlaySongRequest: {
+                        player.stop()
+                        player.play(source)
+                    }
+                }
+        }
+    }
+
+    Audio {
+            id: player;
+            playlist: Playlist {
+                id: playlist
+                PlaylistItem { source: "file:///home/damiano/Projects/MediaCenter/data/song.mp3"; }
+                PlaylistItem { source: "song2.ogg"; }
+                PlaylistItem { source: "song3.ogg"; }
+                PlaylistItem { source: "song1.ogg"; }
+                PlaylistItem { source: "song2.ogg"; }
+                PlaylistItem { source: "song3.ogg"; }
+                PlaylistItem { source: "song1.ogg"; }
+                PlaylistItem { source: "song2.ogg"; }
+                PlaylistItem { source: "song3.ogg"; }
+            }
+    }
+
+    SquareButton{
+        id: playButton
+
+        property url pauseIcon: "qrc:/data/pause.svg"
+        property url playIcon: "qrc:/data/play.svg"
+
+        x: 295
+        width: 56
+        anchors.top: playListArea.bottom
+        anchors.bottom: musicSlider.top
+        defaultColor: "#00000000"
+        anchors.topMargin: 10
+        anchors.bottomMargin: 10
+        anchors.horizontalCenter: musicSlider.horizontalCenter
+        buttonIconSource: pauseIcon
+        onClicked: {
+            buttonIconSource = buttonIconSource === playIcon ? pauseIcon : playIcon
+            player.playbackState === Audio.PlayingState ? player.pause() : player.play()
+        }
+
     }
 
     SquareButton {
@@ -124,10 +178,15 @@ Rectangle {
         width: 53
         height: 16
         color: "#f2f2f2"
-        text: qsTr("Ms")
         anchors.right: musicSlider.right
         anchors.bottom: musicSlider.top
         anchors.bottomMargin: 10
         anchors.rightMargin: 0
+
+        function setTime(millis){
+            var minutes = Math.floor(millis / 60000)
+            var seconds = ((millis % 60000) / 1000).toFixed(0)
+            text =  minutes + ":" + (seconds < 10 ? '0' : '') + seconds
+        }
     }
 }
