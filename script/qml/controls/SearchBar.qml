@@ -41,7 +41,7 @@ TextField{
         id: backgroundColor
         color: internal.dynamicColor
         radius: 8
-        border.color: colorDefault
+        border.color: "purple"//colorDefault
         border.width: 2
 
         Image{

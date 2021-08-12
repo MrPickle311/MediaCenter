@@ -5,15 +5,24 @@ import QtGraphicalEffects 1.15
 Rectangle {
         id: playlistItem
 
-        property string songSource: ""
-
         color: "#282c34"
         border.color: "#202225"
         border.width: 2
         height: 70
         width: 350
 
-        signal playSongRequest(string src)
+        property string songSource: ""
+        property int onPlaylistPosition: 0
+
+        signal playSongRequest(int position)
+
+        function getOnPlaylistPosition(){
+            return onPlaylistPosition
+        }
+
+        Component.onCompleted: {
+            playButton.clicked.connect(playSongRequest)
+        }
 
         SquareButton{
             id: playButton
@@ -26,7 +35,8 @@ Rectangle {
             anchors.topMargin: 10
             anchors.bottomMargin: 10
             anchors.rightMargin: 10
-            onClicked: playSongRequest(text)
+
+            onClicked: playSongRequest(getOnPlaylistPosition())
         }
 
         Image {

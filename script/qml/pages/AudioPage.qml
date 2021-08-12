@@ -9,6 +9,27 @@ Rectangle {
     id: audioPage
     color: "#191919"
 
+    //make Connections
+
+    Component.onCompleted: {
+        playButton.clicked.connect(playButton.updateIconSource)
+        playButton.clicked.connect(player.updateState)
+
+        musicSlider.positionMoved.connect(player.changeSongPosition)
+
+        player.millisChanged.connect(musicTimeLabel.setTime)
+        player.relativePositionChanged.connect(musicSlider.changePosition)
+
+        searchBar.searchRequested.connect(searchInPlaylist)
+
+        nextButton.clicked.connect(player.goNextSong)
+        prevButton.clicked.connect(player.goPreviousSong)
+    }
+
+    //public signals
+    signal searchInPlaylist(string src)
+
+
     Slider {
         id: musicSlider
         y: 413
@@ -19,14 +40,13 @@ Rectangle {
         anchors.rightMargin: 20
         anchors.leftMargin: 20
         anchors.bottomMargin: 20
-        value: player.position / player.duration
 
-        onMoved: player.seek(musicSlider.position * player.duration )
-
-        onPositionChanged: musicTimeLabel.setTime(position * player.duration)
+        function changePosition(newPos){
+            value = newPos
+        }
+        signal positionMoved(real position)
+        onMoved: positionMoved(position)
     }
-
-    signal searchInPlaylist(string src)
 
     SearchBar{
         id: searchBar
@@ -35,13 +55,8 @@ Rectangle {
         anchors.rightMargin: 40
         anchors.leftMargin: 10
         anchors.topMargin: 10
-
         currentWidth: playListArea.width - 20
-
-        onSearchRequested: searchInPlaylist(src)
-
         z: 2
-
     }
 
     Label {
@@ -105,9 +120,14 @@ Rectangle {
                     height: 60
                     width: playListArea.width
                     songSource: source.toString()
+                    onPlaylistPosition: playlist.itemCount
+
+                    //C++ service
                     onPlaySongRequest: {
+                        console.log(position)
                         player.stop()
-                        player.play(source)
+                        playlist.currentIndex = position
+                        player.play()
                     }
                 }
         }
@@ -117,8 +137,9 @@ Rectangle {
             id: player;
             playlist: Playlist {
                 id: playlist
+                //MAKE A WRAPPER FOR A LIST ELEMENT IN C++
+                PlaylistItem { source: "file:///home/damiano/Projects/MediaCenter/data/song2.mp3"; }
                 PlaylistItem { source: "file:///home/damiano/Projects/MediaCenter/data/song.mp3"; }
-                PlaylistItem { source: "song2.ogg"; }
                 PlaylistItem { source: "song3.ogg"; }
                 PlaylistItem { source: "song1.ogg"; }
                 PlaylistItem { source: "song2.ogg"; }
@@ -126,6 +147,31 @@ Rectangle {
                 PlaylistItem { source: "song1.ogg"; }
                 PlaylistItem { source: "song2.ogg"; }
                 PlaylistItem { source: "song3.ogg"; }
+            }
+
+            signal millisChanged(int millis)
+            signal relativePositionChanged(real position)
+
+            onPositionChanged: {
+                millisChanged(position)
+                relativePositionChanged(position / duration)
+            }
+
+            function updateState(){
+                if(playbackState === Audio.PlayingState) pause()
+                else play()
+            }
+
+            function changeSongPosition(position){
+                seek(position * duration)
+            }
+
+            function goNextSong(){
+                playlist.next()
+            }
+
+            function goPreviousSong(){
+                playlist.previous()
             }
     }
 
@@ -144,9 +190,9 @@ Rectangle {
         anchors.bottomMargin: 10
         anchors.horizontalCenter: musicSlider.horizontalCenter
         buttonIconSource: pauseIcon
-        onClicked: {
+
+        function updateIconSource(){
             buttonIconSource = buttonIconSource === playIcon ? pauseIcon : playIcon
-            player.playbackState === Audio.PlayingState ? player.pause() : player.play()
         }
 
     }
