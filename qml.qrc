@@ -39,6 +39,8 @@
         <file>script/qml/controls/PlayButton.qml</file>
         <file>script/qml/controls/TimeLabel.qml</file>
         <file>script/qml/delegates/PlaylistDelegate.qml</file>
-        <file>script/qml/controls/SearchResults.qml</file>
+        <file>script/qml/controls/ItemList.qml</file>
+        <file>script/qml/controls/SongList.qml</file>
+        <file>script/qml/controls/NextButton.qml</file>
     </qresource>
 </RCC>

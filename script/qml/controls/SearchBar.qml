@@ -7,33 +7,64 @@ TextField{
 
     width: 40
     implicitHeight: 40
-
     property color colorDefault: "#282c34"
     property color colorOnFocus: "#202225"
     property color colorMouseOver: "#2B2F38"
     property color colorBorderOnFocus: "#ff007f"
-
     property int currentWidth: width
-
-    //sending signal when user wants to search something
-    signal searchRequested(string what)
-    Keys.onReturnPressed: searchRequested(textField.text)
-
-    placeholderText: "Search by"
-
+    placeholderText: "Search"
     color: "#ffffff"
     rightPadding: 35
     leftPadding: 42
     clip: true
     font.family: "Segoe UI"
-
     font.pointSize: 10
+
+    selectByMouse: true
+    selectedTextColor: "#FFFFFF"
+    selectionColor: "#81848c"
+
+    //sending signal when user wants to search something
+    signal searchRequested(string what)
+    signal focusModified(bool focus)
+
+    Keys.onReturnPressed: searchRequested(textField.text)
+
+    onFocusChanged: {
+        expandCollapseBar(textField.focus)
+        focusModified(focus)
+    }
+
+    function hide(){
+        focus = false
+    }
+
+    function setClearIconVisibility(is_visible){
+        clearIcon.visible = is_visible
+        clearIconOverlay.visible = is_visible
+    }
+
+    function expandBar(){
+        onTextFocus.running = true
+        setClearIconVisibility(true)
+        backgroundColor.border.color = colorBorderOnFocus
+    }
+
+    function collapseBar(){
+        onLostFocus.running = true
+        setClearIconVisibility(false)
+        textField.text = ""
+        backgroundColor.border.color = colorDefault
+    }
+
+    function expandCollapseBar(predicate){
+        if(predicate) expandBar()
+        else collapseBar()
+    }
 
     QtObject{
         id: internal
-
-        property color dynamicColor: if(textField.focus)
-                                         textField.focus ? colorOnFocus : colorDefault
+        property color dynamicColor: if(textField.focus) textField.focus ? colorOnFocus : colorDefault
                                      else textField.hovered ? colorMouseOver : colorDefault
     }
 
@@ -100,29 +131,6 @@ TextField{
             visible: clearIcon.visible
         }
     }
-
-    function setClearIconVisibility(is_visible){
-        clearIcon.visible = is_visible
-        clearIconOverlay.visible = is_visible
-    }
-
-    onFocusChanged: {
-        if(textField.focus){
-            onTextFocus.running = true
-            setClearIconVisibility(true)
-            backgroundColor.border.color = colorBorderOnFocus
-        }
-        else {
-            onLostFocus.running = true
-            setClearIconVisibility(false)
-            textField.text = ""
-            backgroundColor.border.color = colorDefault
-        }
-    }
-
-    selectByMouse: true
-    selectedTextColor: "#FFFFFF"
-    selectionColor: "#81848c"
 
     PropertyAnimation{
         id: onTextFocus

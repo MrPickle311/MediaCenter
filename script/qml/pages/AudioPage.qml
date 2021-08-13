@@ -21,8 +21,13 @@ Rectangle {
         player.relativePositionChanged.connect(musicSlider.changePosition)
 
         searchBar.searchRequested.connect(searchInPlaylist)
+        searchBar.focusModified.connect(playListArea.hideShow)
+        searchBar.focusModified.connect(songsSearchResults.showHide)
+
+        songsSearchResults.playSongRequested.connect(searchBar.hide)
 
         nextButton.clicked.connect(player.goNextSong)
+
         prevButton.clicked.connect(player.goPreviousSong)
     }
 
@@ -30,7 +35,6 @@ Rectangle {
 
     //after emisission of this signal -> model update
     signal searchInPlaylist(string src)
-
 
     Slider {
         id: musicSlider
@@ -59,11 +63,6 @@ Rectangle {
         anchors.topMargin: 10
         currentWidth: playListArea.width - 20
         z: 2
-
-        onFocusChanged: {
-            playListArea.showHide(!focus)
-            searchResults.showHide(focus)
-        }
     }
 
     Label {
@@ -87,11 +86,8 @@ Rectangle {
     }
 
     //a playlist view
-    SearchResults {
+    SongList {
         id: playListArea
-        visible: true
-        radius: 7
-        border.width: 1
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
@@ -100,28 +96,16 @@ Rectangle {
         anchors.leftMargin: 30
         anchors.bottomMargin: 30
         anchors.topMargin: 30
-
-        externalDelegate: PlaylistDelegate {
-            height: 60
-            width: playListArea.width
-            songSource: source
-
-            //C++ service
-            onPlaySongRequest: {
-                player.stop()
-                //Bridge.getPosition(songSource)
-                player.play()
-            }
-        }
-
         externalModel: player.playlist
+
+        //only revert the boolean argument and delegate to showHide ()
+        function hideShow(predicate){
+            showHide(!predicate)
+        }
     }
 
-    SearchResults{
-        id: searchResults
-
-        radius: 7
-        border.width: 1
+    SongList{
+        id: songsSearchResults
         anchors.left: playListArea.left
         anchors.right: playListArea.right
         anchors.top: searchBar.bottom
@@ -130,21 +114,7 @@ Rectangle {
         anchors.leftMargin: 0
         anchors.bottomMargin: 0
         anchors.topMargin: 10
-
-        //To C++ bindings
-        externalDelegate: PlaylistDelegate {
-            height: 60
-            width: playListArea.width
-            songSource: source
-
-            //C++ service
-            onPlaySongRequest: {
-                player.stop()
-                //Bridge.getPosition(songSource)
-                player.play()
-            }
-        }
-
+        visible: false
         ListModel{
             id: temp
             ListElement{
@@ -154,7 +124,6 @@ Rectangle {
                 source: "song2"
             }
         }
-
         externalModel: temp
     }
 
@@ -202,7 +171,6 @@ Rectangle {
 
     PlayButton{
         id: playButton
-
         x: 295
         width: 56
         anchors.top: playListArea.bottom
