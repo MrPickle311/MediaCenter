@@ -2,6 +2,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtGraphicalEffects 1.15
 
+import "../controls"
+
 Rectangle {
         id: playlistItem
 
@@ -11,18 +13,8 @@ Rectangle {
         height: 70
         width: 350
 
-        property string songSource: ""
-        property int onPlaylistPosition: 0
-
-        signal playSongRequest(int position)
-
-        function getOnPlaylistPosition(){
-            return onPlaylistPosition
-        }
-
-        Component.onCompleted: {
-            playButton.clicked.connect(playSongRequest)
-        }
+        property url songSource: ""
+        signal playSongRequest(url src)
 
         SquareButton{
             id: playButton
@@ -36,7 +28,7 @@ Rectangle {
             anchors.bottomMargin: 10
             anchors.rightMargin: 10
 
-            onClicked: playSongRequest(getOnPlaylistPosition())
+            onClicked: playSongRequest(songSource)
         }
 
         Image {
@@ -76,7 +68,7 @@ Rectangle {
             anchors.bottomMargin: 10
             anchors.rightMargin: 10
             anchors.leftMargin: 10
-            placeholderText: songSource.split('/').pop()
+            placeholderText: songSource.toString().split('/').pop()
             readOnly: true
         }
 }

@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtMultimedia 5.15
 import QtQml.Models 2.12
 
+import "../delegates"
 import "../controls"
 
 Rectangle {
@@ -12,7 +13,6 @@ Rectangle {
     //make Connections
 
     Component.onCompleted: {
-        playButton.clicked.connect(playButton.updateIconSource)
         playButton.clicked.connect(player.updateState)
 
         musicSlider.positionMoved.connect(player.changeSongPosition)
@@ -27,6 +27,8 @@ Rectangle {
     }
 
     //public signals
+
+    //after emisission of this signal -> model update
     signal searchInPlaylist(string src)
 
 
@@ -57,6 +59,12 @@ Rectangle {
         anchors.topMargin: 10
         currentWidth: playListArea.width - 20
         z: 2
+
+        onFocusChanged: {
+            if(focus)
+                results.visible = true
+            else results.visible = false
+        }
     }
 
     Label {
@@ -74,8 +82,8 @@ Rectangle {
         textFormat: Text.AutoText
         font.pointSize: 12
 
-        function setTitle(title){
-            text = title
+        function setTitle(source){
+            text = source.split('/').pop()
         }
     }
 
@@ -119,14 +127,12 @@ Rectangle {
                 delegate: PlaylistDelegate {
                     height: 60
                     width: playListArea.width
-                    songSource: source.toString()
-                    onPlaylistPosition: playlist.itemCount
+                    songSource: source
 
                     //C++ service
                     onPlaySongRequest: {
-                        console.log(position)
                         player.stop()
-                        playlist.currentIndex = position
+                        //Bridge.getPosition(songSource)
                         player.play()
                     }
                 }
@@ -175,26 +181,23 @@ Rectangle {
             }
     }
 
-    SquareButton{
-        id: playButton
+    SearchResults{
+        id: results
+        width: 100
+        height: 100
 
-        property url pauseIcon: "qrc:/data/pause.svg"
-        property url playIcon: "qrc:/data/play.svg"
+    }
+
+    PlayButton{
+        id: playButton
 
         x: 295
         width: 56
         anchors.top: playListArea.bottom
         anchors.bottom: musicSlider.top
-        defaultColor: "#00000000"
         anchors.topMargin: 10
         anchors.bottomMargin: 10
         anchors.horizontalCenter: musicSlider.horizontalCenter
-        buttonIconSource: pauseIcon
-
-        function updateIconSource(){
-            buttonIconSource = buttonIconSource === playIcon ? pauseIcon : playIcon
-        }
-
     }
 
     SquareButton {
@@ -217,22 +220,15 @@ Rectangle {
         defaultColor: "#00000000"
     }
 
-    Label {
+    TimeLabel {
         id: musicTimeLabel
         x: 567
         y: 398
         width: 53
         height: 16
-        color: "#f2f2f2"
         anchors.right: musicSlider.right
         anchors.bottom: musicSlider.top
         anchors.bottomMargin: 10
         anchors.rightMargin: 0
-
-        function setTime(millis){
-            var minutes = Math.floor(millis / 60000)
-            var seconds = ((millis % 60000) / 1000).toFixed(0)
-            text =  minutes + ":" + (seconds < 10 ? '0' : '') + seconds
-        }
     }
 }
