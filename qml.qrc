@@ -47,5 +47,6 @@
         <file>script/qml/controls/TitleLabel.qml</file>
         <file>script/qml/delegates/SongDelegate.qml</file>
         <file>script/qml/delegates/VideoDelegate.qml</file>
+        <file>data/movie.svg</file>
     </qresource>
 </RCC>

@@ -14,7 +14,7 @@ Rectangle {
         width: 350
 
         property url mediaSource: ""
-        property alias mediaIcon: ""
+        property alias mediaIcon: mediaIcon.source
 
         signal playRequest(url src)
 
@@ -24,7 +24,6 @@ Rectangle {
             anchors.left: playlistItem.left
             anchors.top: playlistItem.top
             anchors.bottom: playlistItem.bottom
-            source: "qrc:/data/song.svg"
             anchors.bottomMargin: 10
             anchors.leftMargin: 10
             anchors.topMargin: 10
@@ -37,7 +36,6 @@ Rectangle {
             source: mediaIcon
             color: "white"
             antialiasing: true
-
             width: mediaIcon.width
             height: mediaIcon.height
         }
@@ -63,7 +61,7 @@ Rectangle {
         MouseArea{
             id: mouseArea
             anchors.fill: parent
-            onClicked: playSongRequest(mediaSource)
+            onClicked: playRequest(mediaSource)
             hoverEnabled: true
             onHoveredChanged: if(containsMouse) playlistItem.border.color = "#55aaff"
                               else playlistItem.border.color = "#202225"

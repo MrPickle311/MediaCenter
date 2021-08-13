@@ -11,11 +11,11 @@ ItemList {
 
     signal playSongRequested(url src)
 
-    externalDelegate: PlaylistDelegate {
+    externalDelegate: SongDelegate {
         height: 60
         width: songList.width
-        songSource: source
+        mediaSource: source
 
-        onPlaySongRequest: playSongRequested(src)
+        onPlayRequest: playSongRequested(src)
     }
 }

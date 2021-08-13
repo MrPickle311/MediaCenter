@@ -3,13 +3,30 @@ import QtQuick.Controls 2.15
 import QtMultimedia 5.15
 
 import "../controls"
-import QtQuick.Extras 1.4
+import "../delegates"
 
 Rectangle {
     id: videoPage
 
-    Component.onCompleted: {
+    function makeSearchBarConnections(){
+        searchBar.searchRequested.connect(searchVideo)
+        searchBar.focusModified.connect(playListArea.hideShow)
+    }
 
+    function makeInternalConnections(){
+        //makePlayButtonConnections()
+        //makeMusicSliderConnections()
+        //makePlayerConnections()
+        makeSearchBarConnections()
+        //makeSongsSearchResultsConnections()
+        //makeNextButtonConnections()
+        //makePrevButtonConnections()
+    }
+
+    signal searchVideo(url src)
+
+    Component.onCompleted: {
+        makeInternalConnections()
     }
 
     gradient: Gradient {
@@ -37,6 +54,27 @@ Rectangle {
         fillMode: VideoOutput.Stretch
     }
 
+    ItemList{
+        visible: true
+        id: foundMoviesList
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: searchBar.bottom
+        anchors.bottom: videoTitle.top
+        anchors.rightMargin: 10
+        anchors.leftMargin: 10
+        anchors.bottomMargin: 10
+        anchors.topMargin: 10
+        externalModel: null//C++
+        externalDelegate: VideoDelegate{
+            height: 60
+            width: foundMoviesList.width
+            mediaSource: source
+
+            onPlayRequest: searchVideo(src)
+        }
+    }
+
     SearchBar{
         id: searchBar
         anchors.left: parent.left
@@ -47,7 +85,7 @@ Rectangle {
         currentWidth: videoPage.width - 20
     }
 
-    Slider {
+    MediaSlider {
         id: slider
         y: 426
         anchors.left: parent.left
@@ -59,24 +97,15 @@ Rectangle {
         value: 0.5
     }
 
-    Label {
+    TitleLabel {
         id: videoTitle
         y: 395
         width: 52
         height: 19
-        color: "#dcdfe2"
-        text: qsTr("Video Title")
         anchors.left: slider.left
         anchors.bottom: slider.top
-        wrapMode: Text.NoWrap
         anchors.leftMargin: 0
         anchors.bottomMargin: 10
-        textFormat: Text.AutoText
-        font.pointSize: 12
-
-        function setTitle(source){
-            text = source.split('/').pop()
-        }
     }
 
     TimeLabel{
@@ -98,6 +127,5 @@ Rectangle {
         anchors.bottom: slider.top
         anchors.bottomMargin: 10
         anchors.horizontalCenter: slider.horizontalCenter
-
     }
 }
