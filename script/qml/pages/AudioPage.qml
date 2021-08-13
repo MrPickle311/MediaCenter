@@ -61,9 +61,8 @@ Rectangle {
         z: 2
 
         onFocusChanged: {
-            if(focus)
-                results.visible = true
-            else results.visible = false
+            playListArea.showHide(!focus)
+            searchResults.showHide(focus)
         }
     }
 
@@ -87,8 +86,10 @@ Rectangle {
         }
     }
 
-    Rectangle {
+    //a playlist view
+    SearchResults {
         id: playListArea
+        visible: true
         radius: 7
         border.width: 1
         anchors.left: parent.left
@@ -100,43 +101,61 @@ Rectangle {
         anchors.bottomMargin: 30
         anchors.topMargin: 30
 
-        gradient: Gradient {
-            GradientStop {
-                position: 0
-                color: "#434343"
+        externalDelegate: PlaylistDelegate {
+            height: 60
+            width: playListArea.width
+            songSource: source
+
+            //C++ service
+            onPlaySongRequest: {
+                player.stop()
+                //Bridge.getPosition(songSource)
+                player.play()
             }
+        }
 
-            GradientStop {
-                position: 1
-                color: "#000000"
+        externalModel: player.playlist
+    }
+
+    SearchResults{
+        id: searchResults
+
+        radius: 7
+        border.width: 1
+        anchors.left: playListArea.left
+        anchors.right: playListArea.right
+        anchors.top: searchBar.bottom
+        anchors.bottom: playListArea.bottom
+        anchors.rightMargin: 0
+        anchors.leftMargin: 0
+        anchors.bottomMargin: 0
+        anchors.topMargin: 10
+
+        //To C++ bindings
+        externalDelegate: PlaylistDelegate {
+            height: 60
+            width: playListArea.width
+            songSource: source
+
+            //C++ service
+            onPlaySongRequest: {
+                player.stop()
+                //Bridge.getPosition(songSource)
+                player.play()
             }
         }
 
-        ScrollView {
-                anchors.fill: playListArea
-                clip: true
-                ListView {
-                        anchors.fill: parent
-                        model: playlistModel
-                }
+        ListModel{
+            id: temp
+            ListElement{
+                source: "file:///home/damiano/Projects/MediaCenter/data/song2.mp3"
+            }
+            ListElement{
+                source: "song2"
+            }
         }
 
-        DelegateModel {
-                id: playlistModel
-                model: player.playlist
-                delegate: PlaylistDelegate {
-                    height: 60
-                    width: playListArea.width
-                    songSource: source
-
-                    //C++ service
-                    onPlaySongRequest: {
-                        player.stop()
-                        //Bridge.getPosition(songSource)
-                        player.play()
-                    }
-                }
-        }
+        externalModel: temp
     }
 
     Audio {
@@ -179,13 +198,6 @@ Rectangle {
             function goPreviousSong(){
                 playlist.previous()
             }
-    }
-
-    SearchResults{
-        id: results
-        width: 100
-        height: 100
-
     }
 
     PlayButton{

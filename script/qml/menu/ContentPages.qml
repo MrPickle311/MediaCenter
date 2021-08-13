@@ -27,6 +27,7 @@ Rectangle {
     SwipeView {
         id: swipeView
         anchors.fill: parent
+        interactive: false
 
         orientation: Qt.Vertical
 

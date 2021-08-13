@@ -6,9 +6,13 @@ Rectangle {
     id: results
     visible: false
 
-    property var externalDelegate: null
-    property var externalModel: null
+    property alias externalDelegate: delegateModel.delegate
+    property alias externalModel: delegateModel.model
 
+    function showHide(predicate){
+        if(predicate) visible = true
+        else visible = false
+    }
 
     gradient: Gradient {
         GradientStop {
@@ -27,25 +31,12 @@ Rectangle {
             clip: true
             ListView {
                     anchors.fill: parent
-                    model: externalModel
+                    model: delegateModel
             }
     }
 
     DelegateModel {
             id: delegateModel
-            model: externalModel
-            delegate: externalDelegate
     }
-
-    PropertyAnimation{
-        id: onTextFocus
-        target: results
-        properties: "height"
-        //to: currentWidth
-        duration: 300
-        easing.type: Easing.OutQuint
-        //onFinished: textField.anchors.right = parent.right
-    }
-
 
 }
