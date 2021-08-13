@@ -1,5 +1,7 @@
-import QtQuick 2.0
+import QtQuick 2.15
 
-Item {
-
+SquareButton {
+    id: nextButton
+    buttonIconSource: "qrc:/data/right-arrow.svg"
+    defaultColor: "#00000000"
 }

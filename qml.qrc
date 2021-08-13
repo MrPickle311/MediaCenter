@@ -42,5 +42,10 @@
         <file>script/qml/controls/ItemList.qml</file>
         <file>script/qml/controls/SongList.qml</file>
         <file>script/qml/controls/NextButton.qml</file>
+        <file>script/qml/controls/PreviousButton.qml</file>
+        <file>script/qml/controls/MediaSlider.qml</file>
+        <file>script/qml/controls/TitleLabel.qml</file>
+        <file>script/qml/delegates/SongDelegate.qml</file>
+        <file>script/qml/delegates/VideoDelegate.qml</file>
     </qresource>
 </RCC>

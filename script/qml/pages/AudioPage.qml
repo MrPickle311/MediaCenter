@@ -10,48 +10,67 @@ Rectangle {
     id: audioPage
     color: "#191919"
 
-    //make Connections
-
-    Component.onCompleted: {
-        playButton.clicked.connect(player.updateState)
-
-        musicSlider.positionMoved.connect(player.changeSongPosition)
-
-        player.millisChanged.connect(musicTimeLabel.setTime)
-        player.relativePositionChanged.connect(musicSlider.changePosition)
-
-        searchBar.searchRequested.connect(searchInPlaylist)
-        searchBar.focusModified.connect(playListArea.hideShow)
-        searchBar.focusModified.connect(songsSearchResults.showHide)
-
-        songsSearchResults.playSongRequested.connect(searchBar.hide)
-
-        nextButton.clicked.connect(player.goNextSong)
-
-        prevButton.clicked.connect(player.goPreviousSong)
-    }
-
     //public signals
 
     //after emisission of this signal -> model update
     signal searchInPlaylist(string src)
 
-    Slider {
+    //make Connections
+
+    function makePlayButtonConnections(){
+        playButton.clicked.connect(player.updateState)
+    }
+
+    function makeMusicSliderConnections(){
+        musicSlider.positionMoved.connect(player.changeSongPosition)
+    }
+
+    function makePlayerConnections(){
+        player.millisChanged.connect(musicTimeLabel.setTime)
+        player.relativePositionChanged.connect(musicSlider.changePosition)
+    }
+
+    function makeSearchBarConnections(){
+        searchBar.searchRequested.connect(searchInPlaylist)
+        searchBar.focusModified.connect(playListArea.hideShow)
+        searchBar.focusModified.connect(songsSearchResults.showHide)
+    }
+
+    function makeSongsSearchResultsConnections(){
+        songsSearchResults.playSongRequested.connect(searchBar.hide)
+    }
+
+    function makeNextButtonConnections(){
+        nextButton.clicked.connect(player.goNextSong)
+    }
+
+    function makePrevButtonConnections(){
+        prevButton.clicked.connect(player.goPreviousSong)
+    }
+
+    function makeInternalConnections(){
+        makePlayButtonConnections()
+        makeMusicSliderConnections()
+        makePlayerConnections()
+        makeSearchBarConnections()
+        makeSongsSearchResultsConnections()
+        makeNextButtonConnections()
+        makePrevButtonConnections()
+    }
+
+    Component.onCompleted: {
+        makeInternalConnections()
+    }
+
+    MediaSlider {
         id: musicSlider
         y: 413
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        stepSize: 0.01
         anchors.rightMargin: 20
         anchors.leftMargin: 20
         anchors.bottomMargin: 20
-
-        function changePosition(newPos){
-            value = newPos
-        }
-        signal positionMoved(real position)
-        onMoved: positionMoved(position)
     }
 
     SearchBar{
@@ -65,24 +84,15 @@ Rectangle {
         z: 2
     }
 
-    Label {
+    TitleLabel {
         id: musicTitle
         y: 395
         width: 52
         height: 19
-        color: "#dcdfe2"
-        text: qsTr("Music Title")
         anchors.left: musicSlider.left
         anchors.bottom: musicSlider.top
-        wrapMode: Text.NoWrap
         anchors.leftMargin: 0
         anchors.bottomMargin: 10
-        textFormat: Text.AutoText
-        font.pointSize: 12
-
-        function setTitle(source){
-            text = source.split('/').pop()
-        }
     }
 
     //a playlist view
@@ -180,24 +190,20 @@ Rectangle {
         anchors.horizontalCenter: musicSlider.horizontalCenter
     }
 
-    SquareButton {
+    NextButton {
         id: nextButton
         width: 56
         anchors.verticalCenter: playButton.verticalCenter
         anchors.left: playButton.right
         anchors.leftMargin: 10
-        buttonIconSource: "qrc:/data/right-arrow.svg"
-        defaultColor: "#00000000"
     }
 
-    SquareButton {
+    PreviousButton {
         id: prevButton
         width: 56
         anchors.verticalCenter: playButton.verticalCenter
         anchors.right: playButton.left
         anchors.rightMargin: 10
-        buttonIconSource: "qrc:/data/left-arrow.svg"
-        defaultColor: "#00000000"
     }
 
     TimeLabel {

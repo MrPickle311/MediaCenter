@@ -13,11 +13,13 @@ Rectangle {
         height: 70
         width: 350
 
-        property url songSource: ""
-        signal playSongRequest(url src)
+        property url mediaSource: ""
+        property alias mediaIcon: ""
+
+        signal playRequest(url src)
 
         Image {
-            id: songIcon
+            id: mediaIcon
             width: 50
             anchors.left: playlistItem.left
             anchors.top: playlistItem.top
@@ -31,18 +33,18 @@ Rectangle {
 
         ColorOverlay{
             id: clearIconOverlay
-            anchors.fill: songIcon
-            source: songIcon
+            anchors.fill: mediaIcon
+            source: mediaIcon
             color: "white"
             antialiasing: true
 
-            width: songIcon.width
-            height: songIcon.height
+            width: mediaIcon.width
+            height: mediaIcon.height
         }
 
         TextArea {
             id: textArea
-            anchors.left: songIcon.right
+            anchors.left: mediaIcon.right
             //anchors.right: playButton.left
             anchors.right: playlistItem.right
             anchors.top: playlistItem.top
@@ -54,14 +56,14 @@ Rectangle {
             anchors.bottomMargin: 10
             anchors.rightMargin: 10
             anchors.leftMargin: 10
-            placeholderText: songSource.toString().split('/').pop()
+            placeholderText: mediaSource.toString().split('/').pop()
             readOnly: true
         }
 
         MouseArea{
             id: mouseArea
             anchors.fill: parent
-            onClicked: playSongRequest(songSource)
+            onClicked: playSongRequest(mediaSource)
             hoverEnabled: true
             onHoveredChanged: if(containsMouse) playlistItem.border.color = "#55aaff"
                               else playlistItem.border.color = "#202225"
