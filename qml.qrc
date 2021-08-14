@@ -49,5 +49,7 @@
         <file>script/qml/delegates/VideoDelegate.qml</file>
         <file>data/movie.svg</file>
         <file>script/qml/controls/VideoList.qml</file>
+        <file>script/qml/delegates/ImageDelegate.qml</file>
+        <file>script/qml/controls/ImageViewer.qml</file>
     </qresource>
 </RCC>
