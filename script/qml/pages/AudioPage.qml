@@ -38,6 +38,7 @@ Rectangle {
 
     function makeSongsSearchResultsConnections(){
         songsSearchResults.playSongRequested.connect(searchBar.hide)
+        songsSearchResults.playSongRequested.connect(playButton.updateIconSource)
     }
 
     function makeNextButtonConnections(){
