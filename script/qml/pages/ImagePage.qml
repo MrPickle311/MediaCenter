@@ -9,8 +9,35 @@ Rectangle {
     color: "#191919"
     visible: true
 
+    signal loadNextImageRequested(url current_image_src)
+    signal loadPreviousImageRequested(url current_image_src)
+
+    function makeImageBrowserConnections(){
+        imageBrowser.showImageRequested.connect(imageViewer.setImage)
+        imageBrowser.showImageRequested.connect(imageViewer.show)
+    }
+
+    function makeImageViewerConnections(){
+        imageViewer.nextImageRequested.connect(loadNextImageRequested)
+        imageViewer.previousImageRequested.connect(loadPreviousImageRequested)
+    }
+
+    function makeInternalConnections(){
+        makeImageBrowserConnections()
+    }
+
+    Component.onCompleted: {
+        makeInternalConnections()
+    }
+
+    function setImageToViewer(src){
+        imageViewer.setImage(src)
+    }
+
     ScrollView{
-        id: scrollVIew
+        id: imageBrowser
+
+        signal showImageRequested(url src)
 
         GridView {
             id: gridView
@@ -25,31 +52,30 @@ Rectangle {
                 visible: true
                 id: imageDelegate
                 source: imageSource
+
+                onShowImageRequest: imageBrowser.showImageRequested(src)
             }
 
             model: ListModel {
                 ListElement {
                     imageSource: "file:///home/damiano/Projects/MediaCenter/data/imageVERYVERYVERYVERYLONG.jpeg"
                 }
-                //
-                //ListElement {
-                //    name: "Red"
-                //    colorCode: "red"
-                //}
-                //
-                //ListElement {
-                //    name: "Blue"
-                //    colorCode: "blue"
-                //}
-                //
-                //ListElement {
-                //    name: "Green"
-                //    colorCode: "green"
-                //}
             }
         }
     }
 
+    ImageViewer{
+        id: imageViewer
+        visible: false
+        anchors.fill: parent
+        anchors.rightMargin: 10
+        anchors.leftMargin: 10
+        anchors.bottomMargin: 10
+        anchors.topMargin: 10
 
-
+        Shortcut {
+                sequence: "Esc"
+                onActivated: imageViewer.hide()
+        }
+    }
 }
