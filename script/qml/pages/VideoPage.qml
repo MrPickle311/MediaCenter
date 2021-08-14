@@ -21,6 +21,7 @@ Rectangle {
         foundMoviesList.playVideoRequested.connect(searchBar.hide)
         foundMoviesList.playVideoRequested.connect(videoPlayer.playVideo)
         foundMoviesList.playVideoRequested.connect(playButton.updateIconSource)
+        foundMoviesList.playVideoRequested.connect(videoTitle.setTitle)
     }
 
     function makeVideoSliderConnections(){
@@ -38,9 +39,6 @@ Rectangle {
         makePlayerConnections()
         makeSearchBarConnections()
         makeFoundMoviesListConnections()
-        //makeSongsSearchResultsConnections()
-        //makeNextButtonConnections()
-        //makePrevButtonConnections()
     }
 
     signal searchVideo(url src)
@@ -97,7 +95,6 @@ Rectangle {
             if(playbackState === MediaPlayer.PlayingState) pause()
             else play()
         }
-
     }
 
     VideoList{

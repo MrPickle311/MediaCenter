@@ -39,6 +39,7 @@ Rectangle {
     function makeSongsSearchResultsConnections(){
         songsSearchResults.playSongRequested.connect(searchBar.hide)
         songsSearchResults.playSongRequested.connect(playButton.updateIconSource)
+        songsSearchResults.playSongRequested.connect(musicTitle.setTitle)
     }
 
     function makeNextButtonConnections(){
@@ -83,17 +84,6 @@ Rectangle {
         anchors.topMargin: 10
         currentWidth: playListArea.width - 20
         z: 2
-    }
-
-    TitleLabel {
-        id: musicTitle
-        y: 395
-        width: 52
-        height: 19
-        anchors.left: musicSlider.left
-        anchors.bottom: musicSlider.top
-        anchors.leftMargin: 0
-        anchors.bottomMargin: 10
     }
 
     //a playlist view
@@ -205,6 +195,17 @@ Rectangle {
         anchors.verticalCenter: playButton.verticalCenter
         anchors.right: playButton.left
         anchors.rightMargin: 10
+    }
+
+    TitleLabel {
+        id: musicTitle
+        y: 395
+        width: 52
+        height: 19
+        anchors.left: musicSlider.left
+        anchors.bottom: musicSlider.top
+        anchors.leftMargin: 0
+        anchors.bottomMargin: 10
     }
 
     TimeLabel {

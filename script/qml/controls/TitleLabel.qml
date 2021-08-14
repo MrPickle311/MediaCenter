@@ -10,6 +10,6 @@ Label {
     font.pointSize: 12
 
     function setTitle(source){
-        text = source.split('/').pop()
+        text = source.toString().split('/').pop()
     }
 }
