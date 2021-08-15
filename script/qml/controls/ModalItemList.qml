@@ -41,7 +41,6 @@ Item {
         anchors.bottom: parent.bottom
         defaultColor: "#00000000"
         anchors.bottomMargin: 10
-        anchors.leftMargin: 10
         buttonIconSource: "qrc:/data/add.svg"
     }
 
@@ -54,7 +53,6 @@ Item {
         anchors.bottom: parent.bottom
         defaultColor: "#00000000"
         anchors.bottomMargin: 10
-        anchors.leftMargin: 10
         buttonIconSource: "qrc:/data/minus.svg"
     }
 }

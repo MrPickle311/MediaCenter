@@ -16,7 +16,7 @@ Item {
         anchors.leftMargin: 0
         anchors.topMargin: 0
 
-        ModalItemList{
+        FlatStringList{
             id: directoryList
             width: rectangle.width / 2
             anchors.left: parent.left
@@ -26,26 +26,6 @@ Item {
             anchors.bottomMargin: 10
             anchors.topMargin: 10
             title: "Directories"
-
-            externalDelegate: StringItemDelegate{
-                width: directoryList.width
-                str: path
-            }
-
-            externalModel: ListModel{
-                ListElement{
-                    path: "source 1"
-                }
-                ListElement{
-                    path: "source 1"
-                }
-                ListElement{
-                    path: "source 1"
-                }
-                ListElement{
-                    path: "source 1"
-                }
-            }
         }
 
         RowLayout {
@@ -62,29 +42,30 @@ Item {
             visible: true
             spacing: 5
 
-            Rectangle {
+            FlatStringList {
                 id: imagesExtensions
                 height: 189
-                color: "#ffffff"
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                title: "Images Extensions"
             }
 
-            Rectangle {
+            FlatStringList {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 id: videoExtensions
                 height: 184
                 width: gridLayout.recWidth
+                title: "Video Extensions"
             }
 
-            Rectangle {
+            FlatStringList {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 id: audioExtensions
                 height: 194
-                color: "#ffffff"
                 width: gridLayout.recWidth
+                title: "Audio Extensions"
             }
         }
 
@@ -99,7 +80,6 @@ Item {
             anchors.bottomMargin: 20
             value: 0.5
         }
-
 
         Slider {
             id: volumeSensibility
@@ -134,10 +114,7 @@ Item {
             anchors.bottomMargin: 10
             anchors.leftMargin: 0
         }
-
-
     }
-
 }
 
 /*##^##

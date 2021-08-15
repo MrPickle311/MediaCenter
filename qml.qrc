@@ -57,5 +57,6 @@
         <file>data/minus.svg</file>
         <file>script/qml/delegates/StringItemDelegate.qml</file>
         <file>script/qml/controls/FlatStringList.qml</file>
+        <file>script/qml/controls/DirectoryEmplacer.qml</file>
     </qresource>
 </RCC>

@@ -16,10 +16,23 @@ Rectangle {
     property bool isSelected: false
 
     signal selected(string txt)
+    signal deselected(string txt)
+
+    function select(){
+        stringDelegate.border.color = "#55aaff"
+        stringDelegate.isSelected = true
+        stringDelegate.selected(str)
+    }
+
+    function deselect(){
+        stringDelegate.isSelected = false
+        stringDelegate.border.color = "transparent"
+        stringDelegate.deselected(str)
+    }
 
     function selectDeselectThisEntity(){
-        if(!isSelected) stringDelegate.border.color = "#55aaff"
-        else stringDelegate.border.color = "transparent"
+        if(stringDelegate.isSelected) stringDelegate.deselect()
+        else stringDelegate.select()
     }
 
     TextArea {
