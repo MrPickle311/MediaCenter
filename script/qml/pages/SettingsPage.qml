@@ -26,6 +26,14 @@ Item {
             anchors.bottomMargin: 10
             anchors.topMargin: 10
             title: "Directories"
+
+            onAddRequested: emplacer.open()
+        }
+
+        DirectoryEmplacer{
+            id: emplacer
+            //C++ bind
+            //onDirectoryAdded: console.log(dir)
         }
 
         RowLayout {

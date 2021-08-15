@@ -6,15 +6,17 @@ Item {
     id: modalItemList
 
     property string title: "Title"
+    property alias externalDelegate: itemList.externalDelegate
+    property alias externalModel: itemList.externalModel
+
+    signal addRequested()
+    signal removeRequested()
 
     TitleLabel{
         id: titleLabel
         anchors.horizontalCenter: parent.horizontalCenter
         text: modalItemList.title
     }
-
-    property alias externalDelegate: itemList.externalDelegate
-    property alias externalModel: itemList.externalModel
 
     ItemList{
         id: itemList
@@ -42,6 +44,7 @@ Item {
         defaultColor: "#00000000"
         anchors.bottomMargin: 10
         buttonIconSource: "qrc:/data/add.svg"
+        onClicked: modalItemList.addRequested()
     }
 
     SquareButton{
@@ -54,5 +57,6 @@ Item {
         defaultColor: "#00000000"
         anchors.bottomMargin: 10
         buttonIconSource: "qrc:/data/minus.svg"
+        onClicked: modalItemList.removeRequested()
     }
 }
