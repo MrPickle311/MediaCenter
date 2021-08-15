@@ -60,6 +60,10 @@ Rectangle {
         makePrevButtonConnections()
     }
 
+    function setVolume(vol){
+            player.volume = vol
+    }
+
     Component.onCompleted: {
         makeInternalConnections()
     }

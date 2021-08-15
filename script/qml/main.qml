@@ -78,7 +78,6 @@ Window {
         function restoreMargins(){
             setNormalState()
         }
-
     }
 
     Rectangle {

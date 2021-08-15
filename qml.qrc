@@ -51,5 +51,6 @@
         <file>script/qml/controls/VideoList.qml</file>
         <file>script/qml/delegates/ImageDelegate.qml</file>
         <file>script/qml/controls/ImageViewer.qml</file>
+        <file>script/qml/controls/CircularProgressBar.qml</file>
     </qresource>
 </RCC>

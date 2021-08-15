@@ -41,6 +41,10 @@ Rectangle {
         makeFoundMoviesListConnections()
     }
 
+    function setVolume(vol){
+            videoPlayer.volume = vol
+    }
+
     signal searchVideo(url src)
 
     Component.onCompleted: {
