@@ -52,5 +52,10 @@
         <file>script/qml/delegates/ImageDelegate.qml</file>
         <file>script/qml/controls/ImageViewer.qml</file>
         <file>script/qml/controls/CircularProgressBar.qml</file>
+        <file>script/qml/controls/ModalItemList.qml</file>
+        <file>data/add.svg</file>
+        <file>data/minus.svg</file>
+        <file>script/qml/delegates/StringItemDelegate.qml</file>
+        <file>script/qml/controls/FlatStringList.qml</file>
     </qresource>
 </RCC>

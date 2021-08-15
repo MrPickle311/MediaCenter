@@ -42,8 +42,7 @@ Rectangle {
         property real volume: 0.5
         property real realVolume: QtMultimedia.convertVolume(volumeArea.volume,
                                                              QtMultimedia.LinearVolumeScale,
-                                                             QtMultimedia.LogarithmicVolumeScale
-                                                             )
+                                                             QtMultimedia.LogarithmicVolumeScale)
 
         function increaseLinearVolume(){
             if(volumeArea.volume < 1.0)
