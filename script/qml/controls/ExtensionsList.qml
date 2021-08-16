@@ -14,7 +14,7 @@ FlatStringList {
         anchors.topMargin: 20
         anchors.left: flatStringList.left
         anchors.right: flatStringList.right
-        height: 30
+        height: 20
         onTextAccepted: flatStringList.extensionAdded(txt)
         z: 2
     }

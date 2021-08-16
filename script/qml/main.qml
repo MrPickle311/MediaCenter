@@ -113,7 +113,10 @@ Window {
                     mainWindow.showMinimized()
                 }
                 onMaximizeRestore: internal.maximizeRestore()
-                onClosing: mainWindow.close()
+                onClosing: {
+                    console.log("closing")
+                    Qt.quit()
+                }
             }
 
             Rectangle {

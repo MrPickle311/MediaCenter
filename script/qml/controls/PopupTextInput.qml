@@ -5,9 +5,10 @@ Rectangle{
     id: popupTextInput
 
     width: 60
-    height: 30
+    height: 20
     color: "#00a1f1"
     visible: false
+    opacity: 0.5
 
     signal textAccepted(string txt)
 
@@ -34,7 +35,7 @@ Rectangle{
 
     TextInput {
         id: textEngine
-        color: "#7fffffff"
+        color: "white"
         z: 2
         onAccepted: {
             popupTextInput.textAccepted(textEngine.text)
