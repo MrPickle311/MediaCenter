@@ -6,8 +6,8 @@ import "../delegates"
 ModalItemList{
     id: flatStringList
 
-     signal selected(string str)
-     signal deselected(string str)
+    signal selected(string str)
+    signal deselected(string str)
 
     externalDelegate: StringItemDelegate{
         width: flatStringList.width

@@ -50,7 +50,7 @@ Item {
             visible: true
             spacing: 5
 
-            FlatStringList {
+            ExtensionsList {
                 id: imagesExtensions
                 height: 189
                 Layout.fillWidth: true
@@ -58,7 +58,7 @@ Item {
                 title: "Images Extensions"
             }
 
-            FlatStringList {
+            ExtensionsList {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 id: videoExtensions
@@ -67,7 +67,7 @@ Item {
                 title: "Video Extensions"
             }
 
-            FlatStringList {
+            ExtensionsList {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 id: audioExtensions

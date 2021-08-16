@@ -1,0 +1,44 @@
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+
+Rectangle{
+    id: popupTextInput
+
+    width: 60
+    height: 30
+    color: "#00a1f1"
+    visible: false
+
+    signal textAccepted(string txt)
+
+    function show(){
+        popupTextInput.visible = true
+        textEngine.focus = true
+    }
+
+    function hide(){
+        popupTextInput.visible = false
+        textEngine.focus = false
+        textEngine.clear()
+    }
+
+    function tryHide(){
+        if(textEngine.focus)
+            popupTextInput.hide()
+    }
+
+    Action{
+        shortcut: "Esc"
+        onTriggered: popupTextInput.tryHide()
+    }
+
+    TextInput {
+        id: textEngine
+        color: "#7fffffff"
+        z: 2
+        onAccepted: {
+            popupTextInput.textAccepted(textEngine.text)
+            popupTextInput.hide()
+        }
+    }
+}
