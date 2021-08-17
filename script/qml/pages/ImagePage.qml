@@ -13,8 +13,8 @@ Rectangle {
     signal loadPreviousImageRequested(url current_image_src)
 
     function makeImageBrowserConnections(){
-        imageBrowser.showImageRequested.connect(imageViewer.setImage)
-        imageBrowser.showImageRequested.connect(imageViewer.show)
+        imageBrowser.itemClicked.connect(imageViewer.setImage)
+        imageBrowser.itemClicked.connect(imageViewer.show)
     }
 
     function makeImageViewerConnections(){
@@ -34,32 +34,26 @@ Rectangle {
         imageViewer.setImage(src)
     }
 
-    ScrollView{
+    ItemsGrid{
         id: imageBrowser
+        anchors.fill: parent
 
-        signal showImageRequested(url src)
+        anchors.rightMargin: 10
+        anchors.leftMargin: 10
+        anchors.bottomMargin: 10
+        anchors.topMargin: 10
 
-        GridView {
-            id: gridView
-            anchors.fill: parent
-            anchors.rightMargin: 10
-            anchors.leftMargin: 10
-            anchors.bottomMargin: 10
-            anchors.topMargin: 10
-            cellWidth: 70
-            cellHeight: 70
-            delegate: ImageDelegate{
-                visible: true
-                id: imageDelegate
-                source: imageSource
+        externalDelegate: ImageDelegate{
+            visible: true
+            id: imageDelegate
+            source: imageSource
 
-                onShowImageRequest: imageBrowser.showImageRequested(src)
-            }
+            onShowImageRequest: imageBrowser.itemClicked(src)
+        }
 
-            model: ListModel {
-                ListElement {
-                    imageSource: "file:///home/damiano/Projects/MediaCenter/data/imageVERYVERYVERYVERYLONG.jpeg"
-                }
+        externalModel: ListModel {
+            ListElement {
+                imageSource: "file:///home/damiano/Projects/MediaCenter/data/imageVERYVERYVERYVERYLONG.jpeg"
             }
         }
     }
@@ -73,9 +67,9 @@ Rectangle {
         anchors.bottomMargin: 10
         anchors.topMargin: 10
 
-        Shortcut {
-                sequence: "Esc"
-                onActivated: imageViewer.hide()
+        Action {
+           shortcut: "Esc"
+           onTriggered: imageViewer.hide()
         }
     }
 }

@@ -60,5 +60,6 @@
         <file>script/qml/controls/DirectoryEmplacer.qml</file>
         <file>script/qml/controls/PopupTextInput.qml</file>
         <file>script/qml/controls/ExtensionsList.qml</file>
+        <file>script/qml/controls/ItemsGrid.qml</file>
     </qresource>
 </RCC>
