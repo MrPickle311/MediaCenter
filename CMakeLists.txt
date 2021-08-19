@@ -49,6 +49,8 @@ else()
     endif()
 endif()
 
+add_subdirectory(src)
+
 target_compile_definitions(MediaCenter
   PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
 target_link_libraries(MediaCenter
