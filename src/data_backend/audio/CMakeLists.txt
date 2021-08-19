@@ -1,7 +1,9 @@
 set(audio_headers
+    Audio.hpp
 )
 
 set(audio_sources
+    Audio.cpp
 )
 
 add_library(AUDIO_LIBRARIES STATIC
