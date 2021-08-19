@@ -24,7 +24,7 @@ Rectangle {
 
     signal settingsButtonClicked()
 
-    property var currentlySelectedButton: homeButton
+    property var currentlySelectedButton: musicButton
 
     function selectButton(button){
         currentlySelectedButton.isActiveMenu = false
@@ -48,17 +48,17 @@ Rectangle {
         spacing: 0
         anchors.bottomMargin: 70
 
-        LeftMenuButton {
-            id: homeButton
-            text: qsTr("Home page")
-
-            isActiveMenu: true
-
-            onClicked: {
-                selectButton(homeButton)
-                buttonClicked(0)
-            }
-        }
+        //LeftMenuButton {
+        //    id: homeButton
+        //    text: qsTr("Home page")
+        //
+        //    isActiveMenu: true
+        //
+        //    onClicked: {
+        //        selectButton(homeButton)
+        //        buttonClicked(0)
+        //    }
+        //}
 
         LeftMenuButton {
             id: musicButton
@@ -67,7 +67,7 @@ Rectangle {
 
             onClicked: {
                 selectButton(musicButton)
-                buttonClicked(1)
+                buttonClicked(0)
             }
         }
 
@@ -78,7 +78,7 @@ Rectangle {
 
             onClicked: {
                 selectButton(videoButton)
-                buttonClicked(2)
+                buttonClicked(1)
             }
         }
 
@@ -91,7 +91,7 @@ Rectangle {
 
             onClicked: {
                 selectButton(imagesButton)
-                buttonClicked(3)
+                buttonClicked(2)
             }
         }
     }
