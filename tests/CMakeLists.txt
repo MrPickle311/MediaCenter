@@ -68,6 +68,7 @@ set(TESTED_DIRECTORIES
 
 set(TESTED_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/Backend.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/Environment.hpp
     #${CMAKE_CURRENT_SOURCE_DIR}/../src/data_backend/Backend.hpp
 )
 
@@ -77,6 +78,8 @@ set(Tests_files
     main.cpp
     MainBackendTests.hpp
     MainBackendTests.cpp
+    EnvironmentTests.hpp
+    EnvironmentTests.cpp
     ${TESTED_HEADERS}
     )
 

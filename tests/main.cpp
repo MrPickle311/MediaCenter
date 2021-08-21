@@ -7,10 +7,10 @@
 #include <QUrl>
 #include <MainBackendTests.hpp>
 
+#include <QCoreApplication>
 using ::testing::Return;
 
 class Value {
-
 public:
 
     virtual std::string getValue() = 0;
@@ -64,9 +64,11 @@ void runAllUnitTests(int argc, char *argv[])
 
 int main(int argc, char* argv[])
 {
+    QCoreApplication app(argc, argv);
+
     runAllUnitTests(argc, argv);
 
-    return 0;
+    return app.exec();
 }
 
 
