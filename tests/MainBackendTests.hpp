@@ -5,11 +5,20 @@
 
 class BackendMediatorMOCK: public IMediator
 {
+public:
     MOCK_METHOD3(requestAction , void(QString,QString,QVariantList) );
     MOCK_METHOD2(queryAbout , QVariant(QString , QString) );
 };
 
-//virtual void requestAction(QString sender,QString requestedAction,QVariantList args = {}) = 0;
-//virtual QVariant queryAbout(QString sender, QString what) = 0;
+class GeneralBackendTEST : public ::testing::Test
+{
+public:
+    GeneralBackendTEST();
+protected:
+    GeneralBackend gb_;
+    BackendMediatorMOCK data_backend_mock_;
+protected:
+};
+
 
 // FRONTEND MOCK

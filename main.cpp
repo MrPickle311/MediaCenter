@@ -18,5 +18,7 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
     engine.load(url);
 
+    //Notification about C++ environment
+
     return app.exec();
 }
