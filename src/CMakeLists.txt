@@ -1,8 +1,10 @@
 set(backend_headers
-    Backend.hpp)
+    Backend.hpp
+    Environment.hpp )
 
 set(backend_sources
-    Backend.cpp)
+    Backend.cpp
+    Environment.cpp)
 
 add_subdirectory(data_backend)
 

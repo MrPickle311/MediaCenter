@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QVariantMap>
+#include <QQmlContext>
 
 int main(int argc, char *argv[])
 {
@@ -10,6 +11,12 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
+
+    //Notification about C++ environment
+    auto context {new QQmlContext{engine.rootContext(),&engine}};
+    QString cpp_env{"CPP"};
+    context->setContextProperty("env",QVariant::fromValue(cpp_env) );
+
     const QUrl url(QStringLiteral("qrc:/script/qml/main.qml"));
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
                      &app, [url](QObject *obj, const QUrl &objUrl) {
@@ -18,7 +25,7 @@ int main(int argc, char *argv[])
     }, Qt::QueuedConnection);
     engine.load(url);
 
-    //Notification about C++ environment
+
 
     return app.exec();
 }
