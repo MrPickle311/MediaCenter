@@ -21,8 +21,8 @@ Rectangle {
     signal dragging(bool isActive)
     signal toggleButtonClicked()
 
-    property url restoreIcon:  "qrc:/data/restore_icon.svg"
-    property url maximizeIcon: "qrc:/data/maximize_icon.svg"
+    property string restoreIcon:  "restore_icon.svg"
+    property string maximizeIcon: "maximize_icon.svg"
 
     //theses 2 functions set top-left bar maximize icon
     function setRestoreIcon(){
@@ -42,7 +42,7 @@ Rectangle {
     SquareButton {
         id: toggleBtn
         onClicked: toggleButtonClicked()
-        buttonIconSource: "qrc:/data/menu_icon.svg"
+        buttonIconSource: "menu_icon.svg"
     }
 
     Rectangle {
@@ -67,7 +67,7 @@ Rectangle {
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            source: "qrc:/data/media-center.svg"
+            source: "media-center.svg"
             anchors.leftMargin: 0
             anchors.bottomMargin: 0
             anchors.topMargin: 0
@@ -118,7 +118,7 @@ Rectangle {
             id: minimizeButton
             onClicked: minimize()
 
-            buttonIconSource: "qrc:/data/minimize_icon.svg"
+            buttonIconSource: "minimize_icon.svg"
         }
 
         SquareButton{
@@ -140,7 +140,7 @@ Rectangle {
             implicitHeight: 35
             id: closeButton
             pressedColor: "#ff007f"
-            buttonIconSource: "qrc:/data/close_icon.svg"
+            buttonIconSource: "close_icon.svg"
             onClicked: closing()
         }
     }

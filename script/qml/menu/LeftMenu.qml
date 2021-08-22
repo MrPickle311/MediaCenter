@@ -63,7 +63,7 @@ Rectangle {
         LeftMenuButton {
             id: musicButton
             text: qsTr("Play music")
-            buttonIconSource: "qrc:/data/music.svg"
+            buttonIconSource: "music.svg"
 
             onClicked: {
                 selectButton(musicButton)
@@ -74,7 +74,7 @@ Rectangle {
         LeftMenuButton {
             id: videoButton
             text: qsTr("Play video")
-            buttonIconSource: "qrc:/data/video.svg"
+            buttonIconSource: "video.svg"
 
             onClicked: {
                 selectButton(videoButton)
@@ -87,7 +87,7 @@ Rectangle {
             text: qsTr("Browse photos")
             checkable: false
             checked: false
-            buttonIconSource: "qrc:/data/image.svg"
+            buttonIconSource: "image.svg"
 
             onClicked: {
                 selectButton(imagesButton)
@@ -104,7 +104,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 20
         padding: 6
-        buttonIconSource: "qrc:/data/settings_icon.svg"
+        buttonIconSource: "settings_icon.svg"
 
         onClicked: {
             selectButton(settingsButton)

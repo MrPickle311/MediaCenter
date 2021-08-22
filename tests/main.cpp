@@ -8,6 +8,7 @@
 #include <MainBackendTests.hpp>
 
 #include <QCoreApplication>
+
 using ::testing::Return;
 
 class Value {
@@ -64,11 +65,14 @@ void runAllUnitTests(int argc, char *argv[])
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app(argc, argv);
+    //QCoreApplication app(argc, argv);
 
-    runAllUnitTests(argc, argv);
+    //runAllUnitTests(argc, argv);
 
-    return app.exec();
+    //return app.exec();
+
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
 
 

@@ -80,7 +80,7 @@ TextField{
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 10
-            source: "qrc:/data/search.svg"
+            source: "search.svg"
             fillMode: Image.PreserveAspectFit
             sourceSize.height: 20
 
@@ -102,7 +102,7 @@ TextField{
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             anchors.rightMargin: 10
-            source: "qrc:/data/clear.svg"
+            source: "clear.svg"
             fillMode: Image.PreserveAspectFit
             sourceSize.height: 20
             opacity: 0.5

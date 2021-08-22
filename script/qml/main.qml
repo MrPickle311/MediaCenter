@@ -32,8 +32,6 @@ Window {
         }
     }
 
-    property string env: ""
-
     Component.onCompleted: console.log(env)
 
     QtObject{
