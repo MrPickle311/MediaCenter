@@ -31,9 +31,16 @@ public slots:
 class Backend : public IMediator
 {
     Q_OBJECT;
+    friend class BackendBuilder;
 private:
-    std::map<QString, std::unique_ptr<IProxy>> modules_;
+    Backend();
+private:
     QThreadPool tasks_;
+
+    //dependencies
+    std::shared_ptr<IMediator> settings_backend_;
+    std::shared_ptr<IMediator> data_backend_;
+    std::shared_ptr<IMediator> environment_backend_;
 public slots:
     virtual QVariant queryAbout(QString sender, QString what) override;
 };

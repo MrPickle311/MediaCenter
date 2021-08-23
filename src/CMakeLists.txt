@@ -7,6 +7,7 @@ set(backend_sources
     Environment.cpp)
 
 add_subdirectory(data_backend)
+add_subdirectory(utilities)
 
 add_library(ALL_LIBRARIES STATIC
     ${backend_headers}
