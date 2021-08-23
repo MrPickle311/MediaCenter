@@ -9,11 +9,12 @@ class IMediator : public QObject
 {
     Q_OBJECT
 public:
+    virtual ~IMediator(){}
     explicit IMediator(QObject *parent = nullptr);
 public:
-    virtual void requestAction(QString sender,QString requestedAction,QVariantList args = {}) = 0;
     virtual QVariant queryAbout(QString sender, QString what) = 0;
 signals:
+    void requestAction(QString sender,QString requestedAction,QVariantList args = {});
     void requestUIAction(QString action);
 };
 
@@ -34,6 +35,5 @@ private:
     std::map<QString, std::unique_ptr<IProxy>> modules_;
     QThreadPool tasks_;
 public slots:
-    virtual void requestAction(QString sender, QString requestedAction, QVariantList args) override;
     virtual QVariant queryAbout(QString sender, QString what) override;
 };

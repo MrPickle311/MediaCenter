@@ -84,9 +84,6 @@ set(Tests_files
     )
 
 enable_testing()
-set(CTEST_OUTPUT_ON_FAILURE 1)
-set(GTEST_COLOR 1)
-
 find_package(GTest)
 
 function(add_test_exec test_name test_files test_libs)
@@ -94,13 +91,24 @@ function(add_test_exec test_name test_files test_libs)
     target_include_directories(${test_name} PUBLIC ${TESTED_DIRECTORIES})
     target_compile_definitions(${test_name}
        PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
-   gtest_discover_tests(${test_name})
-   #add_test(NAME ${test_name} COMMAND ${test_name})
-   target_link_libraries(${test_name} PRIVATE
+    gtest_discover_tests(${test_name})
+    target_link_libraries(${test_name} PRIVATE
        Threads::Threads Qt5::Core Qt5::Quick Qt5::SerialPort ${test_libs})
 endfunction()
 
-add_test_exec(Tests "${Tests_files}" "${LIBS}")
+function(add_test name)
+    add_executable(${name} ${name}.hpp ${name}.cpp ${GTestFiles})
+    target_include_directories(${name} PUBLIC ${TESTED_DIRECTORIES})
+    target_compile_definitions(${name}
+       PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
+    gtest_discover_tests(${name})
+    target_link_libraries(${name} PRIVATE
+       Threads::Threads Qt5::Core Qt5::Quick Qt5::SerialPort ${test_libs} ALL_LIBRARIES )
+endfunction()
+
+#add_test_exec(Tests "${Tests_files}" "${LIBS}")
+add_test(BackendTests)
+#add_test(EnvironmentTests)
 
 ##qt service stage 2 END
 
