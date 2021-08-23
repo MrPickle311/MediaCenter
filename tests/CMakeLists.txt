@@ -103,11 +103,13 @@ function(add_test name)
        PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
     gtest_discover_tests(${name})
     target_link_libraries(${name} PRIVATE
-       Threads::Threads Qt5::Core Qt5::Quick Qt5::SerialPort ${test_libs} ALL_LIBRARIES )
+       Threads::Threads Qt5::Core Qt5::Quick Qt5::SerialPort ${test_libs} ${LIBS} )
 endfunction()
 
 #add_test_exec(Tests "${Tests_files}" "${LIBS}")
 add_test(BackendTests)
+add_test(ThreadsafeListTests)
+add_test(ThreadsafeQueueTests)
 #add_test(EnvironmentTests)
 
 ##qt service stage 2 END
