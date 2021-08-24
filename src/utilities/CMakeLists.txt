@@ -1,5 +1,4 @@
 set(utilities_headers
-    ThreadsafeList.hpp
     ThreadsafeQueue.hpp
     ThreadPool.hpp)
 
@@ -12,4 +11,4 @@ add_library(UTILITIES_LIB STATIC
 
 target_link_libraries(UTILITIES_LIB )
 
-set_target_properties(UTILITIES_LIB PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(UTILITIES_LIB PROPERTIES LINKER_LANGUAGE CXX CMAKE_CXX_STANDARD 17 )

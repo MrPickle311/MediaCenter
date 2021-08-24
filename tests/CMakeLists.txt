@@ -64,11 +64,14 @@ set(LIBS
 
 set(TESTED_DIRECTORIES
     ${CMAKE_CURRENT_SOURCE_DIR}/../src
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utilities
 )
 
 set(TESTED_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/Backend.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/Environment.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../utilites/ThreadsafeQueue.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../utilites/ThreadPool.hpp
     #${CMAKE_CURRENT_SOURCE_DIR}/../src/data_backend/Backend.hpp
 )
 
@@ -85,6 +88,11 @@ set(Tests_files
 
 enable_testing()
 find_package(GTest)
+
+find_package(Boost 1.71.0)
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
 
 function(add_test_exec test_name test_files test_libs)
     add_executable(${test_name} ${test_files} ${GTestFiles})
@@ -103,13 +111,14 @@ function(add_test name)
        PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
     gtest_discover_tests(${name})
     target_link_libraries(${name} PRIVATE
-       Threads::Threads Qt5::Core Qt5::Quick Qt5::SerialPort ${test_libs} ${LIBS} )
+       Threads::Threads Qt5::Core Qt5::Quick Qt5::SerialPort ${test_libs} ${LIBS} ${Boost_LIBRARIES})
 endfunction()
 
 #add_test_exec(Tests "${Tests_files}" "${LIBS}")
-add_test(BackendTests)
-add_test(ThreadsafeListTests)
-add_test(ThreadsafeQueueTests)
+#add_test(BackendTests)
+#add_test(ThreadsafeListTests)
+#add_test(ThreadsafeQueueTests)
+add_test(ThreadPoolTests)
 #add_test(EnvironmentTests)
 
 ##qt service stage 2 END
