@@ -2,21 +2,6 @@
 #include <queue>
 #include "ThreadsafeQueue.hpp"
 
-class IThreadJoiner
-{
-public:
-    virtual ~IThreadJoiner(){}
-};
-
-class ThreadJoiner : public IThreadJoiner
-{
-private:
-    std::vector<std::thread>* threads_;
-public:
-    explicit ThreadJoiner(std::vector<std::thread>* threads);
-    virtual ~ThreadJoiner();
-};
-
 class IFunctionWrapper
 {
 public:
@@ -105,9 +90,7 @@ private:
     //out
     std::vector<std::thread> threads_;
 
-    //out
-    ThreadJoiner joiner_;
-
+    //MEMORY LEAK
     inline static thread_local StealingQueue* local_queue_;
 
     //out

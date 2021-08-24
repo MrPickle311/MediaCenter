@@ -26,6 +26,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Quick Multimedia  REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Quick Multimedia REQUIRED)
+find_package(Boost 1.71.0)
+
+if(Boost_FOUND)
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
 
 set(PROJECT_SOURCES
         main.cpp
@@ -66,6 +71,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     CXX_STANDARD 17
     CMAKE_CXX_STANDARD_REQUIRED ON
     )
+
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_import_qml_plugins(MediaCenter)
