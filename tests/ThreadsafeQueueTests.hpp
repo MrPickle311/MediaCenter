@@ -16,10 +16,6 @@ protected:
     }
 
     //expectations
-    void clear()
-    {
-        EXPECT_NO_THROW(queue.clear());
-    }
     void expectTryRefPopEqual(int val, int init_val = 0)
     {
         int temp{init_val};

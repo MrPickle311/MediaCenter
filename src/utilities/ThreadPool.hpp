@@ -2,29 +2,41 @@
 #include <queue>
 #include "ThreadsafeQueue.hpp"
 
-class ThreadJoiner
+class IThreadJoiner
 {
-private:
-    std::vector<std::thread>& threads_;
 public:
-    explicit ThreadJoiner(std::vector<std::thread>& threads);
-    ~ThreadJoiner();
+    virtual ~IThreadJoiner(){}
 };
 
+class ThreadJoiner : public IThreadJoiner
+{
+private:
+    std::vector<std::thread>* threads_;
+public:
+    explicit ThreadJoiner(std::vector<std::thread>* threads);
+    virtual ~ThreadJoiner();
+};
+
+class IFunctionWrapper
+{
+public:
+
+};
+
+//@brief A function object with moving semantics
 class FunctionWrapper
 {
 private:
-    struct ImplementationBase
+    struct IImplementation
     {
         virtual void call() = 0;
-        virtual ~ImplementationBase() {}
+        virtual ~IImplementation() {}
     };
 
-    std::unique_ptr<ImplementationBase> implementation_;
+    std::unique_ptr<IImplementation> implementation_;
 
     template<typename PackagedTaskType>
-    struct ImplementationType:
-        public ImplementationBase
+    struct ImplementationType : public IImplementation
     {
         PackagedTaskType func_;
         ImplementationType(PackagedTaskType&& func_):
@@ -46,7 +58,6 @@ public:
     FunctionWrapper(FunctionWrapper&& wrapper);
 
     void operator() ();
-
     FunctionWrapper& operator=(FunctionWrapper&& wrapper);
 
     FunctionWrapper(const FunctionWrapper&) = delete;
@@ -54,7 +65,17 @@ public:
     FunctionWrapper& operator=(const FunctionWrapper&) = delete;
 };
 
-class StealingQueue
+class IStealingQueue
+{
+    using DataType = FunctionWrapper;
+public:
+    virtual void push(DataType data) = 0;
+    virtual bool empty() const = 0;
+    virtual bool tryPop(DataType& data) = 0;
+    virtual bool trySteal(DataType& data) = 0;
+};
+
+class StealingQueue 
 {
     using DataType = FunctionWrapper;
 private:
@@ -77,12 +98,19 @@ class ThreadPool
     using LocalQueueType = std::queue<TaskType>;
 private:
     std::atomic_bool done_;
+
     ThreadsafeQueue<TaskType> global_queue_;
     std::vector<std::unique_ptr<StealingQueue>> queues_;
+
+    //out
     std::vector<std::thread> threads_;
+
+    //out
     ThreadJoiner joiner_;
 
     inline static thread_local StealingQueue* local_queue_;
+
+    //out
     inline static thread_local size_t my_index_;
 private:
     void workerThread(size_t my_index);
@@ -102,7 +130,12 @@ public:
 
         std::future<ResultType> res{task.get_future()};
 
-        if(local_queue_) local_queue_->push(std::move(task));
+        if(local_queue_)
+        {
+            local_queue_->push(std::move(task));
+        } 
         else global_queue_.push(std::move(task));
+
+        return res;
     }
 };
