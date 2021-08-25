@@ -3,45 +3,19 @@
 #include <boost/asio/post.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
+#include <functional>
 
-template<typename T>
-int add(T a , T b)
+int add(int a , int b)
 {
     return a + b;
 }
 
-
 TEST(TST, StabilityTest)
 {
-    using namespace boost::asio;
-    using namespace boost;
+    uint threads_count{5};
+    TaskManager manager{threads_count};
 
-    std::promise<int> promise;
-    auto future = promise.get_future();
-
-    thread_pool pool(4);
-    post(pool, 
-    [&]
-    {
-        promise.set_value(func(4,5));
-    });
-
-    int res {future.get()};
-
-    //auto res {pool.submit(wrapper).get()};
-    EXPECT_EQ(res,9);
-}
-
-TEST(TST, StabilityTest2)
-{
-    int threads_count{5};
-    TaskManager manager{new ThreadSorageBoost{threads_count}};
-
-    //no necessary 
-    //auto future = flag.get_future();
-
-    //internally invokes flag.get_future();
-    int res = manager.addTask(add, 5 , 6).getFuture().get();
+    auto res = manager.addTask(add,5,6).get();
 
     EXPECT_EQ(res,11);
 }
@@ -55,10 +29,8 @@ int aggravatingFunction()
 
 TEST(TST, DutyTest)
 {
-    int threads_count{5};
-    TaskManager manager{new ThreadSorageBoost{threads_count}};
-
-    std::promise<int> flag;
+    uint threads_count{10};
+    TaskManager manager{threads_count};
 
     uint task_count = 100;
 
@@ -67,20 +39,27 @@ TEST(TST, DutyTest)
 
     for(uint i{0}; i < task_count ; ++i)
     {
-        futures[i] = manager.addTask(flag,add, 5 , 6).getFuture();
+        futures[i] = manager.addTask(aggravatingFunction);
     }
 
-    int sum{0};
+    uint sum{0};
 
     std::this_thread::sleep_for(std::chrono::milliseconds{400});
+    
+    auto start = std::chrono::steady_clock::now();
 
     for(uint i{0}; i < task_count ; ++i)
     {
         sum += futures[i].get();
     }
 
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end-start;
+
     EXPECT_EQ(sum,task_count);
+    EXPECT_NEAR(elapsed_seconds.count(),5.0,0.5);
 }
+
 
 int main(int argc, char *argv[])
 {

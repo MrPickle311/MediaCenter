@@ -1,6 +1,13 @@
 #pragma once
+
 #include <queue>
+#include <type_traits>
+
 #include "ThreadsafeQueue.hpp"
+
+#include <boost/asio/thread_pool.hpp>
+#include <boost/asio/post.hpp>
+#include <boost/thread/thread.hpp>
 
 class IFunctionWrapper
 {
@@ -77,47 +84,51 @@ public:
     bool trySteal(DataType& data);
 };
 
-class ThreadPool
+class TaskManager
 {
-    using TaskType = FunctionWrapper;
-    using LocalQueueType = std::queue<TaskType>;
+    //using TaskType = FunctionWrapper;
+    //using LocalQueueType = std::queue<TaskType>;
 private:
-    std::atomic_bool done_;
+    //std::atomic_bool done_;
 
-    ThreadsafeQueue<TaskType> global_queue_;
-    std::vector<std::unique_ptr<StealingQueue>> queues_;
+    boost::asio::thread_pool pool_;
+
+    //ThreadsafeQueue<TaskType> global_queue_;
+    //std::vector<std::unique_ptr<StealingQueue>> queues_;
 
     //out
-    std::vector<std::thread> threads_;
+    //std::vector<std::thread> threads_;
 
     //MEMORY LEAK
-    inline static thread_local StealingQueue* local_queue_;
+    //inline static thread_local StealingQueue* local_queue_;
 
     //out
-    inline static thread_local size_t my_index_;
-private:
-    void workerThread(size_t my_index);
-    bool popTaskFromLocalQueue(TaskType& task);
-    bool popTaskFromGlobalQueue(TaskType& task);
-    bool popTaskFromOtherQueue(TaskType& task);
+    //inline static thread_local size_t my_index_;
 public:
-    ThreadPool();
-    virtual ~ThreadPool();
-    void runPendingTask();
-    template<typename FunctionType>
-    std::future<typename std::result_of<FunctionType()>::type> submit(FunctionType new_task)
+    TaskManager(uint threads_count):
+        pool_{threads_count}
+    {}
+    ~TaskManager()
     {
-        typedef typename std::result_of<FunctionType()>::type ResultType;
+        pool_.join();
+    }
+    //typename std::result_of<Function>::type
+    template<typename Function, typename ... Args>
+    auto addTask(Function&& new_task, Args... args) -> std::future<decltype(new_task(args...))>
+    {
+        typedef decltype(new_task(args...)) ResultType;
 
-        std::packaged_task<ResultType()> task{std::move(new_task)};
+        std::promise<ResultType> promise;
 
-        std::future<ResultType> res{task.get_future()};
+        auto res{promise.get_future()};
 
-        if(local_queue_)
+        boost::asio::post(pool_ , 
+        [local_promise = std::move(promise) , 
+         task_to_call  = std::forward<Function>(new_task) ,
+         args... ] () mutable
         {
-            local_queue_->push(std::move(task));
-        } 
-        else global_queue_.push(std::move(task));
+            local_promise.set_value(task_to_call(args...));
+        });
 
         return res;
     }

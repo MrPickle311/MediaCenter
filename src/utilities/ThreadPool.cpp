@@ -1,23 +1,5 @@
 #include "ThreadPool.hpp"
 
-//ThreadJoiner
-
-ThreadJoiner::ThreadJoiner(std::vector<std::thread>* threads):
-    threads_{threads_}
-{}
-
-ThreadJoiner::~ThreadJoiner()
-{
-    if(!threads_)
-    {
-        throw std::runtime_error{"Threads vector is nullptr"};
-    }
-
-    for(auto&& thread : *threads_)
-        if(thread.joinable())
-            thread.join();
-}
-
 //FunctionWrapper
 
 FunctionWrapper::FunctionWrapper(FunctionWrapper&& wrapper):
@@ -77,19 +59,18 @@ bool StealingQueue::trySteal(DataType& data)
 //ThreadPool
 
 //public
-ThreadPool::ThreadPool():
-        done_{false},
-        joiner_{&threads_}
+/*
+ThreadPool::ThreadPool(uint threads_count):
+        done_{false}
 {
     size_t const thread_count {std::thread::hardware_concurrency()};
     try
     {
-        std::cout << "guh";
         for(size_t i = 0; i < thread_count; ++i)
             queues_.push_back(std::unique_ptr<StealingQueue> {new StealingQueue});
 
-        for(size_t i = 0; i < thread_count; ++i)
-            threads_.push_back(std::thread{&ThreadPool::workerThread,this,i});
+        //for(size_t i = 0; i < thread_count; ++i)
+        //    threads_.push_back(std::thread{&ThreadPool::workerThread,this,i});
     }   
     catch(...)
     {
@@ -97,12 +78,9 @@ ThreadPool::ThreadPool():
 		throw;
     }
 }
+*/
 
-ThreadPool::~ThreadPool()
-{
-    done_ = true;
-}
-
+/*
 void ThreadPool::runPendingTask()
 {
     TaskType task;
@@ -119,15 +97,15 @@ void ThreadPool::runPendingTask()
 
 void ThreadPool::workerThread(size_t my_index)
 {
-        my_index_ = my_index;
-        local_queue_ = queues_[my_index].get();
-        while (!done_)//while !done , search new tasks to do
-            runPendingTask();
+    my_index_ = my_index;
+    local_queue_ = queues_[my_index].get();
+    while (!done_)//while !done , search new tasks to do
+        runPendingTask();
 }
 
 bool ThreadPool::popTaskFromLocalQueue(TaskType& task)
 {
-    return local_queue_ && local_queue_->tryPop(task);
+    //return local_queue_ && local_queue_->tryPop(task);
 }
 
 bool ThreadPool::popTaskFromGlobalQueue(TaskType& task)
@@ -145,3 +123,4 @@ bool ThreadPool::popTaskFromOtherQueue(TaskType& task)
     }
     return false;  
 }
+*/
