@@ -10,7 +10,7 @@ int add(int a , int b)
     return a + b;
 }
 
-TEST(TST, StabilityTest)
+TEST(ThreadPoolTest, StabilityTest)
 {
     uint threads_count{5};
     TaskManager manager{threads_count};
@@ -27,7 +27,7 @@ int aggravatingFunction()
     return 1;
 }
 
-TEST(TST, DutyTest)
+TEST(ThreadPoolTest, DutyTest)
 {
     uint threads_count{10};
     TaskManager manager{threads_count};
@@ -60,9 +60,27 @@ TEST(TST, DutyTest)
     EXPECT_NEAR(elapsed_seconds.count(),5.0,0.5);
 }
 
+void saveSth(std::shared_ptr<std::string> str)
+{
+    *str = "Result";
+}
+
+TEST(ThreadPoolTest , VoidTest)
+{
+    uint threads_count{3};
+    TaskManager manager{threads_count};
+
+    std::shared_ptr<std::string> str{new std::string};
+
+    manager.addTask(saveSth,str).get();
+
+    EXPECT_STREQ(str->c_str(),"Result");
+}
+
 
 int main(int argc, char *argv[])
 {
+    QCoreApplication app{int argc, char *argv[]};
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

@@ -72,7 +72,6 @@ set(TESTED_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/../src/Environment.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../utilites/ThreadsafeQueue.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../utilites/ThreadPool.hpp
-    #${CMAKE_CURRENT_SOURCE_DIR}/../src/data_backend/Backend.hpp
 )
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../src build)
@@ -93,16 +92,6 @@ find_package(Boost 1.71.0)
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
-
-function(add_test_exec test_name test_files test_libs)
-    add_executable(${test_name} ${test_files} ${GTestFiles})
-    target_include_directories(${test_name} PUBLIC ${TESTED_DIRECTORIES})
-    target_compile_definitions(${test_name}
-       PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
-    gtest_discover_tests(${test_name})
-    target_link_libraries(${test_name} PRIVATE
-       Threads::Threads Qt5::Core Qt5::Quick Qt5::SerialPort ${test_libs})
-endfunction()
 
 function(add_test name)
     add_executable(${name} ${name}.hpp ${name}.cpp ${GTestFiles})

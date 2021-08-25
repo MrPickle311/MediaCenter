@@ -9,12 +9,6 @@
 #include <boost/asio/post.hpp>
 #include <boost/thread/thread.hpp>
 
-class IFunctionWrapper
-{
-public:
-
-};
-
 //@brief A function object with moving semantics
 class FunctionWrapper
 {
@@ -84,52 +78,52 @@ public:
     bool trySteal(DataType& data);
 };
 
+// @brief Object of this class has a thread pool to which
+// tasks can be added. User has the guarance that each 
+// task is performed. 
 class TaskManager
 {
-    //using TaskType = FunctionWrapper;
-    //using LocalQueueType = std::queue<TaskType>;
 private:
-    //std::atomic_bool done_;
-
     boost::asio::thread_pool pool_;
-
-    //ThreadsafeQueue<TaskType> global_queue_;
-    //std::vector<std::unique_ptr<StealingQueue>> queues_;
-
-    //out
-    //std::vector<std::thread> threads_;
-
-    //MEMORY LEAK
-    //inline static thread_local StealingQueue* local_queue_;
-
-    //out
-    //inline static thread_local size_t my_index_;
 public:
+    // @brief Constructor takes the number of using threads
     TaskManager(uint threads_count):
         pool_{threads_count}
     {}
+    // @brief Finishes all tasks and destroys object  
     ~TaskManager()
     {
         pool_.join();
     }
-    //typename std::result_of<Function>::type
+    // @brief   This method adds a new task to the thread pool
+    // @param   Function object to call
+    // @param   Arguments its invokation
+    // @return  Return future associated with task's result
     template<typename Function, typename ... Args>
     auto addTask(Function&& new_task, Args... args) -> std::future<decltype(new_task(args...))>
     {
-        typedef decltype(new_task(args...)) ResultType;
+        using ResultType = decltype(new_task(args...));// new_task return type
 
         std::promise<ResultType> promise;
+        auto res{promise.get_future()}; // extern future binding for a user
 
-        auto res{promise.get_future()};
-
+        //forward task and its arguments to the thread pool
         boost::asio::post(pool_ , 
-        [local_promise = std::move(promise) , 
-         task_to_call  = std::forward<Function>(new_task) ,
-         args... ] () mutable
+        [   //parameters in lambda
+            local_promise = std::move(promise) , 
+            task_to_call  = std::forward<Function>(new_task) , //perfect forward the task
+            args... // function args
+        ] () mutable
         {
-            local_promise.set_value(task_to_call(args...));
+            //if return type is void. Cannot assign void to variable
+            if constexpr (std::is_same<ResultType,void>::value)
+            {
+                task_to_call(args...);
+                local_promise.set_value();
+            }
+            else local_promise.set_value(task_to_call(args...));
         });
 
-        return res;
+        return res; 
     }
 };
