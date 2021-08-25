@@ -3,7 +3,6 @@
 #include <gmock/gmock.h>
 #include <ThreadPool.hpp>
 
-//qt
-#include <QCoreApplication>
+#include "CommonUtils.hpp"
 
 int func(int a,int b);

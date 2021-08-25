@@ -28,7 +28,7 @@ BackendTEST::BackendTEST():
 
     backend_ = std::move(builder.getBackendObject());
 
-    QObject::connect(&loop_,&DelayedEventLoop::runned, &wrapper_ , &FunctionWrapper::invoke);
+    QObject::connect(&loop_,&DelayedEventLoop::runned, &wrapper_ , &QFunctionWrapper::invoke);
 }
 
 TEST_F(BackendTEST, InitialTest)
@@ -51,34 +51,6 @@ TEST_F(BackendTEST, InitialTest)
     EXPECT_STREQ(result[0].toStdString().c_str(),"song3.mp3");
 }
 
-void DelayedEventLoop::emitDelayedStartSignal()
-{
-    std::this_thread::sleep_for(this->delay_);
-    emit runned();
-}
-
-DelayedEventLoop::DelayedEventLoop(int ms):
-    delay_{ms}
-{}
-
-void DelayedEventLoop::startTestEventLoop()
-{
-    std::thread th{&DelayedEventLoop::emitDelayedStartSignal,this};
-    loop_.exec();
-    th.join();
-}
-
-void DelayedEventLoop::killTestEventLoop()
-{
-    loop_.quit();
-}
-
-void DEMock::prnt()
-{
-    std::cout << "\n\n! END !\n\n";
-    emit end();
-}
-
 int main(int argc, char *argv[])
 {
     QCoreApplication app{argc , argv};
@@ -86,12 +58,4 @@ int main(int argc, char *argv[])
     return RUN_ALL_TESTS();
 }
 
-void FunctionWrapper::invoke()
-{
-    func_();
-}
 
-void FunctionWrapper::setFunction(std::function<void ()> func)
-{
-    this->func_ = std::move(func);
-}
