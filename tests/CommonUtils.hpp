@@ -31,4 +31,6 @@ public slots:
     void invoke();
 public:
     void setFunction(std::function<void()> func);
+signals:
+    void sendSignal(std::string msg = {});
 };

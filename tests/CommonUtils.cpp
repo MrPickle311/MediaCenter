@@ -1,5 +1,5 @@
 #include <CommonUtils.hpp>
-
+#include <iostream>
 void DelayedEventLoop::emitDelayedStartSignal()
 {
     std::this_thread::sleep_for(this->delay_);
@@ -13,6 +13,7 @@ DelayedEventLoop::DelayedEventLoop(int ms):
 void DelayedEventLoop::startTestEventLoop()
 {
     std::thread th{&DelayedEventLoop::emitDelayedStartSignal,this};
+    std::cout << "\nHI\n";
     loop_.exec();
     th.join();
 }

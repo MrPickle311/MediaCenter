@@ -57,7 +57,7 @@ TEST(ThreadPoolTest, DutyTest)
     std::chrono::duration<double> elapsed_seconds = end-start;
 
     EXPECT_EQ(sum,task_count);
-    EXPECT_NEAR(elapsed_seconds.count(),5.0,0.5);
+    EXPECT_LE(elapsed_seconds.count(), 5.5);//exec time < 5.5 sec
 }
 
 void saveSth(std::shared_ptr<std::string> str)
@@ -77,10 +77,29 @@ TEST(ThreadPoolTest , VoidTest)
     EXPECT_STREQ(str->c_str(),"Result");
 }
 
+TEST_F(ThreadPoolTests , QtEnvTest)
+{
+    std::string msg_to_test {"HappyMsg"};
+
+    std::function<void()> invoked_function = 
+    [&]()
+    {
+        manager_.addTask(
+            [this, msg_to_test]
+            { 
+                this->received_msg_ = msg_to_test;
+                loop_.killTestEventLoop();
+            });
+    };
+    wrapper_.setFunction(std::move(invoked_function));
+    loop_.startTestEventLoop();
+
+    EXPECT_STREQ(this->received_msg_.c_str(), msg_to_test.c_str());
+}
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication app(int argc , char *argv[]);
+    QCoreApplication app{argc , argv};
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

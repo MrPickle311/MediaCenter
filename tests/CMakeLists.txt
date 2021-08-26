@@ -76,13 +76,9 @@ set(TESTED_HEADERS
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../src build)
 
-set(Tests_files
-    main.cpp
-    MainBackendTests.hpp
-    MainBackendTests.cpp
-    EnvironmentTests.hpp
-    EnvironmentTests.cpp
-    ${TESTED_HEADERS}
+set(COMMON_UTILS
+    CommonUtils.cpp
+    CommonUtils.hpp
     )
 
 enable_testing()
@@ -94,7 +90,7 @@ if(Boost_FOUND)
 endif()
 
 function(add_test name)
-    add_executable(${name} ${name}.hpp ${name}.cpp ${GTestFiles})
+    add_executable(${name} ${name}.hpp ${name}.cpp ${COMMON_UTILS} ${GTestFiles})
     target_include_directories(${name} PUBLIC ${TESTED_DIRECTORIES})
     target_compile_definitions(${name}
        PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
@@ -103,9 +99,7 @@ function(add_test name)
        Threads::Threads Qt5::Core Qt5::Quick Qt5::SerialPort ${test_libs} ${LIBS} ${Boost_LIBRARIES})
 endfunction()
 
-#add_test_exec(Tests "${Tests_files}" "${LIBS}")
 #add_test(BackendTests)
-#add_test(ThreadsafeListTests)
 #add_test(ThreadsafeQueueTests)
 add_test(ThreadPoolTests)
 #add_test(EnvironmentTests)

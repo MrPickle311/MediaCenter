@@ -86,6 +86,10 @@ class TaskManager
 private:
     boost::asio::thread_pool pool_;
 public:
+    // @brief The default constructor , number of threads is automatically set
+    TaskManager():
+        pool_{}
+    {}
     // @brief Constructor takes the number of using threads
     TaskManager(uint threads_count):
         pool_{threads_count}
