@@ -1,9 +1,9 @@
 set(utilities_headers
     ThreadsafeQueue.hpp
-    ThreadPool.hpp)
+    TaskManager.hpp)
 
 set(utilities_sources
-    ThreadPool.cpp)
+    TaskManager.cpp)
 
 add_library(UTILITIES_LIB STATIC
     ${utilities_headers}

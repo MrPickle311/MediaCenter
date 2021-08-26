@@ -1,7 +1,7 @@
 #pragma once
 
 #include <gmock/gmock.h>
-#include <ThreadPool.hpp>
+#include <TaskManager.hpp>
 
 #include "CommonUtils.hpp"
 
