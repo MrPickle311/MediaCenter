@@ -1,37 +1,6 @@
 #include "BackendTests.hpp"
 #include <QCoreApplication>
 
-UIMock::UIMock(std::shared_ptr<Backend> backend, QObject *parent) :
-    QObject(parent),
-    backend_(backend)
-{
-    QObject::connect(this , &UIMock::requestAction , backend_.get() , &Backend::requestAction );
-}
-
-QVariant UIMock::queryAbout(QString sender, QString what)
-{
-    emit dataReady();
-    return backend_->queryAbout(sender,what);
-}
-
-
-BackendTEST::BackendTEST():
-    ui_mock_{backend_},
-    backend_{nullptr}
-{
-    BackendBuilder builder;
-
-    builder.setDataBackendDependency(&data_backend_mock_);
-    builder.setEnvironmentDependency(&env_backend_mock_);
-    builder.setSettingsDependency(&settings_backend_mock_);
-    builder.setMaxThreadsCount(3);
-
-    backend_ = std::move(builder.getBackendObject());
-
-    QObject::connect(&loop_,&DelayedEventLoop::runned, &wrapper_ , &QFunctionWrapper::invoke);
-    QObject::connect(&ui_mock_ , &UIMock::dataReady , &loop_ , &DelayedEventLoop::killTestEventLoop);
-}
-
 //Jeśli operacja szukania jest wykonywana ,to przerwij ją i rób tę ,co nadesłałem
 //Co jakiś czas niech sprawdza flagę , czy nie należy przerwać zadania.
 // State machine ? https://www.boost.org/doc/libs/1_49_0/libs/msm/doc/HTML/examples/SimpleTutorial.cpp
@@ -43,16 +12,6 @@ TEST_F(BackendTEST, Stability)
                          {"/home/abc/audio/song3.mp3"},{"song3.mp3"});
     
     setUIQueryAboutAsInit("Audio","Search",{QString{"song3.mp3"}});
-
-    // std::function<void()> ui_action = [&]()
-    // {
-        //waits until searched QStringList is prepared
-        // ODPAL JESZCZE SETTINGSY PRZED
-        // result = ui_mock_.queryAbout("Audio","SearchSongs",{QString{"song3.mp3"}});
-        // emit ui_mock_.dataReady();
-    // };
-
-    // setInitialFunction(ui_action);
     
     startEventLoop();
 

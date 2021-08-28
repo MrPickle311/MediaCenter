@@ -20,18 +20,12 @@ class UIMock : public QObject
     std::shared_ptr<Backend> backend_;
 public:
     virtual ~UIMock(){};
-    UIMock(std::shared_ptr<Backend> backend, QObject *parent = nullptr);
+    UIMock(std::shared_ptr<Backend> backend, QObject* parent = nullptr);
 signals:
     void requestAction(QString sender ,QString what , QVariantList args = {});
     void dataReady();
 public slots:
-    QStringList queryAbout(QString sender , QString what , QStringList);
-};
-
-class BactendTestObjectsWrapper
-{
-protected:
-
+    QStringList queryAbout(QString sender , QString what , QStringList args = {});
 };
 
 struct MediatorsMocks
@@ -43,20 +37,22 @@ struct MediatorsMocks
 
 struct Utils
 {
+    UIMock            ui_mock_;
     QFunctionWrapper  initizal_function_wrapper_;
     DelayedEventLoop  event_loop_;
-    UIMock            ui_mock_;
     QStringList       result;
-
+public:
+    Utils(std::shared_ptr<Backend> backend);
 };
 
 class BackendTEST : public ::testing::Test
 {
 public:
     BackendTEST();
+    virtual ~BackendTEST(){}
 protected:
-    Utils utils_;
-    MediatorsMocks mocks_;
+    Utils           utils_;
+    MediatorsMocks  mocks_;
     //tested obj
     std::shared_ptr<Backend>    backend_;
 protected:
@@ -67,7 +63,6 @@ protected:
                                std::string  what   ,
                                QStringList  call_args = {});
 //Result expectations
-    void expectCanConvertToStringList();
     void expectResultSize(int size);
     void expectResultElementEqualTo(int idx,std::string what);
 //calls expectations
@@ -78,5 +73,95 @@ protected:
                               QStringList   call_args = {});
 };
 
+Utils::Utils(std::shared_ptr<Backend> backend):
+        ui_mock_(std::move(backend))
+{
+    QObject::connect(&event_loop_ , &DelayedEventLoop::runned , 
+                     &initizal_function_wrapper_ , &QFunctionWrapper::invoke);
+    QObject::connect(&ui_mock_ , &UIMock::dataReady , 
+                     &event_loop_ , &DelayedEventLoop::killTestEventLoop);
+}
 
-// FRONTEND MOCK
+UIMock::UIMock(std::shared_ptr<Backend> backend, QObject *parent) :
+    QObject(parent),
+    backend_(backend)
+{
+    QObject::connect(this , &UIMock::requestAction , backend_.get() , &Backend::requestAction );
+}
+
+QStringList UIMock::queryAbout(QString sender, QString what,  QStringList args)
+{
+    emit dataReady();
+    return backend_->queryAbout(sender,what);
+}
+
+
+BackendTEST::BackendTEST():
+    utils_{backend_},
+    backend_{nullptr}
+{
+    BackendBuilder builder;
+
+    builder.setDataBackendDependency(&mocks_.data_storage_);
+    builder.setEnvironmentDependency(&mocks_.environment_);
+    builder.setSettingsDependency(&mocks_.settings_);
+    builder.setMaxThreadsCount(3);
+
+    backend_ = std::move(builder.getBackendObject());
+}
+
+void BackendTEST::startEventLoop() 
+{
+    utils_.event_loop_.startTestEventLoop();
+}
+
+void BackendTEST::setInitialFunction(std::function<void()> function) 
+{
+    utils_.initizal_function_wrapper_.setFunction(std::move(function));
+}
+
+void BackendTEST::setUIQueryAboutAsInit(std::string  sender ,
+                                        std::string  what   ,
+                                        QStringList  call_args) 
+{
+    std::function<void()> ui_action = [&]()
+    {
+        //waits until searched QStringList is prepared
+        //how about settings mock ?
+        //the point is that settings mock returns value immediately,
+        //so i have to introduce another mock pre-call here
+
+        
+
+        utils_.result = utils_.ui_mock_.queryAbout(QString::fromStdString(sender) ,
+                                                   QString::fromStdString(what) ,
+                                                   call_args);
+        emit utils_.ui_mock_.dataReady();
+    };
+ 
+    setInitialFunction(ui_action);
+}
+
+void BackendTEST::expectResultSize(int size) 
+{
+    EXPECT_EQ(utils_.result.size(),size);
+}
+
+void BackendTEST::expectResultElementEqualTo(int idx,std::string what) 
+{
+    EXPECT_STREQ(utils_.result.at(idx).toStdString().c_str(),what.c_str());
+}
+
+void BackendTEST::expectQueryAboutCall(MediatorMOCK& target ,
+                                       std::string   sender ,
+                                       std::string   what ,
+                                       QStringList   result , 
+                                       QStringList   call_args) 
+{
+    using ::testing::Eq;
+    using ::testing::Return;
+
+    EXPECT_CALL(target, queryAbout(Eq(sender),Eq(what),Eq(call_args)))
+        .WillOnce(Return(result));
+}
+
