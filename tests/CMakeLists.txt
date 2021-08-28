@@ -15,7 +15,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt5 REQUIRED)
 find_package(Threads REQUIRED)
-find_package(Qt5 COMPONENTS Core Quick SerialPort REQUIRED)
+find_package(Qt5 COMPONENTS Core Quick SerialPort Test REQUIRED)
 
 ##qt service stage 1 END
 
@@ -96,12 +96,12 @@ function(add_test name)
        PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
     gtest_discover_tests(${name})
     target_link_libraries(${name} PRIVATE
-       Threads::Threads Qt5::Core Qt5::Quick Qt5::SerialPort ${test_libs} ${LIBS} ${Boost_LIBRARIES})
+       Threads::Threads Qt5::Core Qt5::Quick  Qt5::Test Qt5::SerialPort ${test_libs} ${LIBS} ${Boost_LIBRARIES})
 endfunction()
 
-#add_test(BackendTests)
+add_test(BackendTests)
 #add_test(ThreadsafeQueueTests)
-add_test(ThreadPoolTests)
+#add_test(TaskManagerTests)
 #add_test(EnvironmentTests)
 
 ##qt service stage 2 END
