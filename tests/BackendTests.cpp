@@ -7,11 +7,13 @@
 
 TEST_F(BackendTEST, Stability)
 {
+    QueryAboutData data ;
+
     expectQueryAboutCall(mocks_.settings_,"DataStorage","Paths",{"/home/abc/audio"});
     expectQueryAboutCall(mocks_.data_storage_,"Audio","Search",
                          {"/home/abc/audio/song3.mp3"},{"song3.mp3"});
     
-    setUIQueryAboutAsInit("Audio","Search",{QString{"song3.mp3"}});
+    setUIQueryAboutAsInit("Audio","Search",{{"song3.mp3"}});
     
     startEventLoop();
 
@@ -29,7 +31,7 @@ TEST_F(BackendTEST , AudioNotFullName)
                          "/home/abc/audio/song3.mp3"}
                         ,{"song"});
 
-    setUIQueryAboutAsInit("Audio","Search",{QString{"song"}});
+    setUIQueryAboutAsInit("Audio","Search",{{"song"}});
 
     startEventLoop();
 
@@ -48,7 +50,7 @@ TEST_F(BackendTEST, AudioMultipleFileName)
                          "/home/abc/audio/vol2/song3.mp3"}
                         ,{"song3.mp3"});
 
-    setUIQueryAboutAsInit("Audio","Search",{QString{"song3.mp3"}});
+    setUIQueryAboutAsInit("Audio","Search",{{"song3.mp3"}});
 
     startEventLoop();
 

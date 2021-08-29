@@ -73,6 +73,33 @@ protected:
                               QStringList   call_args = {});
 };
 
+struct QueryAboutData
+{
+    //make getters and setters
+    std::string   sender;
+    std::string   what;
+    QStringList   result;
+    QStringList   call_args;
+};
+
+class IQueryAboutDataFactory
+{
+public:
+    virtual QueryAboutData produce() const = 0;
+};
+
+class IQueryAboutInvokation
+{
+public:
+
+};
+
+class IQueryAboutMockFactory
+{
+public:
+
+};
+
 Utils::Utils(std::shared_ptr<Backend> backend):
         ui_mock_(std::move(backend))
 {
@@ -131,7 +158,11 @@ void BackendTEST::setUIQueryAboutAsInit(std::string  sender ,
         //the point is that settings mock returns value immediately,
         //so i have to introduce another mock pre-call here
 
-        
+        // mediator query struct and any factory pattern ?
+        // function factory!!!
+        // expectQueryAboutCall factory !!!
+        // std::function factory !!!
+        // responsibility chain template !!!
 
         utils_.result = utils_.ui_mock_.queryAbout(QString::fromStdString(sender) ,
                                                    QString::fromStdString(what) ,
@@ -162,6 +193,12 @@ void BackendTEST::expectQueryAboutCall(MediatorMOCK& target ,
     using ::testing::Return;
 
     EXPECT_CALL(target, queryAbout(Eq(sender),Eq(what),Eq(call_args)))
-        .WillOnce(Return(result));
+        .WillOnce(
+            [&]
+            {
+                if(additional_initial_query)
+                    additional_initial_query(DATA);
+                return result;
+            });
 }
 
