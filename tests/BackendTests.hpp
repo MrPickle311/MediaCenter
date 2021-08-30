@@ -45,6 +45,158 @@ public:
     Utils(std::shared_ptr<Backend> backend);
 };
 
+class QueryAboutPackage
+{
+private:
+    bool          is_empty_;
+    std::string   sender_;
+    std::string   what_;
+    QStringList   result_;
+    QStringList   call_args_;
+private:
+    void setPackageNotEmpty()
+    {
+        is_empty_ = false;
+    }
+public:
+    QueryAboutPackage():
+        is_empty_{true},
+        call_args_{}
+    {}
+    operator bool() const
+    {
+        return !is_empty_;
+    }
+
+    std::string& sender()
+    {
+        setPackageNotEmpty();
+        return sender_; 
+    }
+    const std::string& sender() const 
+    { 
+        return sender_; 
+    }
+
+    std::string& command()
+    {
+        setPackageNotEmpty();
+        return what_; 
+    }
+    const std::string& command() const 
+    { 
+        return what_; 
+    }
+
+    QStringList& result()
+    {
+        setPackageNotEmpty();
+        return result_; 
+    }
+    const QStringList& result() const 
+    { 
+        return result_; 
+    }
+
+    QStringList& callArguments()
+    {
+        setPackageNotEmpty();
+        return result_; 
+    }
+    const QStringList& callArguments() const 
+    { 
+        return result_; 
+    }
+};
+
+/*
+
+#pragma region Interfaces
+
+using QueryAboutDataPtr = std::shared_ptr<QueryAboutData>;
+
+class IQueryAboutDataFactory
+{
+public:
+    virtual QueryAboutDataPtr produce() const = 0;
+};
+
+class IQueryAboutMock
+{
+public:
+    virtual void invoke() = 0;
+    virtual QueryAboutDataPtr setNext(QueryAboutDataPtr next) = 0;
+};
+
+using QueryAboutMockPtr = std::shared_ptr<IQueryAboutMock>; 
+
+using QueryAboutDataPtr = std::shared_ptr<IQueryAboutMock>;
+
+class IQueryAboutMockFactory
+{
+public:
+    virtual QueryAboutDataPtr produce(MediatorMOCK   target ,
+                                      QueryAboutData query_data);
+};
+
+#pragma endregion Interfaces
+
+#pragma region QueryAboutMock
+
+
+
+class QueryAboutMock: public IQueryAboutMock
+{
+private:
+    QueryAboutMockPtr next_;
+    std::function<void()> body_;
+private:
+    QueryAboutMock(std::function<void()> body):
+        next_{nullptr} , 
+        body_{std::move(body)}
+    {}
+public:
+    //COPY OR MOVE OPERATOR 
+    virtual void invoke()
+    {
+        if(next_)
+        {
+            next_->invoke();
+        }
+
+        body_();
+    }
+    virtual QueryAboutDataPtr setNext(QueryAboutDataPtr next)
+    {
+        this->next_ = next;
+    }
+};
+
+class QueryAboutMockFactory : public IQueryAboutMockFactory
+{
+private:
+    std::shared_ptr<Backend>    backend_;
+public:
+    QueryAboutMockFactory(std::shared_ptr<Backend> backend):
+        backend_{std::move(backend)}
+    {
+
+    }
+    virtual QueryAboutDataPtr produce(MediatorMOCK   target ,
+                                      QueryAboutData query_data)
+    {//I finished HERE
+        using ::testing::Eq;
+    using ::testing::Return;
+
+    EXPECT_CALL(target, queryAbout(Eq(sender),Eq(what),Eq(call_args)))
+        .WillOnce(Return(result));
+    }
+};
+
+#pragma endregion QueryAboutMock
+
+*/
+
 class BackendTEST : public ::testing::Test
 {
 public:
@@ -55,49 +207,20 @@ protected:
     MediatorsMocks  mocks_;
     //tested obj
     std::shared_ptr<Backend>    backend_;
+private:
+    void invokePrecall(QueryAboutPackage pack);
 protected:
 //tests setup
     void startEventLoop();
     void setInitialFunction(std::function<void()> function);
-    void setUIQueryAboutAsInit(std::string  sender ,
-                               std::string  what   ,
-                               QStringList  call_args = {});
+    void setUIQueryAboutAsInit(QueryAboutPackage call_package);
 //Result expectations
     void expectResultSize(int size);
-    void expectResultElementEqualTo(int idx,std::string what);
+    void expectResultElementEqualTo(int idx , std::string what);
 //calls expectations
     void expectQueryAboutCall(MediatorMOCK& target ,
-                              std::string   sender ,
-                              std::string   what ,
-                              QStringList   result , 
-                              QStringList   call_args = {});
-};
-
-struct QueryAboutData
-{
-    //make getters and setters
-    std::string   sender;
-    std::string   what;
-    QStringList   result;
-    QStringList   call_args;
-};
-
-class IQueryAboutDataFactory
-{
-public:
-    virtual QueryAboutData produce() const = 0;
-};
-
-class IQueryAboutInvokation
-{
-public:
-
-};
-
-class IQueryAboutMockFactory
-{
-public:
-
+                              QueryAboutPackage call_package,
+                              QueryAboutPackage pre_call_package = {});
 };
 
 Utils::Utils(std::shared_ptr<Backend> backend):
@@ -119,7 +242,7 @@ UIMock::UIMock(std::shared_ptr<Backend> backend, QObject *parent) :
 QStringList UIMock::queryAbout(QString sender, QString what,  QStringList args)
 {
     emit dataReady();
-    return backend_->queryAbout(sender,what);
+    return backend_->queryAbout(sender,what,args);
 }
 
 
@@ -147,26 +270,16 @@ void BackendTEST::setInitialFunction(std::function<void()> function)
     utils_.initizal_function_wrapper_.setFunction(std::move(function));
 }
 
-void BackendTEST::setUIQueryAboutAsInit(std::string  sender ,
-                                        std::string  what   ,
-                                        QStringList  call_args) 
+void BackendTEST::setUIQueryAboutAsInit(QueryAboutPackage call_package) 
 {
     std::function<void()> ui_action = [&]()
     {
         //waits until searched QStringList is prepared
-        //how about settings mock ?
-        //the point is that settings mock returns value immediately,
-        //so i have to introduce another mock pre-call here
+        utils_.result = utils_.ui_mock_
+                              .queryAbout(QString::fromStdString(call_package.sender()) ,
+                                          QString::fromStdString(call_package.command()) ,
+                                          call_package.callArguments());
 
-        // mediator query struct and any factory pattern ?
-        // function factory!!!
-        // expectQueryAboutCall factory !!!
-        // std::function factory !!!
-        // responsibility chain template !!!
-
-        utils_.result = utils_.ui_mock_.queryAbout(QString::fromStdString(sender) ,
-                                                   QString::fromStdString(what) ,
-                                                   call_args);
         emit utils_.ui_mock_.dataReady();
     };
  
@@ -183,22 +296,34 @@ void BackendTEST::expectResultElementEqualTo(int idx,std::string what)
     EXPECT_STREQ(utils_.result.at(idx).toStdString().c_str(),what.c_str());
 }
 
+void BackendTEST::invokePrecall(QueryAboutPackage pack)
+{
+    if(pack)
+    {
+        auto precall_result = backend_->queryAbout(pack.sender() ,
+                                                   pack.command() ,
+                                                   pack.callArguments());
+        
+        EXPECT_EQ(precall_result , pack.result());
+    }
+}
+
 void BackendTEST::expectQueryAboutCall(MediatorMOCK& target ,
-                                       std::string   sender ,
-                                       std::string   what ,
-                                       QStringList   result , 
-                                       QStringList   call_args) 
+                                       QueryAboutPackage call_package,
+                                       QueryAboutPackage pre_call_package) 
 {
     using ::testing::Eq;
-    using ::testing::Return;
 
-    EXPECT_CALL(target, queryAbout(Eq(sender),Eq(what),Eq(call_args)))
+    EXPECT_CALL(target, 
+                queryAbout(Eq(call_package.sender()),
+                           Eq(call_package.command()),
+                           Eq(call_package.callArguments())))
         .WillOnce(
             [&]
             {
-                if(additional_initial_query)
-                    additional_initial_query(DATA);
-                return result;
-            });
+                invokePrecall(pre_call_package);
+                return call_package.result();
+            }
+        );
 }
 
