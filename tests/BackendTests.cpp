@@ -20,8 +20,8 @@ TEST_F(BackendTEST, AudioSearch)
     settings_pack.command() =  "AudioPaths";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
     
-    expectQueryAboutCall(mocks_.data_storage_ , storage_pack , settings_pack);
-    expectQueryAboutCall(mocks_.settings_ , settings_pack);
+    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
+    expectQueryAboutCall(*mocks_.settings_ , settings_pack);
 
     setUIQueryAboutAsInit(storage_pack);
     
@@ -51,8 +51,8 @@ TEST_F(BackendTEST , AudioNotFullName)
     settings_pack.command() =  "AudioPaths";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
     
-    expectQueryAboutCall(mocks_.data_storage_ , storage_pack , settings_pack);
-    expectQueryAboutCall(mocks_.settings_ , settings_pack);
+    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
+    expectQueryAboutCall(*mocks_.settings_ , settings_pack);
 
     setUIQueryAboutAsInit(storage_pack);
 
@@ -83,8 +83,8 @@ TEST_F(BackendTEST, AudioMultipleFileName)
     settings_pack.command() =  "AudioPaths";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
 
-    expectQueryAboutCall(mocks_.data_storage_ , storage_pack , settings_pack);
-    expectQueryAboutCall(mocks_.settings_ , settings_pack);
+    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
+    expectQueryAboutCall(*mocks_.settings_ , settings_pack);
 
     setUIQueryAboutAsInit(storage_pack);
 
@@ -107,7 +107,7 @@ TEST_F(BackendTEST, AddAudioDir)
 
     //this lambda checks the requestAction() signal emission
     //place it in separate object called wrapper
-    QObject::connect(&mocks_.settings_,&MediatorMOCK::requestAction ,
+    QObject::connect(mocks_.settings_.get() , &MediatorMOCK::requestAction ,
             [this](QString sender,QString requestedAction,QStringList args = {})
             {
                 utils_.result.append(sender);
@@ -136,8 +136,8 @@ TEST_F(BackendTEST , VideoSearch)
     settings_pack.command() =  "VideoPaths";
     settings_pack.result()  =  QStringList{"/home/abc/video"};
     
-    expectQueryAboutCall(mocks_.settings_ , settings_pack);
-    expectQueryAboutCall(mocks_.data_storage_ , storage_pack);
+    expectQueryAboutCall(*mocks_.settings_ , settings_pack);
+    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack);
 
     setUIQueryAboutAsInit(settings_pack);
 
@@ -166,9 +166,9 @@ TEST_F(BackendTEST , AudioPlaylist)
     settings_pack.command() =  "AudioPaths";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
 
-    expectQueryAboutCall(mocks_.settings_ , settings_pack);
+    expectQueryAboutCall(*mocks_.settings_ , settings_pack);
 
-    expectQueryAboutCall(mocks_.data_storage_ , storage_pack);
+    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack);
 
     setUIQueryAboutAsInit(storage_pack);
 
@@ -195,15 +195,15 @@ TEST_F(BackendTEST , ImageSearch)
     settings_pack.command() =  "AudioPaths";
     settings_pack.result()  =  QStringList{"/home/abc/img"};
     
-    expectQueryAboutCall(mocks_.data_storage_ , storage_pack , settings_pack);
-    expectQueryAboutCall(mocks_.settings_ , settings_pack);
+    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
+    expectQueryAboutCall(*mocks_.settings_ , settings_pack);
 
     setUIQueryAboutAsInit(storage_pack);
 
     startEventLoop();
 
     expectResultSize(1);
-    expectResultElementEqualTo(0 , storage_pack.result()[0].toStdString());
+    expectResultElementEqualTo(0 , storage_pack.result()[0]);
 }
 
 TEST_F(BackendTEST , UnsupportedCommand)

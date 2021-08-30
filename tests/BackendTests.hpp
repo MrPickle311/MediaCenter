@@ -30,9 +30,14 @@ public slots:
 
 struct MediatorsMocks
 {
-    MediatorMOCK  data_storage_;
-    MediatorMOCK  environment_;
-    MediatorMOCK  settings_;
+    std::shared_ptr<MediatorMOCK>  data_storage_;
+    std::shared_ptr<MediatorMOCK>  environment_;
+    std::shared_ptr<MediatorMOCK>  settings_;
+    MediatorsMocks():
+        data_storage_{new MediatorMOCK},
+        environment_{new MediatorMOCK},
+        settings_{new MediatorMOCK}
+    {}
 };
 
 struct Utils
@@ -49,8 +54,8 @@ class QueryAboutPackage
 {
 private:
     bool          is_empty_;
-    std::string   sender_;
-    std::string   what_;
+    QString       sender_;
+    QString       what_;
     QStringList   result_;
     QStringList   call_args_;
 private:
@@ -68,22 +73,22 @@ public:
         return !is_empty_;
     }
 
-    std::string& sender()
+    QString& sender()
     {
         setPackageNotEmpty();
         return sender_; 
     }
-    const std::string& sender() const 
+    const QString& sender() const 
     { 
         return sender_; 
     }
 
-    std::string& command()
+    QString& command()
     {
         setPackageNotEmpty();
         return what_; 
     }
-    const std::string& command() const 
+    const QString& command() const 
     { 
         return what_; 
     }
@@ -216,7 +221,7 @@ protected:
     void setUIQueryAboutAsInit(QueryAboutPackage call_package);
 //Result expectations
     void expectResultSize(int size);
-    void expectResultElementEqualTo(int idx , std::string what);
+    void expectResultElementEqualTo(int idx , QString what);
 //calls expectations
     void expectQueryAboutCall(MediatorMOCK& target ,
                               QueryAboutPackage call_package,
@@ -251,13 +256,13 @@ BackendTEST::BackendTEST():
     backend_{nullptr}
 {
     BackendBuilder builder;
+    
+    builder.setDataBackendDependency(mocks_.data_storage_)
+           .setEnvironmentDependency(mocks_.environment_)
+           .setSettingsDependency(mocks_.settings_)
+           .setThreadsCount(5);
 
-    builder.setDataBackendDependency(&mocks_.data_storage_);
-    builder.setEnvironmentDependency(&mocks_.environment_);
-    builder.setSettingsDependency(&mocks_.settings_);
-    builder.setMaxThreadsCount(3);
-
-    backend_ = std::move(builder.getBackendObject());
+    backend_ = builder.build();
 }
 
 void BackendTEST::startEventLoop() 
@@ -276,8 +281,8 @@ void BackendTEST::setUIQueryAboutAsInit(QueryAboutPackage call_package)
     {
         //waits until searched QStringList is prepared
         utils_.result = utils_.ui_mock_
-                              .queryAbout(QString::fromStdString(call_package.sender()) ,
-                                          QString::fromStdString(call_package.command()) ,
+                              .queryAbout(call_package.sender() ,
+                                          call_package.command() ,
                                           call_package.callArguments());
 
         emit utils_.ui_mock_.dataReady();
@@ -291,9 +296,9 @@ void BackendTEST::expectResultSize(int size)
     EXPECT_EQ(utils_.result.size(),size);
 }
 
-void BackendTEST::expectResultElementEqualTo(int idx,std::string what) 
+void BackendTEST::expectResultElementEqualTo(int idx,QString what) 
 {
-    EXPECT_STREQ(utils_.result.at(idx).toStdString().c_str(),what.c_str());
+    EXPECT_STREQ(utils_.result.at(idx).toStdString().c_str(),what.toStdString().c_str());
 }
 
 void BackendTEST::invokePrecall(QueryAboutPackage pack)
