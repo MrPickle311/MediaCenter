@@ -5,6 +5,112 @@
 //The task in progress  
 // State machine ? https://www.boost.org/doc/libs/1_49_0/libs/msm/doc/HTML/examples/SimpleTutorial.cpp
 
+Utils::Utils(std::shared_ptr<Backend> backend):
+        ui_mock_(std::move(backend))
+{
+    QObject::connect(&event_loop_ , &DelayedEventLoop::runned , 
+                     &initizal_function_wrapper_ , &QFunctionWrapper::invoke);
+    QObject::connect(&ui_mock_ , &UIMock::dataReady , 
+                     &event_loop_ , &DelayedEventLoop::killTestEventLoop);
+}
+
+UIMock::UIMock(std::shared_ptr<Backend> backend, QObject *parent) :
+    QObject(parent),
+    backend_(backend)
+{
+    QObject::connect(this , &UIMock::requestAction , backend_.get() , &Backend::requestAction );
+}
+
+QStringList UIMock::queryAbout(QString sender, QString what,  QStringList args)
+{
+    emit dataReady();
+    return backend_->queryAbout(sender,what,args);
+}
+
+
+BackendTEST::BackendTEST():
+    utils_{backend_},
+    backend_{nullptr}
+{
+    BackendBuilder builder;
+    
+    builder.setDataBackendDependency(mocks_.data_storage_)
+           .setEnvironmentDependency(mocks_.environment_)
+           .setSettingsDependency(mocks_.settings_)
+           .setThreadsCount(5);
+
+    backend_ = builder.build();
+}
+
+void BackendTEST::startEventLoop() 
+{
+    utils_.event_loop_.startTestEventLoop();
+}
+
+void BackendTEST::setInitialFunction(std::function<void()> function) 
+{
+    utils_.initizal_function_wrapper_.setFunction(std::move(function));
+}
+
+void BackendTEST::setUIQueryAboutAsInit(QueryAboutPackage call_package) 
+{
+    std::function<void()> ui_action = [&]()
+    {
+        //waits until searched QStringList is prepared
+        utils_.result = utils_.ui_mock_
+                              .queryAbout(call_package.sender() ,
+                                          call_package.command() ,
+                                          call_package.callArguments());
+
+        emit utils_.ui_mock_.dataReady();
+    };
+ 
+    setInitialFunction(ui_action);
+}
+
+void BackendTEST::expectResultSize(int size) 
+{
+    EXPECT_EQ(utils_.result.size(),size);
+}
+
+void BackendTEST::expectResultElementEqualTo(int idx,QString what) 
+{
+    EXPECT_STREQ(utils_.result.at(idx).toStdString().c_str(),what.toStdString().c_str());
+}
+
+void BackendTEST::invokePrecall(QueryAboutPackage pack)
+{
+    if(pack)
+    {
+        auto precall_result = backend_->queryAbout(pack.sender() ,
+                                                   pack.command() ,
+                                                   pack.callArguments());
+        
+        EXPECT_EQ(precall_result , pack.result());
+    }
+}
+
+void BackendTEST::expectQueryAboutCall(MediatorMOCK& target ,
+                                       QueryAboutPackage call_package,
+                                       QueryAboutPackage pre_call_package) 
+{
+    using ::testing::Eq;
+
+    EXPECT_CALL(target, 
+                queryAbout(Eq(call_package.sender()),
+                           Eq(call_package.command()),
+                           Eq(call_package.callArguments())))
+        .WillOnce(
+            [&]
+            {
+                invokePrecall(pre_call_package);
+                return call_package.result();
+            }
+        );
+}
+
+// Unit tests
+
 TEST_F(BackendTEST, AudioSearch)
 {
     QueryAboutPackage storage_pack;
