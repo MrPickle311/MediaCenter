@@ -204,17 +204,15 @@ TEST_F(BackendTEST, AddAudioDir)
     //this lambda checks the requestAction() signal emission
     //place it in separate object called wrapper
     QObject::connect(mocks_.settings_.get() , &MediatorMOCK::requestAction ,
-            [this](QString sender,QString requestedAction,QStringList args = {})
+            [this](QString requestedAction,QStringList args = {})
             {
-                utils_.result.append(sender);
                 utils_.result.append(requestedAction);
                 emit utils_.event_loop_.killTestEventLoop();
             });
     
     startEventLoop();
 
-    expectResultElementEqualTo(0,"Audio");
-    expectResultElementEqualTo(1,"AddDir");
+    expectResultElementEqualTo(0 , "AddDirAudio");
 }
 
 TEST_F(BackendTEST , VideoSearch)

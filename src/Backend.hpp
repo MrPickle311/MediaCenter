@@ -13,9 +13,9 @@ public:
     virtual ~IMediator(){}
     explicit IMediator(QObject *parent = nullptr);
 public:
-    virtual QStringList queryAbout(QString sender, QString what, QStringList args) = 0;
+    virtual QStringList queryAbout(QString command, QStringList args) = 0;
 signals:
-    void requestAction(QString sender , QString requestedAction , QStringList args = {});
+    void requestAction(QString requestedAction , QStringList args = {});
     void requestUIAction(QString action);
 };
 
@@ -45,7 +45,7 @@ private:
 private:
     void packTask();
 public slots:
-    virtual QStringList queryAbout(QString sender, QString what, QStringList args) override;
+    virtual QStringList queryAbout(QString command, QStringList args) override;
 };
 
 class BackendBuilder
