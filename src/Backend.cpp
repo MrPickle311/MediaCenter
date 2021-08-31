@@ -16,7 +16,9 @@ Backend::Backend(int threads_count) :
 
 QStringList Backend::queryAbout(QString sender, QString what, QStringList args)
 {
-    //CHANGE IT
+    //I HAVE FINISHED HERE
+
+    
     return {};
 }
 

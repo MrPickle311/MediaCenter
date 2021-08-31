@@ -10,7 +10,7 @@ class MediatorMOCK: public IMediator
 {
     Q_OBJECT;
 public:
-    MOCK_METHOD(QStringList , queryAbout , (QString , QString, QStringList) );
+    MOCK_METHOD(QStringList , queryAbout , (QString , QStringList) );
 
 };
 
@@ -22,10 +22,10 @@ public:
     virtual ~UIMock(){};
     UIMock(std::shared_ptr<Backend> backend, QObject* parent = nullptr);
 signals:
-    void requestAction(QString sender ,QString what , QStringList args = {});
+    void requestAction(QString command , QStringList args = {});
     void dataReady();
 public slots:
-    QStringList queryAbout(QString sender , QString what , QStringList args = {});
+    QStringList queryAbout(QString command , QStringList args = {});
 };
 
 struct MediatorsMocks
@@ -54,8 +54,7 @@ class QueryAboutPackage
 {
 private:
     bool          is_empty_;
-    QString       sender_;
-    QString       what_;
+    QString       command_;
     QStringList   result_;
     QStringList   call_args_;
 private:
@@ -73,24 +72,14 @@ public:
         return !is_empty_;
     }
 
-    QString& sender()
-    {
-        setPackageNotEmpty();
-        return sender_; 
-    }
-    const QString& sender() const 
-    { 
-        return sender_; 
-    }
-
     QString& command()
     {
         setPackageNotEmpty();
-        return what_; 
+        return command_; 
     }
     const QString& command() const 
     { 
-        return what_; 
+        return command_; 
     }
 
     QStringList& result()

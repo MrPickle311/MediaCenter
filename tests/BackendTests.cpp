@@ -21,10 +21,10 @@ UIMock::UIMock(std::shared_ptr<Backend> backend, QObject *parent) :
     QObject::connect(this , &UIMock::requestAction , backend_.get() , &Backend::requestAction );
 }
 
-QStringList UIMock::queryAbout(QString sender, QString what,  QStringList args)
+QStringList UIMock::queryAbout(QString command,  QStringList args)
 {
     emit dataReady();
-    return backend_->queryAbout(sender,what,args);
+    return backend_->queryAbout(command , args);
 }
 
 
@@ -58,8 +58,7 @@ void BackendTEST::setUIQueryAboutAsInit(QueryAboutPackage call_package)
     {
         //waits until searched QStringList is prepared
         utils_.result = utils_.ui_mock_
-                              .queryAbout(call_package.sender() ,
-                                          call_package.command() ,
+                              .queryAbout(call_package.command() ,
                                           call_package.callArguments());
 
         emit utils_.ui_mock_.dataReady();
@@ -82,8 +81,7 @@ void BackendTEST::invokePrecall(QueryAboutPackage pack)
 {
     if(pack)
     {
-        auto precall_result = backend_->queryAbout(pack.sender() ,
-                                                   pack.command() ,
+        auto precall_result = backend_->queryAbout(pack.command() ,
                                                    pack.callArguments());
         
         EXPECT_EQ(precall_result , pack.result());
@@ -97,8 +95,7 @@ void BackendTEST::expectQueryAboutCall(MediatorMOCK& target ,
     using ::testing::Eq;
 
     EXPECT_CALL(target, 
-                queryAbout(Eq(call_package.sender()),
-                           Eq(call_package.command()),
+                queryAbout(Eq(call_package.command()),
                            Eq(call_package.callArguments())))
         .WillOnce(
             [&]
@@ -115,15 +112,13 @@ TEST_F(BackendTEST, AudioSearch)
 {
     QueryAboutPackage storage_pack;
 
-    storage_pack.sender()        = "Audio";
-    storage_pack.command()       = "Search";
+    storage_pack.command()       = "SearchAudio";
     storage_pack.result()        = QStringList{"/home/abc/audio/song3.mp3"};
     storage_pack.callArguments() = QStringList{"song3.mp3"};
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.sender()  =  "DataStorage";
-    settings_pack.command() =  "AudioPaths";
+    settings_pack.command() =  "PathsAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
     
     expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
@@ -141,8 +136,7 @@ TEST_F(BackendTEST , AudioNotFullName)
 {
     QueryAboutPackage storage_pack;
 
-    storage_pack.sender()        = "Audio";
-    storage_pack.command()       = "Search";
+    storage_pack.command()       = "SearchAudio";
     storage_pack.result()        = QStringList
                                    {
                                        "/home/abc/audio/song1.mp3",
@@ -153,8 +147,7 @@ TEST_F(BackendTEST , AudioNotFullName)
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.sender()  =  "DataStorage";
-    settings_pack.command() =  "AudioPaths";
+    settings_pack.command() =  "PathsAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
     
     expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
@@ -174,8 +167,7 @@ TEST_F(BackendTEST, AudioMultipleFileName)
 {
     QueryAboutPackage storage_pack;
 
-    storage_pack.sender()        = "Audio";
-    storage_pack.command()       = "Search";
+    storage_pack.command()       = "SearchAudio";
     storage_pack.result()        = QStringList
                                    {
                                        "/home/abc/audio/vol1/song3.mp3",
@@ -185,7 +177,6 @@ TEST_F(BackendTEST, AudioMultipleFileName)
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.sender()  =  "DataStorage";
     settings_pack.command() =  "AudioPaths";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
 
@@ -205,8 +196,7 @@ TEST_F(BackendTEST, AddAudioDir)
 {
     QueryAboutPackage settings_pack;
 
-    settings_pack.sender()  =  "Audio";
-    settings_pack.command() =  "AddDir";
+    settings_pack.command() =  "AddDirAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
 
     setUIQueryAboutAsInit(settings_pack);
@@ -231,15 +221,13 @@ TEST_F(BackendTEST , VideoSearch)
 {
     QueryAboutPackage storage_pack;
 
-    storage_pack.sender()        = "Video";
-    storage_pack.command()       = "Search";
+    storage_pack.command()       = "SearchVideo";
     storage_pack.result()        = QStringList{"/home/abc/video/video.mp4"};
     storage_pack.callArguments() = QStringList{"video.mp4"};
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.sender()  =  "DataStorage";
-    settings_pack.command() =  "VideoPaths";
+    settings_pack.command() =  "PathsVideo";
     settings_pack.result()  =  QStringList{"/home/abc/video"};
     
     expectQueryAboutCall(*mocks_.settings_ , settings_pack);
@@ -257,8 +245,7 @@ TEST_F(BackendTEST , AudioPlaylist)
 {
     QueryAboutPackage storage_pack;
 
-    storage_pack.sender()   = "Audio";
-    storage_pack.command()  = "Playlist";
+    storage_pack.command()  = "PlaylistAudio";
     storage_pack.result()   = QStringList
                               {
                                   "/home/abc/audio/song1.mp3",
@@ -268,8 +255,7 @@ TEST_F(BackendTEST , AudioPlaylist)
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.sender()  =  "DataStorage";
-    settings_pack.command() =  "AudioPaths";
+    settings_pack.command() =  "PathsAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
 
     expectQueryAboutCall(*mocks_.settings_ , settings_pack);
@@ -290,15 +276,13 @@ TEST_F(BackendTEST , ImageSearch)
 {
     QueryAboutPackage storage_pack;
 
-    storage_pack.sender()        = "Image";
-    storage_pack.command()       = "Search";
+    storage_pack.command()       = "SearchImages";
     storage_pack.result()        = QStringList{"/home/abc/img/image.jpg"};
     storage_pack.callArguments() = QStringList{"image.jpg"};
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.sender()  =  "DataStorage";
-    settings_pack.command() =  "AudioPaths";
+    settings_pack.command() =  "PathsImages";
     settings_pack.result()  =  QStringList{"/home/abc/img"};
     
     expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
@@ -316,7 +300,6 @@ TEST_F(BackendTEST , UnsupportedCommand)
 {
     QueryAboutPackage pack;
 
-    pack.sender()        = "Audio";
     pack.command()       = "XYZ";
 
     setUIQueryAboutAsInit(pack);

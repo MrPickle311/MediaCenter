@@ -42,6 +42,8 @@ private:
     std::shared_ptr<IMediator> settings_backend_;
     std::shared_ptr<IMediator> data_backend_;
     std::shared_ptr<IMediator> environment_backend_;
+private:
+    void packTask();
 public slots:
     virtual QStringList queryAbout(QString sender, QString what, QStringList args) override;
 };
