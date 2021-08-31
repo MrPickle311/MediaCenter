@@ -34,7 +34,7 @@ class Backend : public IMediator
     Q_OBJECT;
     friend class BackendBuilder;
 private:
-    Backend(int threads_count);
+    Backend(uint threads_count);
 private:
     TaskManager task_manager_;
 
@@ -43,7 +43,9 @@ private:
     std::shared_ptr<IMediator> data_backend_;
     std::shared_ptr<IMediator> environment_backend_;
 private:
+    std::shared_ptr<IMediator>& redirect(QString command);
     void packTask();
+    std::future<QStringList> makeQuery(QString command, QStringList args);
 public slots:
     virtual QStringList queryAbout(QString command, QStringList args) override;
 };
@@ -51,7 +53,7 @@ public slots:
 class BackendBuilder
 {
 private:
-    int threads_count_;
+    uint threads_count_;
     std::shared_ptr<IMediator> data_backend_;
     std::shared_ptr<IMediator> env_backend_;
     std::shared_ptr<IMediator> settings_backend_;
@@ -60,5 +62,5 @@ public:
     BackendBuilder& setDataBackendDependency(std::shared_ptr<IMediator> data_backend);
     BackendBuilder& setEnvironmentDependency(std::shared_ptr<IMediator> env_backend);
     BackendBuilder& setSettingsDependency(std::shared_ptr<IMediator> settings_backend);
-    BackendBuilder& setThreadsCount(int th_count);
+    BackendBuilder& setThreadsCount(uint th_count);
 };
