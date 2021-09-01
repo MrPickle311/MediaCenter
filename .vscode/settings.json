@@ -71,6 +71,8 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "qcoreapplication": "cpp",
-        "qthreadpool": "cpp"
+        "qthreadpool": "cpp",
+        "regex": "cpp",
+        "shared_mutex": "cpp"
     }
 }

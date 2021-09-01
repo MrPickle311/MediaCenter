@@ -1,5 +1,6 @@
 #include "Backend.hpp"
 #include <regex>
+#include <map>
 
 IMediator::IMediator(QObject *parent):
     QObject(parent)
@@ -9,23 +10,59 @@ IProxy::IProxy(QObject *parent):
     QObject(parent)
 {}
 
+// backend
+
 Backend::Backend(uint threads_count) :
     task_manager_{threads_count}
-{}
+{
+    addBinding("Search" , data_backend_);
+    addBinding("Playlist" , data_backend_);
+    addBinding("Mediapaths" , settings_backend_);
+}
 
-// backend
+void Backend::addBinding(QString key , std::shared_ptr<IMediator>& target) 
+{
+    bindings_[key] = target;
+}
+
+QString Backend::getTargetKey(QString command)
+{
+    const static thread_local std::regex matcher{"[A-Z]{1}+[a-z]+"};
+    std::string str{command.toStdString()};
+    std::smatch sm;
+
+    if(std::regex_search(str , sm , matcher))
+    {
+        auto g = sm[0].str();
+    }
+    else return "WrongCmd";
+}
 
 std::shared_ptr<IMediator>& Backend::redirect(QString command)
 {
-    return settings_backend_;
-}
+    QString target_key{getTargetKey(command)};
 
+    if(bindings_.find(target_key) == bindings_.end())
+    {
+        throw std::logic_error{"WrongCmd"};
+    }
+
+    return bindings_[target_key];
+}
+// !!! MAKE CONST REF EVERYWHERE U CAN !!!
 std::future<QStringList> Backend::makeQuery(QString command, QStringList args)
 {
     return task_manager_.addTask(
         [&]
         {
-            return redirect(command)->queryAbout(command ,args);
+            try
+            {
+                return redirect(command)->queryAbout(command ,args);
+            }
+            catch(const std::logic_error& e)
+            {
+                return QStringList{"WrongCmd"};
+            }
         });
 }
 
@@ -39,9 +76,11 @@ QStringList Backend::queryAbout(QString command, QStringList args)
 std::shared_ptr<Backend> BackendBuilder::build() 
 {
     std::shared_ptr<Backend> backend{new Backend{threads_count_}};
-    backend->data_backend_ = this->data_backend_;
-    backend->settings_backend_ = this->settings_backend_;
+
+    backend->data_backend_        = this->data_backend_;
+    backend->settings_backend_    = this->settings_backend_;
     backend->environment_backend_ = this->env_backend_;
+
     return backend;
 }
 

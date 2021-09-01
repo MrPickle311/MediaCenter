@@ -42,9 +42,12 @@ private:
     std::shared_ptr<IMediator> settings_backend_;
     std::shared_ptr<IMediator> data_backend_;
     std::shared_ptr<IMediator> environment_backend_;
+
+    std::map<QString , std::shared_ptr<IMediator>&> bindings_;
 private:
+    void addBinding(QString key , std::shared_ptr<IMediator>& target);
+    QString getTargetKey(QString command);
     std::shared_ptr<IMediator>& redirect(QString command);
-    void packTask();
     std::future<QStringList> makeQuery(QString command, QStringList args);
 public slots:
     virtual QStringList queryAbout(QString command, QStringList args) override;

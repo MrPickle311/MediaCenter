@@ -118,7 +118,7 @@ TEST_F(BackendTEST, AudioSearch)
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "PathsAudio";
+    settings_pack.command() =  "MediapathsAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
     
     expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
@@ -147,7 +147,7 @@ TEST_F(BackendTEST , AudioNotFullName)
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "PathsAudio";
+    settings_pack.command() =  "MediapathsAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
     
     expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
@@ -177,7 +177,7 @@ TEST_F(BackendTEST, AudioMultipleFileName)
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "AudioPaths";
+    settings_pack.command() =  "MediapathsAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
 
     expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
@@ -192,11 +192,11 @@ TEST_F(BackendTEST, AudioMultipleFileName)
     expectResultElementEqualTo(1,"/home/abc/audio/vol2/song3.mp3");
 }
 
-TEST_F(BackendTEST, AddAudioDir)
+TEST_F(BackendTEST, DISABLED_AppendAudioDir)
 {
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "AddDirAudio";
+    settings_pack.command() =  "AppdirAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
 
     setUIQueryAboutAsInit(settings_pack);
@@ -212,7 +212,7 @@ TEST_F(BackendTEST, AddAudioDir)
     
     startEventLoop();
 
-    expectResultElementEqualTo(0 , "AddDirAudio");
+    expectResultElementEqualTo(0 , "AppdirAudio");
 }
 
 TEST_F(BackendTEST , VideoSearch)
@@ -225,7 +225,7 @@ TEST_F(BackendTEST , VideoSearch)
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "PathsVideo";
+    settings_pack.command() =  "MediapathsVideo";
     settings_pack.result()  =  QStringList{"/home/abc/video"};
     
     expectQueryAboutCall(*mocks_.settings_ , settings_pack);
@@ -253,7 +253,7 @@ TEST_F(BackendTEST , AudioPlaylist)
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "PathsAudio";
+    settings_pack.command() =  "MediapathsAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
 
     expectQueryAboutCall(*mocks_.settings_ , settings_pack);
@@ -280,7 +280,7 @@ TEST_F(BackendTEST , ImageSearch)
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "PathsImages";
+    settings_pack.command() =  "MediapathsImages";
     settings_pack.result()  =  QStringList{"/home/abc/img"};
     
     expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
@@ -298,7 +298,7 @@ TEST_F(BackendTEST , UnsupportedCommand)
 {
     QueryAboutPackage pack;
 
-    pack.command()       = "XYZ";
+    pack.command() = "XYZ";
 
     setUIQueryAboutAsInit(pack);
 
