@@ -20,7 +20,7 @@ Backend::Backend(uint threads_count) :
     addBinding("Mediapaths" , settings_backend_);
 }
 
-void Backend::addBinding(QString key , std::shared_ptr<IMediator>& target) 
+void Backend::addBinding(QString key , std::shared_ptr<IMediator> target) 
 {
     bindings_[key] = target;
 }

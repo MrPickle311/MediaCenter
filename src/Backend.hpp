@@ -43,9 +43,9 @@ private:
     std::shared_ptr<IMediator> data_backend_;
     std::shared_ptr<IMediator> environment_backend_;
 
-    std::map<QString , std::shared_ptr<IMediator>&> bindings_;
+    std::map<QString , std::shared_ptr<IMediator>> bindings_;
 private:
-    void addBinding(QString key , std::shared_ptr<IMediator>& target);
+    void addBinding(QString key , std::shared_ptr<IMediator> target);
     QString getTargetKey(QString command);
     std::shared_ptr<IMediator>& redirect(QString command);
     std::future<QStringList> makeQuery(QString command, QStringList args);

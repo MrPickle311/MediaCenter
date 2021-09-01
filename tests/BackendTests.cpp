@@ -5,15 +5,6 @@
 //The task in progress  
 // State machine ? https://www.boost.org/doc/libs/1_49_0/libs/msm/doc/HTML/examples/SimpleTutorial.cpp
 
-Utils::Utils(std::shared_ptr<Backend> backend):
-        ui_mock_(std::move(backend))
-{
-    QObject::connect(&event_loop_ , &DelayedEventLoop::runned , 
-                     &initizal_function_wrapper_ , &QFunctionWrapper::invoke);
-    QObject::connect(&ui_mock_ , &UIMock::dataReady , 
-                     &event_loop_ , &DelayedEventLoop::killTestEventLoop);
-}
-
 UIMock::UIMock(std::shared_ptr<Backend> backend, QObject *parent) :
     QObject(parent),
     backend_(backend)
@@ -27,6 +18,14 @@ QStringList UIMock::queryAbout(QString command,  QStringList args)
     return backend_->queryAbout(command , args);
 }
 
+Utils::Utils(std::shared_ptr<Backend> backend):
+        ui_mock_(std::move(backend))
+{
+    QObject::connect(&event_loop_ , &DelayedEventLoop::runned , 
+                     &initizal_function_wrapper_ , &QFunctionWrapper::invoke);
+    QObject::connect(&ui_mock_ , &UIMock::dataReady , 
+                     &event_loop_ , &DelayedEventLoop::killTestEventLoop);
+}
 
 BackendTEST::BackendTEST():
     utils_{backend_},
@@ -40,6 +39,12 @@ BackendTEST::BackendTEST():
            .setThreadsCount(5);
 
     backend_ = builder.build();
+
+    if(!backend_)
+    {
+        std::cout << "It's not ok!\n";
+    }
+    EXPECT_NE(backend_.get() , nullptr);
 }
 
 void BackendTEST::startEventLoop() 
