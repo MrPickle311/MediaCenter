@@ -13,7 +13,6 @@ DelayedEventLoop::DelayedEventLoop(int ms):
 void DelayedEventLoop::startTestEventLoop()
 {
     std::thread th{&DelayedEventLoop::emitDelayedStartSignal,this};
-    std::cout << "\nHI\n";
     loop_.exec();
     th.join();
 }

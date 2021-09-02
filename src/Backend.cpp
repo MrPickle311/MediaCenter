@@ -15,9 +15,7 @@ IProxy::IProxy(QObject *parent):
 Backend::Backend(uint threads_count) :
     task_manager_{threads_count}
 {
-    addBinding("Search" , data_backend_);
-    addBinding("Playlist" , data_backend_);
-    addBinding("Mediapaths" , settings_backend_);
+    
 }
 
 void Backend::addBinding(QString key , std::shared_ptr<IMediator> target) 
@@ -33,9 +31,10 @@ QString Backend::getTargetKey(QString command)
 
     if(std::regex_search(str , sm , matcher))
     {
-        auto g = sm[0].str();
+        return QString::fromStdString(sm[0].str());
     }
-    else return "WrongCmd";
+    
+    return "WrongCmd";
 }
 
 std::shared_ptr<IMediator>& Backend::redirect(QString command)
@@ -68,7 +67,7 @@ std::future<QStringList> Backend::makeQuery(QString command, QStringList args)
 
 QStringList Backend::queryAbout(QString command, QStringList args)
 {
-    return makeQuery(std::move(command) , std::move(args)).get();
+    return makeQuery(command , args).get();
 }
 
 // builder
@@ -81,12 +80,17 @@ std::shared_ptr<Backend> BackendBuilder::build()
     backend->settings_backend_    = this->settings_backend_;
     backend->environment_backend_ = this->env_backend_;
 
+    backend->addBinding("Search" , backend->data_backend_);
+    backend->addBinding("Playlist" , backend->data_backend_);
+    backend->addBinding("Mediapaths" , backend->settings_backend_);
+
     return backend;
 }
 
 BackendBuilder& BackendBuilder::setDataBackendDependency(std::shared_ptr<IMediator> data_backend) 
 {
     this->data_backend_ = data_backend;
+    
     return *this;
 }
 

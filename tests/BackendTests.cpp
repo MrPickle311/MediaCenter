@@ -5,26 +5,35 @@
 //The task in progress  
 // State machine ? https://www.boost.org/doc/libs/1_49_0/libs/msm/doc/HTML/examples/SimpleTutorial.cpp
 
-UIMock::UIMock(std::shared_ptr<Backend> backend, QObject *parent) :
+UIMock::UIMock(QObject *parent) :
     QObject(parent),
-    backend_(backend)
-{
-    QObject::connect(this , &UIMock::requestAction , backend_.get() , &Backend::requestAction );
-}
+    backend_(nullptr)
+{}
 
 QStringList UIMock::queryAbout(QString command,  QStringList args)
 {
+    QStringList result {backend_->queryAbout(command , args)};
     emit dataReady();
-    return backend_->queryAbout(command , args);
+    return result;
 }
 
-Utils::Utils(std::shared_ptr<Backend> backend):
-        ui_mock_(std::move(backend))
+void UIMock::setBackend(std::shared_ptr<Backend> backend) 
+{
+    this->backend_ = backend;
+    QObject::connect(this , &UIMock::requestAction , backend_.get() , &Backend::requestAction );
+}
+
+Utils::Utils(std::shared_ptr<Backend> backend)
 {
     QObject::connect(&event_loop_ , &DelayedEventLoop::runned , 
                      &initizal_function_wrapper_ , &QFunctionWrapper::invoke);
     QObject::connect(&ui_mock_ , &UIMock::dataReady , 
                      &event_loop_ , &DelayedEventLoop::killTestEventLoop);
+}
+
+void Utils::setBackend(std::shared_ptr<Backend> backend)
+{
+    ui_mock_.setBackend(backend);
 }
 
 BackendTEST::BackendTEST():
@@ -40,11 +49,9 @@ BackendTEST::BackendTEST():
 
     backend_ = builder.build();
 
-    if(!backend_)
-    {
-        std::cout << "It's not ok!\n";
-    }
     EXPECT_NE(backend_.get() , nullptr);
+
+    utils_.setBackend(backend_);
 }
 
 void BackendTEST::startEventLoop() 
@@ -103,7 +110,7 @@ void BackendTEST::expectQueryAboutCall(MediatorMOCK& target ,
                 queryAbout(Eq(call_package.command()),
                            Eq(call_package.callArguments())))
         .WillOnce(
-            [&]
+            [call_package , pre_call_package , this]
             {
                 invokePrecall(pre_call_package);
                 return call_package.result();
@@ -125,10 +132,10 @@ TEST_F(BackendTEST, AudioSearch)
 
     settings_pack.command() =  "MediapathsAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
-    
+
     expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
     expectQueryAboutCall(*mocks_.settings_ , settings_pack);
-
+    
     setUIQueryAboutAsInit(storage_pack);
     
     startEventLoop();
@@ -136,6 +143,8 @@ TEST_F(BackendTEST, AudioSearch)
     expectResultSize(1);
     expectResultElementEqualTo(0,"/home/abc/audio/song3.mp3");
 }
+
+
 
 TEST_F(BackendTEST , AudioNotFullName)
 {
@@ -313,7 +322,7 @@ TEST_F(BackendTEST , UnsupportedCommand)
     expectResultElementEqualTo(0,"WrongCmd");
 }
 
-//TEST IDEA 
+//TEST IDEA MULTIPLE BACKEND CALLS , MIX CALLS
 
 int main(int argc, char *argv[])
 {
