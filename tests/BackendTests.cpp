@@ -118,6 +118,26 @@ void BackendTEST::expectQueryAboutCall(MediatorMOCK& target ,
         );
 }
 
+void BackendTEST::expectResultPatternMatching(QueryAboutPackage pattern) 
+{
+    expectResultSize(pattern.result().size());
+
+    for(int i{0}; i < pattern.result().size() ; ++i)
+    {
+        expectResultElementEqualTo(i, pattern.result()[i]);
+    }
+}
+
+void BackendTEST::testSingleQueryCall(QueryAboutPackage call_pack)
+{    
+    setUIQueryAboutAsInit(call_pack);
+    startEventLoop();
+
+    expectResultPatternMatching(call_pack);
+}
+
+
+
 // Unit tests
 
 TEST_F(BackendTEST, AudioSearch)
@@ -136,12 +156,7 @@ TEST_F(BackendTEST, AudioSearch)
     expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
     expectQueryAboutCall(*mocks_.settings_ , settings_pack);
     
-    setUIQueryAboutAsInit(storage_pack);
-    
-    startEventLoop();
-
-    expectResultSize(1);
-    expectResultElementEqualTo(0,"/home/abc/audio/song3.mp3");
+    testSingleQueryCall(storage_pack);
 }
 
 
@@ -167,14 +182,7 @@ TEST_F(BackendTEST , AudioNotFullName)
     expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
     expectQueryAboutCall(*mocks_.settings_ , settings_pack);
 
-    setUIQueryAboutAsInit(storage_pack);
-
-    startEventLoop();
-
-    expectResultSize(3);
-    expectResultElementEqualTo(0,"/home/abc/audio/song1.mp3");
-    expectResultElementEqualTo(1,"/home/abc/audio/song2.mp3");
-    expectResultElementEqualTo(2,"/home/abc/audio/song3.mp3");
+    testSingleQueryCall(storage_pack);
 }
 
 TEST_F(BackendTEST, AudioMultipleFileName)
@@ -197,13 +205,7 @@ TEST_F(BackendTEST, AudioMultipleFileName)
     expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
     expectQueryAboutCall(*mocks_.settings_ , settings_pack);
 
-    setUIQueryAboutAsInit(storage_pack);
-
-    startEventLoop();
-
-    expectResultSize(2);
-    expectResultElementEqualTo(0,"/home/abc/audio/vol1/song3.mp3");
-    expectResultElementEqualTo(1,"/home/abc/audio/vol2/song3.mp3");
+    testSingleQueryCall(storage_pack);
 }
 
 TEST_F(BackendTEST, DISABLED_AppendAudioDir)
@@ -243,14 +245,9 @@ TEST_F(BackendTEST , VideoSearch)
     settings_pack.result()  =  QStringList{"/home/abc/video"};
     
     expectQueryAboutCall(*mocks_.settings_ , settings_pack);
-    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack);
+    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
 
-    setUIQueryAboutAsInit(settings_pack);
-
-    startEventLoop();
-
-    expectResultSize(1);
-    expectResultElementEqualTo(0,"/home/abc/video/video.mp4");
+    testSingleQueryCall(storage_pack);
 }
 
 TEST_F(BackendTEST , AudioPlaylist)
@@ -271,17 +268,9 @@ TEST_F(BackendTEST , AudioPlaylist)
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
 
     expectQueryAboutCall(*mocks_.settings_ , settings_pack);
+    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
 
-    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack);
-
-    setUIQueryAboutAsInit(storage_pack);
-
-    startEventLoop();
-
-    expectResultSize(3);
-    expectResultElementEqualTo(0,"/home/abc/audio/song1.mp3");
-    expectResultElementEqualTo(1,"/home/abc/audio/song2.mp3");
-    expectResultElementEqualTo(2,"/home/abc/audio/song3.mp3");
+    testSingleQueryCall(storage_pack);
 }
 
 TEST_F(BackendTEST , ImageSearch)
@@ -300,12 +289,7 @@ TEST_F(BackendTEST , ImageSearch)
     expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
     expectQueryAboutCall(*mocks_.settings_ , settings_pack);
 
-    setUIQueryAboutAsInit(storage_pack);
-
-    startEventLoop();
-
-    expectResultSize(1);
-    expectResultElementEqualTo(0 , storage_pack.result()[0]);
+    testSingleQueryCall(storage_pack);
 }
 
 TEST_F(BackendTEST , UnsupportedCommand)
@@ -313,13 +297,9 @@ TEST_F(BackendTEST , UnsupportedCommand)
     QueryAboutPackage pack;
 
     pack.command() = "XYZ";
+    pack.result()  = QStringList{"WrongCmd"};
 
-    setUIQueryAboutAsInit(pack);
-
-    startEventLoop();
-
-    expectResultSize(0);
-    expectResultElementEqualTo(0,"WrongCmd");
+    testSingleQueryCall(pack);
 }
 
 //TEST IDEA MULTIPLE BACKEND CALLS , MIX CALLS

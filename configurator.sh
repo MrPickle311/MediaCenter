@@ -75,12 +75,21 @@ buildDir(){
 runTests(){
     prev_path=$(pwd) # safe previous dir as backup
     cd $1 # go to a certain build folder
-    ctest
+    ctest -v
     cd ${prev_path} # go back to the root folder
 }
 
 declare selected_qt_dir
 promptAboutQtVersion selected_qt_dir
+
+
+#check whether verbosity of failure is set
+if ! [[ -z "${CTEST_OUTPUT_ON_FAILURE}" ]]; then
+  CTEST_OUTPUT_ON_FAILURE=1
+  export CTEST_OUTPUT_ON_FAILURE
+fi
+
+
 
 #t - configure tests
 #T - build tests

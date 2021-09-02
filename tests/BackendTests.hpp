@@ -214,9 +214,12 @@ protected:
 //Result expectations
     void expectResultSize(int size);
     void expectResultElementEqualTo(int idx , QString what);
+    void expectResultPatternMatching(QueryAboutPackage pattern);
 //calls expectations
     void expectQueryAboutCall(MediatorMOCK& target ,
-                              QueryAboutPackage call_package,
+                              QueryAboutPackage call_package ,
                               QueryAboutPackage pre_call_package = {});
+//testing methods
+    void testSingleQueryCall(QueryAboutPackage call_pack);
 };
 
