@@ -101,6 +101,7 @@ void BackendTEST::invokePrecall(QueryAboutPackage pack)
 }
 
 void BackendTEST::expectQueryAboutCall(MediatorMOCK& target ,
+                                       int times , 
                                        QueryAboutPackage call_package,
                                        QueryAboutPackage pre_call_package) 
 {
@@ -109,13 +110,21 @@ void BackendTEST::expectQueryAboutCall(MediatorMOCK& target ,
     EXPECT_CALL(target, 
                 queryAbout(Eq(call_package.command()),
                            Eq(call_package.callArguments())))
-        .WillOnce(
+        .Times(times)
+        .WillRepeatedly(
             [call_package , pre_call_package , this]
             {
                 invokePrecall(pre_call_package);
                 return call_package.result();
             }
         );
+}
+
+void BackendTEST::expectSingleQueryAboutCall(MediatorMOCK& target ,
+                                    QueryAboutPackage call_package ,
+                                    QueryAboutPackage pre_call_package) 
+{
+    expectQueryAboutCall(target , 1 , std::move(call_package) , std::move(pre_call_package));
 }
 
 void BackendTEST::expectResultPatternMatching(QueryAboutPackage pattern) 
@@ -126,6 +135,12 @@ void BackendTEST::expectResultPatternMatching(QueryAboutPackage pattern)
     {
         expectResultElementEqualTo(i, pattern.result()[i]);
     }
+}
+
+void BackendTEST::testQueryCall(QueryAboutPackage call_pack , int count) 
+{
+    // setUIQueryAboutAsInit(call_pack , count);
+    startEventLoop();
 }
 
 void BackendTEST::testSingleQueryCall(QueryAboutPackage call_pack)
@@ -153,8 +168,8 @@ TEST_F(BackendTEST, AudioSearch)
     settings_pack.command() =  "MediapathsAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
 
-    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
-    expectQueryAboutCall(*mocks_.settings_ , settings_pack);
+    expectSingleQueryAboutCall(*mocks_.data_storage_ ,storage_pack , settings_pack);
+    expectSingleQueryAboutCall(*mocks_.settings_ ,  settings_pack);
     
     testSingleQueryCall(storage_pack);
 }
@@ -179,8 +194,8 @@ TEST_F(BackendTEST , AudioNotFullName)
     settings_pack.command() =  "MediapathsAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
     
-    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
-    expectQueryAboutCall(*mocks_.settings_ , settings_pack);
+    expectSingleQueryAboutCall(*mocks_.data_storage_  , storage_pack , settings_pack);
+    expectSingleQueryAboutCall(*mocks_.settings_  , settings_pack);
 
     testSingleQueryCall(storage_pack);
 }
@@ -202,8 +217,8 @@ TEST_F(BackendTEST, AudioMultipleFileName)
     settings_pack.command() =  "MediapathsAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
 
-    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
-    expectQueryAboutCall(*mocks_.settings_ , settings_pack);
+    expectSingleQueryAboutCall(*mocks_.data_storage_  , storage_pack , settings_pack);
+    expectSingleQueryAboutCall(*mocks_.settings_ ,  settings_pack);
 
     testSingleQueryCall(storage_pack);
 }
@@ -244,8 +259,8 @@ TEST_F(BackendTEST , VideoSearch)
     settings_pack.command() =  "MediapathsVideo";
     settings_pack.result()  =  QStringList{"/home/abc/video"};
     
-    expectQueryAboutCall(*mocks_.settings_ , settings_pack);
-    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
+    expectSingleQueryAboutCall(*mocks_.settings_ , settings_pack);
+    expectSingleQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
 
     testSingleQueryCall(storage_pack);
 }
@@ -267,8 +282,8 @@ TEST_F(BackendTEST , AudioPlaylist)
     settings_pack.command() =  "MediapathsAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
 
-    expectQueryAboutCall(*mocks_.settings_ , settings_pack);
-    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
+    expectSingleQueryAboutCall(*mocks_.settings_ , settings_pack);
+    expectSingleQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
 
     testSingleQueryCall(storage_pack);
 }
@@ -286,8 +301,8 @@ TEST_F(BackendTEST , ImageSearch)
     settings_pack.command() =  "MediapathsImages";
     settings_pack.result()  =  QStringList{"/home/abc/img"};
     
-    expectQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
-    expectQueryAboutCall(*mocks_.settings_ , settings_pack);
+    expectSingleQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
+    expectSingleQueryAboutCall(*mocks_.settings_ , settings_pack);
 
     testSingleQueryCall(storage_pack);
 }
@@ -301,6 +316,29 @@ TEST_F(BackendTEST , UnsupportedCommand)
 
     testSingleQueryCall(pack);
 }
+
+/*
+TEST_F(BackendTEST , MultipleCall)
+{
+    QueryAboutPackage storage_pack;
+
+    int calls_count{10};
+
+    storage_pack.command()       = "SearchImages";
+    storage_pack.result()        = QStringList{"/home/abc/img/image.jpg"};
+    storage_pack.callArguments() = QStringList{"image.jpg"};
+
+    QueryAboutPackage settings_pack;
+
+    settings_pack.command() =  "MediapathsImages";
+    settings_pack.result()  =  QStringList{"/home/abc/img"};
+    
+    expectQueryAboutCall(*mocks_.data_storage_ , calls_count ,storage_pack , settings_pack);
+    expectQueryAboutCall(*mocks_.settings_ , calls_count , settings_pack);
+
+    testQueryCall(storage_pack, calls_count);
+}
+*/
 
 //TEST IDEA MULTIPLE BACKEND CALLS , MIX CALLS
 

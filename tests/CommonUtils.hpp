@@ -27,10 +27,19 @@ class QFunctionWrapper : public QObject
     Q_OBJECT;
 private:
     std::function<void()> func_;
-public slots:
+public:
     void invoke();
 public:
     void setFunction(std::function<void()> func);
 signals:
     void sendSignal(std::string msg = {});
+};
+
+class QFunctionWrapperFactory
+{
+private:
+    std::function<void()> func_;
+public:
+    void setFunction(std::function<void()> func);
+    std::shared_ptr<QFunctionWrapper> produce() const;
 };

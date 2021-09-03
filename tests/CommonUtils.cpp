@@ -31,3 +31,16 @@ void QFunctionWrapper::setFunction(std::function<void ()> func)
 {
     this->func_ = std::move(func);
 }
+
+void QFunctionWrapperFactory::setFunction(std::function<void()> func) 
+{
+    this->func_ = std::move(func);
+}
+
+std::shared_ptr<QFunctionWrapper> QFunctionWrapperFactory::produce() const
+{
+    std::shared_ptr<QFunctionWrapper> wrapper;
+    wrapper->setFunction(this->func_);
+
+    return wrapper;
+}

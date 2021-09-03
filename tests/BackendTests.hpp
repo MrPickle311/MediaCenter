@@ -217,9 +217,14 @@ protected:
     void expectResultPatternMatching(QueryAboutPackage pattern);
 //calls expectations
     void expectQueryAboutCall(MediatorMOCK& target ,
+                              int count , 
                               QueryAboutPackage call_package ,
                               QueryAboutPackage pre_call_package = {});
+    void expectSingleQueryAboutCall(MediatorMOCK& target ,
+                                    QueryAboutPackage call_package ,
+                                    QueryAboutPackage pre_call_package = {});
 //testing methods
+    void testQueryCall(QueryAboutPackage call_pack , int count); 
     void testSingleQueryCall(QueryAboutPackage call_pack);
 };
 
