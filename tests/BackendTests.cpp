@@ -66,27 +66,18 @@ void BackendTEST::setInitialFunction(std::function<void()> function)
 
 void BackendTEST::setUIQueryAboutAsInit(QueryAboutPackage call_package) 
 {
-    std::function<void()> ui_action = [&]()
+    std::function<void()> ui_action = [call_package, this]
     {
         //waits until searched QStringList is prepared
-        utils_.result = utils_.ui_mock_
+        auto result = utils_.ui_mock_
                               .queryAbout(call_package.command() ,
                                           call_package.callArguments());
-
-        emit utils_.ui_mock_.dataReady();
+        
+        checker_.pattern() = call_package.result();
+        checker_.checkResult(result);
     };
  
     setInitialFunction(ui_action);
-}
-
-void BackendTEST::expectResultSize(int size) 
-{
-    EXPECT_EQ(utils_.result.size(),size);
-}
-
-void BackendTEST::expectResultElementEqualTo(int idx,QString what) 
-{
-    EXPECT_STREQ(utils_.result.at(idx).toStdString().c_str(),what.toStdString().c_str());
 }
 
 void BackendTEST::invokePrecall(QueryAboutPackage pack)
@@ -127,16 +118,6 @@ void BackendTEST::expectSingleQueryAboutCall(MediatorMOCK& target ,
     expectQueryAboutCall(target , 1 , std::move(call_package) , std::move(pre_call_package));
 }
 
-void BackendTEST::expectResultPatternMatching(QueryAboutPackage pattern) 
-{
-    expectResultSize(pattern.result().size());
-
-    for(int i{0}; i < pattern.result().size() ; ++i)
-    {
-        expectResultElementEqualTo(i, pattern.result()[i]);
-    }
-}
-
 void BackendTEST::testQueryCall(QueryAboutPackage call_pack , int count) 
 {
     // setUIQueryAboutAsInit(call_pack , count);
@@ -147,11 +128,7 @@ void BackendTEST::testSingleQueryCall(QueryAboutPackage call_pack)
 {    
     setUIQueryAboutAsInit(call_pack);
     startEventLoop();
-
-    expectResultPatternMatching(call_pack);
 }
-
-
 
 // Unit tests
 
@@ -232,18 +209,20 @@ TEST_F(BackendTEST, DISABLED_AppendAudioDir)
 
     setUIQueryAboutAsInit(settings_pack);
 
+    QString result;
+
     //this lambda checks the requestAction() signal emission
     //place it in separate object called wrapper
     QObject::connect(mocks_.settings_.get() , &MediatorMOCK::requestAction ,
-            [this](QString requestedAction,QStringList args = {})
+            [this, &result](QString requestedAction,QStringList args = {})
             {
-                utils_.result.append(requestedAction);
+                result = requestedAction;
                 emit utils_.event_loop_.killTestEventLoop();
             });
     
     startEventLoop();
 
-    expectResultElementEqualTo(0 , "AppdirAudio");
+    EXPECT_STREQ(result.toStdString().c_str() , "AppdirAudio");
 }
 
 TEST_F(BackendTEST , VideoSearch)

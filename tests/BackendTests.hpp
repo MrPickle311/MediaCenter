@@ -46,7 +46,6 @@ struct Utils
     UIMock            ui_mock_;
     QFunctionWrapper  initizal_function_wrapper_;
     DelayedEventLoop  event_loop_;
-    QStringList       result;
 public:
     Utils(std::shared_ptr<Backend> backend);
 public:
@@ -194,6 +193,43 @@ public:
 
 */
 
+class ResultChecker
+{
+private:
+    QStringList pattern_;
+private:
+    void expectResultSizeEqualToPattern(QStringList result)
+    {
+        ASSERT_EQ(result.size() , pattern_.size());
+    }
+    void expectResultElementEqualTo(QStringList result , int idx)
+    {
+        EXPECT_STREQ(pattern_.at(idx).toStdString().c_str() , 
+                     result.at(idx).toStdString().c_str());
+    }
+    void expectResultPatternMatching(QStringList result)
+    {
+        for(int i{0}; i < pattern_.size() ; ++i)
+        {
+            expectResultElementEqualTo(result , i);
+        }
+    }
+public:
+    QStringList& pattern()
+    {
+        return pattern_; 
+    }
+    const QStringList& pattern() const 
+    { 
+        return pattern_; 
+    }
+    void checkResult(QStringList result)
+    {
+        expectResultSizeEqualToPattern(result);
+        expectResultPatternMatching(result);
+    }
+};
+
 class BackendTEST : public ::testing::Test
 {
 public:
@@ -204,6 +240,8 @@ protected:
     MediatorsMocks  mocks_;
     //tested obj
     std::shared_ptr<Backend>    backend_;
+
+    ResultChecker checker_;
 private:
     void invokePrecall(QueryAboutPackage pack);
 protected:
@@ -211,10 +249,6 @@ protected:
     void startEventLoop();
     void setInitialFunction(std::function<void()> function);
     void setUIQueryAboutAsInit(QueryAboutPackage call_package);
-//Result expectations
-    void expectResultSize(int size);
-    void expectResultElementEqualTo(int idx , QString what);
-    void expectResultPatternMatching(QueryAboutPackage pattern);
 //calls expectations
     void expectQueryAboutCall(MediatorMOCK& target ,
                               int count , 
