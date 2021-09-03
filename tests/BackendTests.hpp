@@ -44,7 +44,7 @@ struct MediatorsMocks
 struct Utils
 {
     UIMock            ui_mock_;
-    QFunctionWrapper  initizal_function_wrapper_;
+    QFunctionWrapper  init_func_wrappers_;
     DelayedEventLoop  event_loop_;
 public:
     Utils(std::shared_ptr<Backend> backend);
@@ -258,6 +258,7 @@ protected:
                                     QueryAboutPackage call_package ,
                                     QueryAboutPackage pre_call_package = {});
 //testing methods
+    void checkResult(const QStringList& result , const QueryAboutPackage& pattern);
     void testQueryCall(QueryAboutPackage call_pack , int count); 
     void testSingleQueryCall(QueryAboutPackage call_pack);
 };

@@ -26,7 +26,7 @@ void UIMock::setBackend(std::shared_ptr<Backend> backend)
 Utils::Utils(std::shared_ptr<Backend> backend)
 {
     QObject::connect(&event_loop_ , &DelayedEventLoop::runned , 
-                     &initizal_function_wrapper_ , &QFunctionWrapper::invoke);
+                     &init_func_wrappers_ , &QFunctionWrapper::invoke);
     QObject::connect(&ui_mock_ , &UIMock::dataReady , 
                      &event_loop_ , &DelayedEventLoop::killTestEventLoop);
 }
@@ -61,7 +61,7 @@ void BackendTEST::startEventLoop()
 
 void BackendTEST::setInitialFunction(std::function<void()> function) 
 {
-    utils_.initizal_function_wrapper_.setFunction(std::move(function));
+    utils_.init_func_wrappers_.setFunction(std::move(function));
 }
 
 void BackendTEST::setUIQueryAboutAsInit(QueryAboutPackage call_package) 
@@ -73,8 +73,7 @@ void BackendTEST::setUIQueryAboutAsInit(QueryAboutPackage call_package)
                               .queryAbout(call_package.command() ,
                                           call_package.callArguments());
         
-        checker_.pattern() = call_package.result();
-        checker_.checkResult(result);
+        checkResult(result , call_package);
     };
  
     setInitialFunction(ui_action);
@@ -87,7 +86,7 @@ void BackendTEST::invokePrecall(QueryAboutPackage pack)
         auto precall_result = backend_->queryAbout(pack.command() ,
                                                    pack.callArguments());
         
-        EXPECT_EQ(precall_result , pack.result());
+        checkResult(precall_result , pack);
     }
 }
 
@@ -116,6 +115,12 @@ void BackendTEST::expectSingleQueryAboutCall(MediatorMOCK& target ,
                                     QueryAboutPackage pre_call_package) 
 {
     expectQueryAboutCall(target , 1 , std::move(call_package) , std::move(pre_call_package));
+}
+
+void BackendTEST::checkResult(const QStringList& result , const QueryAboutPackage& pattern) 
+{
+    checker_.pattern() = pattern.result();
+    checker_.checkResult(result);
 }
 
 void BackendTEST::testQueryCall(QueryAboutPackage call_pack , int count) 
