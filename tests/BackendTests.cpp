@@ -12,9 +12,7 @@ UIMock::UIMock(QObject *parent) :
 
 QStringList UIMock::queryAbout(QString command,  QStringList args)
 {
-    QStringList result {backend_->queryAbout(command , args)};
-    emit dataReady();
-    return result;
+    return backend_->queryAbout(command , args);
 }
 
 void UIMock::setBackend(std::shared_ptr<Backend> backend) 
@@ -26,8 +24,8 @@ void UIMock::setBackend(std::shared_ptr<Backend> backend)
 Utils::Utils(std::shared_ptr<Backend> backend)
 {
     QObject::connect(&event_loop_ , &DelayedEventLoop::runned , 
-                     &init_func_wrappers_ , &QFunctionWrapper::invoke);
-    QObject::connect(&ui_mock_ , &UIMock::dataReady , 
+                     &wrappers_ , &WrappersList::callAll);
+    QObject::connect(&wrappers_ , &WrappersList::finished , 
                      &event_loop_ , &DelayedEventLoop::killTestEventLoop);
 }
 
@@ -59,12 +57,15 @@ void BackendTEST::startEventLoop()
     utils_.event_loop_.startTestEventLoop();
 }
 
-void BackendTEST::setInitialFunction(std::function<void()> function) 
+void BackendTEST::appendInitialFunction(std::function<void()> function, int count ) 
 {
-    utils_.init_func_wrappers_.setFunction(std::move(function));
+    for(int i{0}; i < count; ++i)
+    {
+        utils_.wrappers_.append(function);
+    }
 }
 
-void BackendTEST::setUIQueryAboutAsInit(QueryAboutPackage call_package) 
+void BackendTEST::appendUIQueryAboutOnStart(QueryAboutPackage call_package , int count ) 
 {
     std::function<void()> ui_action = [call_package, this]
     {
@@ -75,8 +76,8 @@ void BackendTEST::setUIQueryAboutAsInit(QueryAboutPackage call_package)
         
         checkResult(result , call_package);
     };
- 
-    setInitialFunction(ui_action);
+
+    appendInitialFunction(ui_action , count);
 }
 
 void BackendTEST::invokePrecall(QueryAboutPackage pack)
@@ -123,15 +124,9 @@ void BackendTEST::checkResult(const QStringList& result , const QueryAboutPackag
     checker_.checkResult(result);
 }
 
-void BackendTEST::testQueryCall(QueryAboutPackage call_pack , int count) 
+void BackendTEST::testQueryAboutCall(QueryAboutPackage call_pack , int count) 
 {
-    // setUIQueryAboutAsInit(call_pack , count);
-    startEventLoop();
-}
-
-void BackendTEST::testSingleQueryCall(QueryAboutPackage call_pack)
-{    
-    setUIQueryAboutAsInit(call_pack);
+    appendUIQueryAboutOnStart(call_pack , count);
     startEventLoop();
 }
 
@@ -153,9 +148,8 @@ TEST_F(BackendTEST, AudioSearch)
     expectSingleQueryAboutCall(*mocks_.data_storage_ ,storage_pack , settings_pack);
     expectSingleQueryAboutCall(*mocks_.settings_ ,  settings_pack);
     
-    testSingleQueryCall(storage_pack);
+    testQueryAboutCall(storage_pack);
 }
-
 
 
 TEST_F(BackendTEST , AudioNotFullName)
@@ -179,7 +173,7 @@ TEST_F(BackendTEST , AudioNotFullName)
     expectSingleQueryAboutCall(*mocks_.data_storage_  , storage_pack , settings_pack);
     expectSingleQueryAboutCall(*mocks_.settings_  , settings_pack);
 
-    testSingleQueryCall(storage_pack);
+    testQueryAboutCall(storage_pack);
 }
 
 TEST_F(BackendTEST, AudioMultipleFileName)
@@ -202,7 +196,7 @@ TEST_F(BackendTEST, AudioMultipleFileName)
     expectSingleQueryAboutCall(*mocks_.data_storage_  , storage_pack , settings_pack);
     expectSingleQueryAboutCall(*mocks_.settings_ ,  settings_pack);
 
-    testSingleQueryCall(storage_pack);
+    testQueryAboutCall(storage_pack);
 }
 
 TEST_F(BackendTEST, DISABLED_AppendAudioDir)
@@ -212,7 +206,7 @@ TEST_F(BackendTEST, DISABLED_AppendAudioDir)
     settings_pack.command() =  "AppdirAudio";
     settings_pack.result()  =  QStringList{"/home/abc/audio"};
 
-    setUIQueryAboutAsInit(settings_pack);
+    appendUIQueryAboutOnStart(settings_pack);
 
     QString result;
 
@@ -246,7 +240,7 @@ TEST_F(BackendTEST , VideoSearch)
     expectSingleQueryAboutCall(*mocks_.settings_ , settings_pack);
     expectSingleQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
 
-    testSingleQueryCall(storage_pack);
+    testQueryAboutCall(storage_pack);
 }
 
 TEST_F(BackendTEST , AudioPlaylist)
@@ -269,7 +263,7 @@ TEST_F(BackendTEST , AudioPlaylist)
     expectSingleQueryAboutCall(*mocks_.settings_ , settings_pack);
     expectSingleQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
 
-    testSingleQueryCall(storage_pack);
+    testQueryAboutCall(storage_pack);
 }
 
 TEST_F(BackendTEST , ImageSearch)
@@ -288,7 +282,7 @@ TEST_F(BackendTEST , ImageSearch)
     expectSingleQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
     expectSingleQueryAboutCall(*mocks_.settings_ , settings_pack);
 
-    testSingleQueryCall(storage_pack);
+    testQueryAboutCall(storage_pack);
 }
 
 TEST_F(BackendTEST , UnsupportedCommand)
@@ -298,10 +292,9 @@ TEST_F(BackendTEST , UnsupportedCommand)
     pack.command() = "XYZ";
     pack.result()  = QStringList{"WrongCmd"};
 
-    testSingleQueryCall(pack);
+    testQueryAboutCall(pack);
 }
 
-/*
 TEST_F(BackendTEST , MultipleCall)
 {
     QueryAboutPackage storage_pack;
@@ -320,9 +313,9 @@ TEST_F(BackendTEST , MultipleCall)
     expectQueryAboutCall(*mocks_.data_storage_ , calls_count ,storage_pack , settings_pack);
     expectQueryAboutCall(*mocks_.settings_ , calls_count , settings_pack);
 
-    testQueryCall(storage_pack, calls_count);
+    testQueryAboutCall(storage_pack, calls_count);
 }
-*/
+
 
 //TEST IDEA MULTIPLE BACKEND CALLS , MIX CALLS
 

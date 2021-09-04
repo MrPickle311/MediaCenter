@@ -6,6 +6,9 @@
 #include <CommonUtils.hpp>
 #include <QSignalSpy>
 
+#include <forward_list>
+#include <atomic>
+
 class MediatorMOCK: public IMediator
 {
     Q_OBJECT;
@@ -41,10 +44,48 @@ struct MediatorsMocks
     {}
 };
 
+class WrappersList : public QObject
+{
+    Q_OBJECT;
+private:
+    std::atomic_int tasks_finished_;
+    QFunctionWrapperFactory factory_;
+    std::list<std::shared_ptr<QFunctionWrapper>>  init_func_wrappers_;
+    void checkIfFinished()
+    {
+        if(tasks_finished_ == init_func_wrappers_.size())
+        {
+            emit finished();
+            tasks_finished_ = 0;
+        }
+    }
+public:
+    void append(std::function<void()> function)
+    {
+        factory_.setFunction(
+            [function = std::move(function), this]
+            {
+                function();
+                ++this->tasks_finished_;
+                checkIfFinished();
+            }
+        );
+        auto wrapper {factory_.produce()};
+
+        QObject::connect(this , &WrappersList::callAll ,
+                         wrapper.get(), &QFunctionWrapper::invoke);
+
+        init_func_wrappers_.push_back(std::move(wrapper));
+    }
+signals:
+    void callAll();
+    void finished();
+};
+
 struct Utils
 {
+    WrappersList      wrappers_;
     UIMock            ui_mock_;
-    QFunctionWrapper  init_func_wrappers_;
     DelayedEventLoop  event_loop_;
 public:
     Utils(std::shared_ptr<Backend> backend);
@@ -247,8 +288,8 @@ private:
 protected:
 //tests setup
     void startEventLoop();
-    void setInitialFunction(std::function<void()> function);
-    void setUIQueryAboutAsInit(QueryAboutPackage call_package);
+    void appendInitialFunction(std::function<void()> function, int count = 1);
+    void appendUIQueryAboutOnStart(QueryAboutPackage call_package , int count = 1);
 //calls expectations
     void expectQueryAboutCall(MediatorMOCK& target ,
                               int count , 
@@ -259,7 +300,6 @@ protected:
                                     QueryAboutPackage pre_call_package = {});
 //testing methods
     void checkResult(const QStringList& result , const QueryAboutPackage& pattern);
-    void testQueryCall(QueryAboutPackage call_pack , int count); 
-    void testSingleQueryCall(QueryAboutPackage call_pack);
+    void testQueryAboutCall(QueryAboutPackage call_pack , int count = 1); 
 };
 

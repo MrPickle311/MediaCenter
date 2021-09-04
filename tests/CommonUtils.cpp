@@ -39,7 +39,7 @@ void QFunctionWrapperFactory::setFunction(std::function<void()> func)
 
 std::shared_ptr<QFunctionWrapper> QFunctionWrapperFactory::produce() const
 {
-    std::shared_ptr<QFunctionWrapper> wrapper;
+    std::shared_ptr<QFunctionWrapper> wrapper{new QFunctionWrapper};
     wrapper->setFunction(this->func_);
 
     return wrapper;
