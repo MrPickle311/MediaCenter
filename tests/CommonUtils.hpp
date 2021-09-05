@@ -22,17 +22,24 @@ signals:
     void runned();
 };
 
-class QFunctionWrapper : public QObject
+class IQFunctionWrapper : public QObject
+{
+    Q_OBJECT;
+public:
+    virtual void invoke() = 0;
+    virtual void setFunction(std::function<void()> func) = 0;
+signals:
+    void sendSignal(std::string msg = {});   
+};
+
+class QFunctionWrapper : public IQFunctionWrapper
 {
     Q_OBJECT;
 private:
-    std::function<void()> func_;
+    std::function<void()> func_body_;
 public:
-    void invoke();
-public:
-    void setFunction(std::function<void()> func);
-signals:
-    void sendSignal(std::string msg = {});
+    virtual void invoke();
+    virtual void setFunction(std::function<void()> func);
 };
 
 class QFunctionWrapperFactory

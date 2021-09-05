@@ -24,12 +24,12 @@ void DelayedEventLoop::killTestEventLoop()
 
 void QFunctionWrapper::invoke()
 {
-    func_();
+    func_body_();
 }
 
 void QFunctionWrapper::setFunction(std::function<void ()> func)
 {
-    this->func_ = std::move(func);
+    this->func_body_ = std::move(func);
 }
 
 void QFunctionWrapperFactory::setFunction(std::function<void()> func) 
