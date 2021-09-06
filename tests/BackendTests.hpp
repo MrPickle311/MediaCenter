@@ -164,94 +164,6 @@ public:
     }
 };
 
-/*
-
-#pragma region Interfaces
-
-using QueryAboutDataPtr = std::shared_ptr<QueryAboutData>;
-
-class IQueryAboutDataFactory
-{
-public:
-    virtual QueryAboutDataPtr produce() const = 0;
-};
-
-class IQueryAboutMock
-{
-public:
-    virtual void invoke() = 0;
-    virtual QueryAboutDataPtr setNext(QueryAboutDataPtr next) = 0;
-};
-
-using QueryAboutMockPtr = std::shared_ptr<IQueryAboutMock>; 
-
-using QueryAboutDataPtr = std::shared_ptr<IQueryAboutMock>;
-
-class IQueryAboutMockFactory
-{
-public:
-    virtual QueryAboutDataPtr produce(MediatorMOCK   target ,
-                                      QueryAboutData query_data);
-};
-
-#pragma endregion Interfaces
-
-#pragma region QueryAboutMock
-
-
-
-class QueryAboutMock: public IQueryAboutMock
-{
-private:
-    QueryAboutMockPtr next_;
-    std::function<void()> body_;
-private:
-    QueryAboutMock(std::function<void()> body):
-        next_{nullptr} , 
-        body_{std::move(body)}
-    {}
-public:
-    //COPY OR MOVE OPERATOR 
-    virtual void invoke()
-    {
-        if(next_)
-        {
-            next_->invoke();
-        }
-
-        body_();
-    }
-    virtual QueryAboutDataPtr setNext(QueryAboutDataPtr next)
-    {
-        this->next_ = next;
-    }
-};
-
-class QueryAboutMockFactory : public IQueryAboutMockFactory
-{
-private:
-    std::shared_ptr<Backend>    backend_;
-public:
-    QueryAboutMockFactory(std::shared_ptr<Backend> backend):
-        backend_{std::move(backend)}
-    {
-
-    }
-    virtual QueryAboutDataPtr produce(MediatorMOCK   target ,
-                                      QueryAboutData query_data)
-    {//I finished HERE
-        using ::testing::Eq;
-    using ::testing::Return;
-
-    EXPECT_CALL(target, queryAbout(Eq(sender),Eq(what),Eq(call_args)))
-        .WillOnce(Return(result));
-    }
-};
-
-#pragma endregion QueryAboutMock
-
-*/
-
 class ResultChecker
 {
 private:
@@ -291,7 +203,7 @@ public:
 
 class QueryAboutCaller : public QFunctionWrapper
 {
-    friend class QueryAboutMockFactory;
+    friend class QueryAboutCallerFactory;
     Q_OBJECT;
 private:
     std::shared_ptr<ResultChecker>  checker_;
@@ -345,14 +257,13 @@ public:
     }
 };
 
-class QueryAboutMockFactory
+class QueryAboutCallerFactory
 {
 private:
     std::shared_ptr<ResultChecker>  checker_;
     std::shared_ptr<Backend>        backend_;
-    // QueryAboutPackage               query_package_;
 public:
-    QueryAboutMockFactory(std::shared_ptr<ResultChecker>  checker ,
+    QueryAboutCallerFactory(std::shared_ptr<ResultChecker>  checker ,
                           std::shared_ptr<Backend>        backend):
                 checker_{checker} ,
                 backend_{backend}
@@ -373,8 +284,60 @@ public:
 
 class RequestActionCaller : public QFunctionWrapper
 {
-
+    Q_OBJECT;
+    friend class RequestActionCallerFactory;
+private:
+    QString                         command_;
+    std::shared_ptr<Backend>        backend_;
+    std::shared_ptr<MediatorMOCK>   expected_mock_to_call_;
+private:
+    RequestActionCaller(QString command , 
+                        std::shared_ptr<Backend> backend , 
+                        std::shared_ptr<MediatorMOCK>   expected_mock_to_call):
+                command_{command} , 
+                backend_{backend} ,
+                expected_mock_to_call_{expected_mock_to_call}
+    {
+        QObject::connect(expected_mock_to_call_.get() , &MediatorMOCK::requestAction ,
+            [this](QString requestedAction , QStringList args = {})
+            {
+                EXPECT_STREQ(requestedAction.toStdString().c_str() , 
+                             command_.toStdString().c_str() );
+                
+                emit finished();
+            });
+    }
+public:
+    virtual void invoke()
+    {
+        backend_->requestAction(command_);
+    }
 };
+
+class RequestActionCallerFactory
+{
+private:
+    std::shared_ptr<Backend>  backend_;
+public:
+    RequestActionCallerFactory(std::shared_ptr<Backend> backend):
+                backend_{backend}
+    {}
+public:
+    std::shared_ptr<RequestActionCaller> produce(QString command , 
+                                                 std::shared_ptr<MediatorMOCK> expected_mock_to_call) const
+    {
+        return std::shared_ptr<RequestActionCaller>{new RequestActionCaller{ 
+                                                                       command , 
+                                                                       backend_ , 
+                                                                       expected_mock_to_call
+                                                                     }};
+    }
+    void setBackend(std::shared_ptr<Backend> backend)
+    {
+        this->backend_ = backend;
+    }
+};
+
 
 class BackendTEST : public ::testing::Test
 {
@@ -385,7 +348,7 @@ protected:
     Utils           utils_;
     MediatorsMocks  mocks_;
     std::shared_ptr<ResultChecker> checker_;
-    QueryAboutMockFactory factory_;
+    QueryAboutCallerFactory factory_;
 
     //tested object
     std::shared_ptr<Backend>    backend_;

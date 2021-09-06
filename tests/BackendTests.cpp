@@ -137,7 +137,7 @@ TEST_F(BackendTEST, AudioMultipleFileName)
     start();
 }
 
-
+/*
 
 TEST_F(BackendTEST, DISABLED_AppendAudioDir)
 {
@@ -164,6 +164,7 @@ TEST_F(BackendTEST, DISABLED_AppendAudioDir)
     EXPECT_STREQ(result.toStdString().c_str() , "AppdirAudio");
 }
 
+*/
 
 
 TEST_F(BackendTEST , VideoSearch)
