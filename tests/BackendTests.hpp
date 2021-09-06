@@ -303,7 +303,7 @@ private:
             {
                 EXPECT_STREQ(requestedAction.toStdString().c_str() , 
                              command_.toStdString().c_str() );
-                
+                std::cout << "\nI'm here!\n"; 
                 emit finished();
             });
     }
@@ -348,7 +348,8 @@ protected:
     Utils           utils_;
     MediatorsMocks  mocks_;
     std::shared_ptr<ResultChecker> checker_;
-    QueryAboutCallerFactory factory_;
+    QueryAboutCallerFactory query_factory_;
+    RequestActionCallerFactory request_factory_;
 
     //tested object
     std::shared_ptr<Backend>    backend_;
@@ -374,7 +375,13 @@ protected:
                                                              int times = 1)
     {
         expectQueryAboutCall(target , pack , times);//WTF? times not here
-        return factory_.produce(pack);
+        return query_factory_.produce(pack);
+    }
+    void appendRequestActionToList(QString command , 
+                                   std::shared_ptr<MediatorMOCK> expected_target , 
+                                   int times = 1)
+    {
+        appendFunctionWrapperToCallList(request_factory_.produce(command , expected_target), times );
     }
     void start()
     {

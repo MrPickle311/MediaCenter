@@ -38,7 +38,8 @@ BackendTEST::BackendTEST():
     utils_{backend_},
     backend_{nullptr},
     checker_{new ResultChecker} ,
-    factory_{checker_ , backend_}
+    query_factory_{checker_ , nullptr} ,
+    request_factory_{nullptr}
 {
     BackendBuilder builder;
     
@@ -52,7 +53,8 @@ BackendTEST::BackendTEST():
     EXPECT_NE(backend_.get() , nullptr);
 
     utils_.setBackend(backend_);
-    factory_.setBackend(backend_);
+    query_factory_.setBackend(backend_);
+    request_factory_.setBackend(backend_);
 }
 
 void BackendTEST::startEventLoop() 
@@ -137,35 +139,14 @@ TEST_F(BackendTEST, AudioMultipleFileName)
     start();
 }
 
-/*
-
-TEST_F(BackendTEST, DISABLED_AppendAudioDir)
+TEST_F(BackendTEST, AppendAudioDir)
 {
-    QueryAboutPackage settings_pack;
+    QString command{"AppdirAudio"};
 
-    settings_pack.command() =  "AppdirAudio";
-    settings_pack.expectedResult()  =  QStringList{"/home/abc/audio"};
+    appendRequestActionToList(command , mocks_.settings_);
 
-    appendUIQueryAbout(settings_pack);
-
-    QString result;
-
-    //this lambda checks the requestAction() signal emission
-    //place it in separate object called wrapper
-    QObject::connect(mocks_.settings_.get() , &MediatorMOCK::requestAction ,
-            [this, &result](QString requestedAction,QStringList args = {})
-            {
-                result = requestedAction;
-                emit utils_.event_loop_.killTestEventLoop();
-            });
-    
-    startEventLoop();
-
-    EXPECT_STREQ(result.toStdString().c_str() , "AppdirAudio");
+    start();
 }
-
-*/
-
 
 TEST_F(BackendTEST , VideoSearch)
 {
@@ -273,7 +254,36 @@ TEST_F(BackendTEST , MultipleCall)
     start();
 }
 
+TEST_F(BackendTEST , MixedCalls)
+{
+    int calls_count{10};
 
+    QueryAboutPackage storage_pack;
+
+    storage_pack.command()  = "PlaylistAudio";
+    storage_pack.expectedResult()   = QStringList
+                              {
+                                  "/home/abc/audio/song1.mp3",
+                                  "/home/abc/audio/song2.mp3",
+                                  "/home/abc/audio/song3.mp3"
+                              };
+
+    QueryAboutPackage settings_pack;
+
+    settings_pack.command() =  "MediapathsAudio";
+    settings_pack.expectedResult()  =  QStringList{"/home/abc/audio"};
+
+    auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack , calls_count)};
+    wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack , calls_count));
+
+    appendFunctionWrapperToCallList(std::move(wrapper) , calls_count);
+
+    QString command{"AppdirAudio"};
+
+    appendRequestActionToList(command , mocks_.settings_ , calls_count);
+
+    start();
+}
 
 //TEST IDEA MULTIPLE BACKEND CALLS , MIX CALLS
 
