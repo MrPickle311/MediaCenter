@@ -25,6 +25,7 @@ void DelayedEventLoop::killTestEventLoop()
 void QFunctionWrapper::invoke()
 {
     func_body_();
+    emit finished();
 }
 
 void QFunctionWrapper::setFunction(std::function<void ()> func)

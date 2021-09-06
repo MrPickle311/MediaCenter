@@ -29,7 +29,8 @@ public:
     virtual void invoke() = 0;
     virtual void setFunction(std::function<void()> func) = 0;
 signals:
-    void sendSignal(std::string msg = {});   
+    void sendSignal(std::string msg = {});
+    void finished();
 };
 
 class QFunctionWrapper : public IQFunctionWrapper
