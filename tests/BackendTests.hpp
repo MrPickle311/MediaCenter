@@ -51,6 +51,7 @@ private:
     std::atomic_int tasks_finished_;
     QFunctionWrapperFactory factory_;
     std::list<std::shared_ptr<QFunctionWrapper>>  init_func_wrappers_;
+private:
     void checkIfFinished()
     {
         if(tasks_finished_ == init_func_wrappers_.size())
@@ -59,23 +60,37 @@ private:
             tasks_finished_ = 0;
         }
     }
+    void connectWrapper(std::shared_ptr<QFunctionWrapper>& wrapper)
+    {
+        QObject::connect(this , &WrappersList::callAll ,
+                         wrapper.get() , &QFunctionWrapper::invoke);
+
+        QObject::connect(wrapper.get() , &QFunctionWrapper::finished ,
+                         this , &WrappersList::updateCallState);
+    }
+    void pushBack(std::shared_ptr<QFunctionWrapper> wrapper)
+    {
+        init_func_wrappers_.push_back(std::move(wrapper));
+    }
+private slots:
+    void updateCallState()
+    {
+        ++this->tasks_finished_;
+        checkIfFinished();
+    }
 public:
     void append(std::function<void()> function)
     {
-        factory_.setFunction(
-            [function = std::move(function), this]
-            {
-                function();
-                ++this->tasks_finished_;
-                checkIfFinished();
-            }
-        );
+        factory_.setFunction(std::move(function));
         auto wrapper {factory_.produce()};
 
-        QObject::connect(this , &WrappersList::callAll ,
-                         wrapper.get(), &QFunctionWrapper::invoke);
-
-        init_func_wrappers_.push_back(std::move(wrapper));
+        connectWrapper(wrapper);
+        pushBack(std::move(wrapper));
+    }
+    void append(std::shared_ptr<QFunctionWrapper> wrapper)
+    {
+        connectWrapper(wrapper);
+        pushBack(std::move(wrapper));
     }
 signals:
     void callAll();
@@ -271,7 +286,7 @@ public:
     }
 };
 
-class QueryAboutMock : public QFunctionWrapper
+class QueryAboutCaller : public QFunctionWrapper
 {
     friend class QueryAboutMockFactory;
     Q_OBJECT;
@@ -279,7 +294,7 @@ private:
     std::shared_ptr<ResultChecker>  checker_;
     std::shared_ptr<Backend>        backend_;
     QueryAboutPackage               query_package_;
-    std::shared_ptr<QueryAboutMock> precall_;
+    std::shared_ptr<QueryAboutCaller> precall_;
 private:
     void invokePrecall(QueryAboutPackage pack);
     void checkItself(QStringList result)
@@ -288,9 +303,9 @@ private:
         checker_->checkResult(result);
     }
 private:
-    QueryAboutMock(std::shared_ptr<ResultChecker> checker,
-                   std::shared_ptr<Backend>       backend , 
-                   QueryAboutPackage              query_package):
+    QueryAboutCaller(std::shared_ptr<ResultChecker> checker,
+                     std::shared_ptr<Backend>       backend , 
+                     QueryAboutPackage              query_package):
             checker_{checker} ,
             backend_{backend} ,
             query_package_{std::move(query_package)}
@@ -316,23 +331,7 @@ public:
 
         QFunctionWrapper::invoke();
     }
-    void registerMock()
-    {
-        //during cunstruction EXPECT_CALL perform occurs
-        EXPECT_CALL(target, 
-                queryAbout(Eq(call_package.command()),
-                           Eq(call_package.callArguments())))
-        .Times(1)
-        .WillRepeatedly(
-            [this]
-            {
-                // i no need this , each mock is registere d in constructor
-                // invokePrecall(pre_call_package);
-                return call_package.result();
-            }
-        );
-    }
-    QueryAboutMock& setPrecall(std::shared_ptr<QueryAboutMock> precall)
+    QueryAboutCaller& setPrecall(std::shared_ptr<QueryAboutCaller> precall)
     {
         this->precall_ = precall;
         return *this->precall_;
@@ -352,9 +351,9 @@ public:
                 backend_{backend}
     {}
 public:
-    std::shared_ptr<QueryAboutMock> produce() const
+    std::shared_ptr<QueryAboutCaller> produce() const
     {
-        return std::shared_ptr<QueryAboutMock>{new QueryAboutMock{ checker_ , 
+        return std::shared_ptr<QueryAboutCaller>{new QueryAboutCaller{ checker_ , 
                                                                    backend_ , 
                                                                    query_package_
                                                                  }};
@@ -369,7 +368,7 @@ public:
 protected:
     Utils           utils_;
     MediatorsMocks  mocks_;
-    ResultChecker checker_;
+    std::shared_ptr<ResultChecker> checker_;
     
     //tested object
     std::shared_ptr<Backend>    backend_;

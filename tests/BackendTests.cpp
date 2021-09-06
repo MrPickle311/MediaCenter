@@ -36,7 +36,8 @@ void Utils::setBackend(std::shared_ptr<Backend> backend)
 
 BackendTEST::BackendTEST():
     utils_{backend_},
-    backend_{nullptr}
+    backend_{nullptr},
+    checker_{new ResultChecker}
 {
     BackendBuilder builder;
     
@@ -120,8 +121,8 @@ void BackendTEST::expectSingleQueryAboutCall(MediatorMOCK& target ,
 
 void BackendTEST::checkResult(const QStringList& result , const QueryAboutPackage& pattern) 
 {
-    checker_.pattern() = pattern.result();
-    checker_.checkResult(result);
+    checker_->pattern() = pattern.result();
+    checker_->checkResult(result);
 }
 
 void BackendTEST::testQueryAboutCall(QueryAboutPackage call_pack , int count) 
@@ -144,6 +145,10 @@ TEST_F(BackendTEST, AudioSearch)
 
     settings_pack.command() =  "MediapathsAudio";
     settings_pack.expectedResult()  =  QStringList{"/home/abc/audio"};
+
+    QueryAboutMockFactory factory{checker_ , backend_};
+
+
 
     expectSingleQueryAboutCall(*mocks_.data_storage_ ,storage_pack , settings_pack);
     expectSingleQueryAboutCall(*mocks_.settings_ ,  settings_pack);
@@ -315,6 +320,7 @@ TEST_F(BackendTEST , MultipleCall)
 
     testQueryAboutCall(storage_pack, calls_count);
 }
+
 
 
 //TEST IDEA MULTIPLE BACKEND CALLS , MIX CALLS
