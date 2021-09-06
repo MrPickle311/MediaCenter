@@ -72,6 +72,11 @@ private:
     {
         init_func_wrappers_.push_back(std::move(wrapper));
     }
+    void connectAndPush(std::shared_ptr<QFunctionWrapper> wrapper)
+    {
+        connectWrapper(wrapper);
+        pushBack(std::move(wrapper));
+    }
 private slots:
     void updateCallState()
     {
@@ -84,13 +89,11 @@ public:
         factory_.setFunction(std::move(function));
         auto wrapper {factory_.produce()};
 
-        connectWrapper(wrapper);
-        pushBack(std::move(wrapper));
+        connectAndPush(wrapper);
     }
     void append(std::shared_ptr<QFunctionWrapper> wrapper)
     {
-        connectWrapper(wrapper);
-        pushBack(std::move(wrapper));
+        connectAndPush(wrapper);
     }
 signals:
     void callAll();
@@ -321,14 +324,18 @@ private:
 
         QFunctionWrapper::setFunction(std::move(ui_action));
     }
-public:
-    virtual void invoke()
+private:
+    void tryInvokePrecall()
     {
         if(this->precall_)
         {
             this->precall_->invoke();
         }
-
+    }
+public:
+    virtual void invoke()
+    {
+        tryInvokePrecall();
         QFunctionWrapper::invoke();
     }
     QueryAboutCaller& setPrecall(std::shared_ptr<QueryAboutCaller> precall)
@@ -343,7 +350,7 @@ class QueryAboutMockFactory
 private:
     std::shared_ptr<ResultChecker>  checker_;
     std::shared_ptr<Backend>        backend_;
-    QueryAboutPackage               query_package_;
+    // QueryAboutPackage               query_package_;
 public:
     QueryAboutMockFactory(std::shared_ptr<ResultChecker>  checker ,
                           std::shared_ptr<Backend>        backend):
@@ -351,13 +358,22 @@ public:
                 backend_{backend}
     {}
 public:
-    std::shared_ptr<QueryAboutCaller> produce() const
+    std::shared_ptr<QueryAboutCaller> produce(QueryAboutPackage query_package) const
     {
         return std::shared_ptr<QueryAboutCaller>{new QueryAboutCaller{ checker_ , 
-                                                                   backend_ , 
-                                                                   query_package_
-                                                                 }};
+                                                                       backend_ , 
+                                                                       query_package
+                                                                     }};
     }
+    void setBackend(std::shared_ptr<Backend> backend)
+    {
+        this->backend_ = backend;
+    }
+};
+
+class RequestActionCaller : public QFunctionWrapper
+{
+
 };
 
 class BackendTEST : public ::testing::Test
@@ -369,26 +385,52 @@ protected:
     Utils           utils_;
     MediatorsMocks  mocks_;
     std::shared_ptr<ResultChecker> checker_;
-    
+    QueryAboutMockFactory factory_;
+
     //tested object
     std::shared_ptr<Backend>    backend_;
-private:
-    void invokePrecall(QueryAboutPackage pack);
 protected:
 //tests setup
     void startEventLoop();
-    void appendInitialFunction(std::function<void()> function, int count = 1);
-    void appendUIQueryAbout(QueryAboutPackage call_package , int count = 1);
+    void appendFunctionToCallList(std::function<void()> function, int count = 1)
+    {
+        for(int i{0}; i < count; ++i)
+        {
+            utils_.wrappers_.append(function);
+        }
+    }
+    void appendFunctionWrapperToCallList(std::shared_ptr<QFunctionWrapper> wrapper , int times = 1)
+    {
+        for(int i{0}; i < times; ++i)
+        {
+            utils_.wrappers_.append(wrapper);
+        }    
+    }
+    std::shared_ptr<QueryAboutCaller> createQueryAboutCaller(MediatorMOCK& target , 
+                                                             QueryAboutPackage pack , 
+                                                             int times = 1)
+    {
+        expectQueryAboutCall(target , pack , times);//WTF? times not here
+        return factory_.produce(pack);
+    }
+    void start()
+    {
+        startEventLoop();
+    }
 //calls expectations
     void expectQueryAboutCall(MediatorMOCK& target ,
-                              int count , 
-                              QueryAboutPackage call_package ,
-                              QueryAboutPackage pre_call_package = {});
-    void expectSingleQueryAboutCall(MediatorMOCK& target ,
-                                    QueryAboutPackage call_package ,
-                                    QueryAboutPackage pre_call_package = {});
-//testing methods
-    void checkResult(const QStringList& result , const QueryAboutPackage& pattern);
-    void testQueryAboutCall(QueryAboutPackage call_pack , int count = 1); 
+                              QueryAboutPackage call_package , 
+                              int times = 1 )
+    {
+        using ::testing::Eq;
+        using ::testing::Return;
+
+        EXPECT_CALL(target, 
+                    queryAbout(Eq(call_package.command()),
+                               Eq(call_package.callArguments())))
+            .Times(times)
+            .WillRepeatedly(Return(call_package.result())
+            );
+    }
 };
 

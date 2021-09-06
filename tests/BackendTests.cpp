@@ -37,7 +37,8 @@ void Utils::setBackend(std::shared_ptr<Backend> backend)
 BackendTEST::BackendTEST():
     utils_{backend_},
     backend_{nullptr},
-    checker_{new ResultChecker}
+    checker_{new ResultChecker} ,
+    factory_{checker_ , backend_}
 {
     BackendBuilder builder;
     
@@ -51,6 +52,7 @@ BackendTEST::BackendTEST():
     EXPECT_NE(backend_.get() , nullptr);
 
     utils_.setBackend(backend_);
+    factory_.setBackend(backend_);
 }
 
 void BackendTEST::startEventLoop() 
@@ -58,78 +60,6 @@ void BackendTEST::startEventLoop()
     utils_.event_loop_.startTestEventLoop();
 }
 
-void BackendTEST::appendInitialFunction(std::function<void()> function, int count ) 
-{
-    for(int i{0}; i < count; ++i)
-    {
-        utils_.wrappers_.append(function);
-    }
-}
-
-void BackendTEST::appendUIQueryAbout(QueryAboutPackage call_package , int count ) 
-{
-    std::function<void()> ui_action = [call_package, this]
-    {
-        //waits until searched QStringList is prepared
-        auto result = utils_.ui_mock_
-                              .queryAbout(call_package.command() ,
-                                          call_package.callArguments());
-        
-        checkResult(result , call_package);
-    };
-
-    appendInitialFunction(ui_action , count);
-}
-
-void BackendTEST::invokePrecall(QueryAboutPackage pack)
-{
-    if(pack)
-    {
-        auto precall_result = backend_->queryAbout(pack.command() ,
-                                                   pack.callArguments());
-        
-        checkResult(precall_result , pack);
-    }
-}
-
-void BackendTEST::expectQueryAboutCall(MediatorMOCK& target ,
-                                       int times , 
-                                       QueryAboutPackage call_package,
-                                       QueryAboutPackage pre_call_package) 
-{
-    using ::testing::Eq;
-
-    EXPECT_CALL(target, 
-                queryAbout(Eq(call_package.command()),
-                           Eq(call_package.callArguments())))
-        .Times(times)
-        .WillRepeatedly(
-            [call_package , pre_call_package , this]
-            {
-                invokePrecall(pre_call_package);
-                return call_package.result();
-            }
-        );
-}
-
-void BackendTEST::expectSingleQueryAboutCall(MediatorMOCK& target ,
-                                    QueryAboutPackage call_package ,
-                                    QueryAboutPackage pre_call_package) 
-{
-    expectQueryAboutCall(target , 1 , std::move(call_package) , std::move(pre_call_package));
-}
-
-void BackendTEST::checkResult(const QStringList& result , const QueryAboutPackage& pattern) 
-{
-    checker_->pattern() = pattern.result();
-    checker_->checkResult(result);
-}
-
-void BackendTEST::testQueryAboutCall(QueryAboutPackage call_pack , int count) 
-{
-    appendUIQueryAbout(call_pack , count);
-    startEventLoop();
-}
 
 // Unit tests
 
@@ -146,15 +76,14 @@ TEST_F(BackendTEST, AudioSearch)
     settings_pack.command() =  "MediapathsAudio";
     settings_pack.expectedResult()  =  QStringList{"/home/abc/audio"};
 
-    QueryAboutMockFactory factory{checker_ , backend_};
+    auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack)};
+    wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack));
 
-
-
-    expectSingleQueryAboutCall(*mocks_.data_storage_ ,storage_pack , settings_pack);
-    expectSingleQueryAboutCall(*mocks_.settings_ ,  settings_pack);
+    appendFunctionWrapperToCallList(std::move(wrapper));
     
-    testQueryAboutCall(storage_pack);
+    start();
 }
+
 
 
 TEST_F(BackendTEST , AudioNotFullName)
@@ -175,10 +104,12 @@ TEST_F(BackendTEST , AudioNotFullName)
     settings_pack.command() =  "MediapathsAudio";
     settings_pack.expectedResult()  =  QStringList{"/home/abc/audio"};
     
-    expectSingleQueryAboutCall(*mocks_.data_storage_  , storage_pack , settings_pack);
-    expectSingleQueryAboutCall(*mocks_.settings_  , settings_pack);
+    auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack)};
+    wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack));
 
-    testQueryAboutCall(storage_pack);
+    appendFunctionWrapperToCallList(std::move(wrapper));
+    
+    start();
 }
 
 TEST_F(BackendTEST, AudioMultipleFileName)
@@ -198,11 +129,15 @@ TEST_F(BackendTEST, AudioMultipleFileName)
     settings_pack.command() =  "MediapathsAudio";
     settings_pack.expectedResult()  =  QStringList{"/home/abc/audio"};
 
-    expectSingleQueryAboutCall(*mocks_.data_storage_  , storage_pack , settings_pack);
-    expectSingleQueryAboutCall(*mocks_.settings_ ,  settings_pack);
+    auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack)};
+    wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack));
 
-    testQueryAboutCall(storage_pack);
+    appendFunctionWrapperToCallList(std::move(wrapper));
+    
+    start();
 }
+
+
 
 TEST_F(BackendTEST, DISABLED_AppendAudioDir)
 {
@@ -229,6 +164,8 @@ TEST_F(BackendTEST, DISABLED_AppendAudioDir)
     EXPECT_STREQ(result.toStdString().c_str() , "AppdirAudio");
 }
 
+
+
 TEST_F(BackendTEST , VideoSearch)
 {
     QueryAboutPackage storage_pack;
@@ -242,10 +179,12 @@ TEST_F(BackendTEST , VideoSearch)
     settings_pack.command() =  "MediapathsVideo";
     settings_pack.expectedResult()  =  QStringList{"/home/abc/video"};
     
-    expectSingleQueryAboutCall(*mocks_.settings_ , settings_pack);
-    expectSingleQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
+    auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack)};
+    wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack));
 
-    testQueryAboutCall(storage_pack);
+    appendFunctionWrapperToCallList(std::move(wrapper));
+    
+    start();
 }
 
 TEST_F(BackendTEST , AudioPlaylist)
@@ -265,10 +204,12 @@ TEST_F(BackendTEST , AudioPlaylist)
     settings_pack.command() =  "MediapathsAudio";
     settings_pack.expectedResult()  =  QStringList{"/home/abc/audio"};
 
-    expectSingleQueryAboutCall(*mocks_.settings_ , settings_pack);
-    expectSingleQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
+    auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack)};
+    wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack));
 
-    testQueryAboutCall(storage_pack);
+    appendFunctionWrapperToCallList(std::move(wrapper));
+    
+    start();
 }
 
 TEST_F(BackendTEST , ImageSearch)
@@ -284,10 +225,12 @@ TEST_F(BackendTEST , ImageSearch)
     settings_pack.command() =  "MediapathsImages";
     settings_pack.expectedResult()  =  QStringList{"/home/abc/img"};
     
-    expectSingleQueryAboutCall(*mocks_.data_storage_ , storage_pack , settings_pack);
-    expectSingleQueryAboutCall(*mocks_.settings_ , settings_pack);
+    auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack)};
+    wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack));
 
-    testQueryAboutCall(storage_pack);
+    appendFunctionWrapperToCallList(std::move(wrapper));
+    
+    start();
 }
 
 TEST_F(BackendTEST , UnsupportedCommand)
@@ -297,7 +240,13 @@ TEST_F(BackendTEST , UnsupportedCommand)
     pack.command() = "XYZ";
     pack.expectedResult()  = QStringList{"WrongCmd"};
 
-    testQueryAboutCall(pack);
+    int expected_calls_count{0};
+
+    auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , pack , expected_calls_count)};
+
+    appendFunctionWrapperToCallList(std::move(wrapper));
+    
+    start();
 }
 
 TEST_F(BackendTEST , MultipleCall)
@@ -314,11 +263,13 @@ TEST_F(BackendTEST , MultipleCall)
 
     settings_pack.command() =  "MediapathsImages";
     settings_pack.expectedResult()  =  QStringList{"/home/abc/img"};
-    
-    expectQueryAboutCall(*mocks_.data_storage_ , calls_count ,storage_pack , settings_pack);
-    expectQueryAboutCall(*mocks_.settings_ , calls_count , settings_pack);
 
-    testQueryAboutCall(storage_pack, calls_count);
+    auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack , calls_count)};
+    wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack , calls_count));
+
+    appendFunctionWrapperToCallList(std::move(wrapper) , calls_count);
+    
+    start();
 }
 
 
