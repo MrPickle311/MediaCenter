@@ -299,7 +299,7 @@ private:
                 expected_mock_to_call_{expected_mock_to_call}
     {
         QObject::connect(expected_mock_to_call_.get() , &MediatorMOCK::requestAction ,
-            [this](QString requestedAction , QStringList args = {})
+            [this](auto requestedAction , auto args = {})
             {
                 EXPECT_STREQ(requestedAction.toStdString().c_str() , 
                              command_.toStdString().c_str() );

@@ -1,6 +1,4 @@
 #include "Backend.hpp"
-#include <regex>
-#include <map>
 
 IMediator::IMediator(QObject *parent):
     QObject(parent)
@@ -14,40 +12,9 @@ IProxy::IProxy(QObject *parent):
 
 Backend::Backend(uint threads_count) :
     task_manager_{threads_count}
-{
-    
-}
+{}
 
-void Backend::addBinding(QString key , std::shared_ptr<IMediator> target) 
-{
-    bindings_[key] = target;
-}
 
-QString Backend::getTargetKey(QString command)
-{
-    const static thread_local std::regex matcher{"[A-Z]{1}+[a-z]+"};
-    std::string str{command.toStdString()};
-    std::smatch sm;
-
-    if(std::regex_search(str , sm , matcher))
-    {
-        return QString::fromStdString(sm[0].str());
-    }
-    
-    return "WrongCmd";
-}
-
-std::shared_ptr<IMediator>& Backend::redirect(QString command)
-{
-    QString target_key{getTargetKey(command)};
-
-    if(bindings_.find(target_key) == bindings_.end())
-    {
-        throw std::logic_error{"WrongCmd"};
-    }
-
-    return bindings_[target_key];
-}
 // !!! MAKE CONST REF EVERYWHERE U CAN !!!
 std::future<QStringList> Backend::makeQuery(QString command, QStringList args)
 {
@@ -56,13 +23,18 @@ std::future<QStringList> Backend::makeQuery(QString command, QStringList args)
         {
             try
             {
-                return redirect(command)->queryAbout(command ,args);
+                return subsystems_->getSubsystem(command)->queryAbout(command ,args);
             }
             catch(const std::logic_error& e)
             {
                 return QStringList{"WrongCmd"};
             }
         });
+}
+
+void Backend::redirectRequestAction(QString action , QVariantList args) 
+{
+    bindings_[getTargetKey(action)]->requestAction(action ,args);
 }
 
 QStringList Backend::queryAbout(QString command, QStringList args)
