@@ -32,9 +32,16 @@ std::future<QStringList> Backend::makeQuery(QString command, QStringList args)
         });
 }
 
-void Backend::redirectRequestAction(QString action , QVariantList args) 
+void Backend::redirectRequestAction(QString action , QStringList args) 
 {
-    bindings_[getTargetKey(action)]->requestAction(action ,args);
+    try//if command is correct resend request
+    {
+        subsystems_->getSubsystem(action)->requestAction(action , args);
+    }
+    catch(const std::logic_error& e)
+    {
+        //nothing will happen otherwise
+    }
 }
 
 QStringList Backend::queryAbout(QString command, QStringList args)
@@ -48,34 +55,28 @@ std::shared_ptr<Backend> BackendBuilder::build()
 {
     std::shared_ptr<Backend> backend{new Backend{threads_count_}};
 
-    backend->data_backend_        = this->data_backend_;
-    backend->settings_backend_    = this->settings_backend_;
-    backend->environment_backend_ = this->env_backend_;
+    backend->subsystems_ = std::move(this->subsystems_);
 
-    backend->addBinding("Search" , backend->data_backend_);
-    backend->addBinding("Playlist" , backend->data_backend_);
-    backend->addBinding("Mediapaths" , backend->settings_backend_);
+
+    // backend->data_backend_        = this->data_backend_;
+    // backend->settings_backend_    = this->settings_backend_;
+    // backend->environment_backend_ = this->env_backend_;
+
+    // backend->addBinding("Search" , backend->data_backend_);
+    // backend->addBinding("Playlist" , backend->data_backend_);
+    // backend->addBinding("Mediapaths" , backend->settings_backend_);
 
     return backend;
 }
 
-BackendBuilder& BackendBuilder::setDataBackendDependency(std::shared_ptr<IMediator> data_backend) 
+BackendBuilder& BackendBuilder::addSubsystem(const QString& subsystem_name , std::shared_ptr<IMediator> subsystem)
 {
-    this->data_backend_ = data_backend;
-    
-    return *this;
+    subsystems_->addSubsystem(subsystem_name , subsystem);
 }
 
-BackendBuilder& BackendBuilder::setEnvironmentDependency(std::shared_ptr<IMediator> env_backend) 
+BackendBuilder& BackendBuilder::addSubsystemBinding(const QString& subsystem_name , const QString& binding_key) 
 {
-    this->env_backend_ = env_backend;
-    return *this;
-}
-
-BackendBuilder& BackendBuilder::setSettingsDependency(std::shared_ptr<IMediator> settings_backend) 
-{
-    this->settings_backend_ = settings_backend;
-    return *this;
+    subsystems_->addSubsystemBinding(subsystem_name , binding_key);
 }
 
 BackendBuilder& BackendBuilder::setThreadsCount(uint th_count) 

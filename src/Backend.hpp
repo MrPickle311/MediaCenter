@@ -7,6 +7,8 @@
 #include <regex>
 #include "utilities/TaskManager.hpp"
 
+using u32 = uint;
+
 class IMediator : public QObject
 {
     Q_OBJECT
@@ -60,9 +62,9 @@ private:
     Matcher                          matcher_;
     std::map<QString , IMediatorPtr> subsystems_;
 public:
-    void addSubsystem(const QString& subsys_key, IMediatorPtr subsystem)
+    void addSubsystem(const QString& subsys_name, IMediatorPtr subsystem)
     {
-        subsystems_[subsys_key] = subsystem;
+        subsystems_[subsys_name] = subsystem;
     }
     IMediatorPtr& getSubsystem(const QString& command) noexcept(false)
     {
@@ -74,6 +76,10 @@ public:
         }
 
         return subsystems_[command];
+    }
+    void addSubsystemBinding( const QString& subsystem_name , const QString& binding_key)
+    {
+        subsystems_[binding_key] = subsystems_[subsystem_name];
     }
 };
 
@@ -90,7 +96,7 @@ private:
     std::shared_ptr<BackendSubsystems> subsystems_;
 private:
     std::future<QStringList> makeQuery(QString command, QStringList args);
-    void redirectRequestAction(QString action , QVariantList args);
+    void redirectRequestAction(QString action , QStringList args);
 public slots:
     virtual QStringList queryAbout(QString command, QStringList args) override;
 };
@@ -99,10 +105,10 @@ class BackendBuilder
 {
 private:
     uint threads_count_;
+    std::shared_ptr<BackendSubsystems> subsystems_;
 public:
     std::shared_ptr<Backend> build();
-    BackendBuilder& setDataBackendDependency(std::shared_ptr<IMediator> data_backend);
-    BackendBuilder& setEnvironmentDependency(std::shared_ptr<IMediator> env_backend);
-    BackendBuilder& setSettingsDependency(std::shared_ptr<IMediator> settings_backend);
-    BackendBuilder& setThreadsCount(uint th_count);
+    BackendBuilder& addSubsystem(const QString& subsystem_name , std::shared_ptr<IMediator> subsystem);
+    BackendBuilder& addSubsystemBinding(const QString& subsystem_name , const QString& binding_key);
+    BackendBuilder& setThreadsCount(u32 th_count);
 };
