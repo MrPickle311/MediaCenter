@@ -74,6 +74,9 @@
         "qthreadpool": "cpp",
         "regex": "cpp",
         "shared_mutex": "cpp",
-        "*.ipp": "cpp"
-    }
+        "*.ipp": "cpp",
+        "qvariant": "cpp"
+    },
+    "C_Cpp.default.cppStandard": "gnu++20",
+    "C_Cpp.default.cStandard": "gnu17"
 }

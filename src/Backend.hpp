@@ -1,13 +1,56 @@
 ﻿#pragma once
 
 #include <QObject>
-#include <QVariant>
-#include <QThreadPool>
 #include <map>
 #include <regex>
 #include "utilities/TaskManager.hpp"
 
+
 using u32 = uint;
+
+//generic string adapter
+class String
+{
+private:
+    std::string body_;
+public:
+    String(const std::string& str):
+        body_{str}
+    {}
+    String(const QString& str):
+        body_{str.toStdString()}
+    {}
+    String(const char* str):
+        body_{str}
+    {}
+    operator QString () const
+    {
+        return QString::fromStdString(body_);
+    }
+    operator std::string ()
+    {
+        return body_;
+    }
+    operator const char* () const
+    {
+        return body_.c_str();
+    }
+    String& operator=(const std::string& str)
+    {
+        this->body_ = str;
+        return *this;
+    }
+    String& operator=(const QString& str)
+    {
+        this->body_ = str.toStdString();
+        return *this;
+    }
+    String& operator=(const char* str)
+    {
+        this->body_ = str;
+        return *this;
+    }
+};
 
 class IMediator : public QObject
 {
@@ -28,8 +71,8 @@ class IProxy : public QObject
 public:
     explicit IProxy(QObject *parent = nullptr);
 public slots:
-    virtual void requestAction(QString action , QVariantList args) = 0;
-    virtual QVariantList requestData(QString what) = 0;
+    virtual void requestAction(QString action , QStringList args) = 0;
+    virtual QStringList requestData(QString what) = 0;
 };
 
 
