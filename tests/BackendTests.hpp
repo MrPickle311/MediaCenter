@@ -303,7 +303,6 @@ private:
             {
                 EXPECT_STREQ(requestedAction.toStdString().c_str() , 
                              command_.toStdString().c_str() );
-                std::cout << "\nI'm here!\n"; 
                 emit finished();
             });
     }

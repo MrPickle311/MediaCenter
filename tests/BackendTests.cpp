@@ -42,14 +42,20 @@ BackendTEST::BackendTEST():
     request_factory_{nullptr}
 {
     BackendBuilder builder;
+
+    builder.addSubsystem("DataStorage" , mocks_.data_storage_)
+           .addSubsystem("Environment" , mocks_.environment_)
+           .addSubsystem("Settings" , mocks_.settings_);
     
-    builder.setDataBackendDependency(mocks_.data_storage_)
-           .setEnvironmentDependency(mocks_.environment_)
-           .setSettingsDependency(mocks_.settings_)
-           .setThreadsCount(5);
+    builder.addSubsystemBinding("DataStorage" , "Search")
+           .addSubsystemBinding("DataStorage" , "Playlist")
+           .addSubsystemBinding("Settings"    , "Mediapaths")
+           .addSubsystemBinding("Settings"    , "Appdir")
+           .setThreadsCount(10);
 
     backend_ = builder.build();
 
+    // expect that backend is initilized
     EXPECT_NE(backend_.get() , nullptr);
 
     utils_.setBackend(backend_);
@@ -64,6 +70,7 @@ void BackendTEST::startEventLoop()
 
 
 // Unit tests
+
 
 TEST_F(BackendTEST, AudioSearch)
 {
@@ -138,6 +145,7 @@ TEST_F(BackendTEST, AudioMultipleFileName)
     
     start();
 }
+
 
 TEST_F(BackendTEST, AppendAudioDir)
 {
@@ -235,7 +243,7 @@ TEST_F(BackendTEST , MultipleCall)
 {
     QueryAboutPackage storage_pack;
 
-    int calls_count{10};
+    int calls_count{20};
 
     storage_pack.command()       = "SearchImages";
     storage_pack.expectedResult()        = QStringList{"/home/abc/img/image.jpg"};
@@ -256,7 +264,7 @@ TEST_F(BackendTEST , MultipleCall)
 
 TEST_F(BackendTEST , MixedCalls)
 {
-    int calls_count{10};
+    int calls_count{100};
 
     QueryAboutPackage storage_pack;
 

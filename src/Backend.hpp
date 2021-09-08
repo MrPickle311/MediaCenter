@@ -36,13 +36,14 @@ public slots:
 class Matcher
 {
 private:
-    const std::regex matcher_body_;
+    // const std::regex matcher_body_;
 public:
-    Matcher(std::string regex_pattern):
-        matcher_body_{regex_pattern}
+    Matcher(std::string regex_pattern)//:
+        // matcher_body_{regex_pattern}
     {}
     QString extractSubsystemKey(const QString command)
     {
+        thread_local static std::regex matcher_body_{"[A-Z]{1}[a-z]+"};
         thread_local static std::string str{command.toStdString()};
         thread_local static std::smatch match_results;
 
@@ -61,25 +62,22 @@ class BackendSubsystems
 private:
     Matcher                          matcher_;
     std::map<QString , IMediatorPtr> subsystems_;
+    // std::map<QString , IMediatorPtr> subsystems_;
 public:
+    BackendSubsystems():
+        matcher_{"[A-Z]{1}[a-z]+"}
+    {}
     void addSubsystem(const QString& subsys_name, IMediatorPtr subsystem)
     {
         subsystems_[subsys_name] = subsystem;
     }
     IMediatorPtr& getSubsystem(const QString& command) noexcept(false)
     {
-        QString target_key{matcher_.extractSubsystemKey(command)};
-
-        if(subsystems_.find(target_key) == subsystems_.end())
-        {
-            throw std::logic_error{"WrongCmd"};
-        }
-
-        return subsystems_[command];
+        return subsystems_.at(matcher_.extractSubsystemKey(command));
     }
     void addSubsystemBinding( const QString& subsystem_name , const QString& binding_key)
     {
-        subsystems_[binding_key] = subsystems_[subsystem_name];
+        subsystems_[binding_key] = subsystems_.at(subsystem_name);
     }
 };
 
@@ -106,7 +104,12 @@ class BackendBuilder
 private:
     uint threads_count_;
     std::shared_ptr<BackendSubsystems> subsystems_;
+private:
+    void resetSubsystems();
 public:
+    BackendBuilder():
+        subsystems_{new BackendSubsystems}
+    {}
     std::shared_ptr<Backend> build();
     BackendBuilder& addSubsystem(const QString& subsystem_name , std::shared_ptr<IMediator> subsystem);
     BackendBuilder& addSubsystemBinding(const QString& subsystem_name , const QString& binding_key);

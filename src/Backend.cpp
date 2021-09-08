@@ -12,7 +12,10 @@ IProxy::IProxy(QObject *parent):
 
 Backend::Backend(uint threads_count) :
     task_manager_{threads_count}
-{}
+{
+    QObject::connect(this , &Backend::requestAction ,
+                     this , &Backend::redirectRequestAction);
+}
 
 
 // !!! MAKE CONST REF EVERYWHERE U CAN !!!
@@ -25,7 +28,7 @@ std::future<QStringList> Backend::makeQuery(QString command, QStringList args)
             {
                 return subsystems_->getSubsystem(command)->queryAbout(command ,args);
             }
-            catch(const std::logic_error& e)
+            catch(const std::out_of_range& e)
             {
                 return QStringList{"WrongCmd"};
             }
@@ -38,15 +41,25 @@ void Backend::redirectRequestAction(QString action , QStringList args)
     {
         subsystems_->getSubsystem(action)->requestAction(action , args);
     }
-    catch(const std::logic_error& e)
+    catch(const std::out_of_range& e)
     {
+        std::cout << "\n Backend::redirectRequestAction : Requested action not found \n ";
         //nothing will happen otherwise
+    }
+    catch(...)
+    {
+        std::cout << "\n Backend::redirectRequestAction : Unexpected error \n ";
     }
 }
 
 QStringList Backend::queryAbout(QString command, QStringList args)
 {
     return makeQuery(command , args).get();
+}
+
+void BackendBuilder::resetSubsystems() 
+{
+    this->subsystems_.reset(new BackendSubsystems);
 }
 
 // builder
@@ -56,15 +69,7 @@ std::shared_ptr<Backend> BackendBuilder::build()
     std::shared_ptr<Backend> backend{new Backend{threads_count_}};
 
     backend->subsystems_ = std::move(this->subsystems_);
-
-
-    // backend->data_backend_        = this->data_backend_;
-    // backend->settings_backend_    = this->settings_backend_;
-    // backend->environment_backend_ = this->env_backend_;
-
-    // backend->addBinding("Search" , backend->data_backend_);
-    // backend->addBinding("Playlist" , backend->data_backend_);
-    // backend->addBinding("Mediapaths" , backend->settings_backend_);
+    resetSubsystems();
 
     return backend;
 }
@@ -72,11 +77,13 @@ std::shared_ptr<Backend> BackendBuilder::build()
 BackendBuilder& BackendBuilder::addSubsystem(const QString& subsystem_name , std::shared_ptr<IMediator> subsystem)
 {
     subsystems_->addSubsystem(subsystem_name , subsystem);
+    return *this;
 }
 
 BackendBuilder& BackendBuilder::addSubsystemBinding(const QString& subsystem_name , const QString& binding_key) 
 {
     subsystems_->addSubsystemBinding(subsystem_name , binding_key);
+    return *this;
 }
 
 BackendBuilder& BackendBuilder::setThreadsCount(uint th_count) 
