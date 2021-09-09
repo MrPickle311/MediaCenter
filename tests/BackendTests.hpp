@@ -9,38 +9,34 @@
 #include <forward_list>
 #include <atomic>
 
-class MediatorMOCK: public IMediator
-{
-    Q_OBJECT;
-public:
-    MOCK_METHOD(QStringList , queryAbout , (QString , QStringList) );
-};
+class MediatorMock;
+class QueryAboutPackage;
+class ResultChecker;
+class QueryAboutCaller;
+class RequestActionCaller;
 
-class UIMock : public QObject
+using MediatorMOCKPtr        = std::shared_ptr<MediatorMock>;
+using ResultCheckerPtr       = std::shared_ptr<ResultChecker>;
+using QueryAboutCallerPtr    = std::shared_ptr<QueryAboutCaller>;
+using RequestActionCallerPtr = std::shared_ptr<RequestActionCaller>;
+
+
+class MediatorMock: public IMediator
 {
     Q_OBJECT;
-    std::shared_ptr<Backend> backend_;
 public:
-    virtual ~UIMock(){};
-    UIMock(QObject* parent = nullptr);
-signals:
-    void requestAction(QString command , QStringList args = {});
-    void dataReady();
-public slots:
-    QStringList queryAbout(QString command , QStringList args = {});
-public:
-    void setBackend(std::shared_ptr<Backend> backend);
+    MOCK_METHOD(QStringList , queryAbout , (const QString& , QStringList) );
 };
 
 struct MediatorsMocks
 {
-    std::shared_ptr<MediatorMOCK>  data_storage_;
-    std::shared_ptr<MediatorMOCK>  environment_;
-    std::shared_ptr<MediatorMOCK>  settings_;
+    MediatorMOCKPtr  data_storage_;
+    MediatorMOCKPtr  environment_;
+    MediatorMOCKPtr  settings_;
     MediatorsMocks():
-        data_storage_{new MediatorMOCK},
-        environment_{new MediatorMOCK},
-        settings_{new MediatorMOCK}
+        data_storage_{new MediatorMock},
+        environment_{new MediatorMock},
+        settings_{new MediatorMock}
     {}
 };
 
@@ -48,9 +44,9 @@ class WrappersList : public QObject
 {
     Q_OBJECT;
 private:
-    std::atomic_int tasks_finished_;
-    QFunctionWrapperFactory factory_;
-    std::list<std::shared_ptr<QFunctionWrapper>>  init_func_wrappers_;
+    std::atomic_int                 tasks_finished_;
+    QFunctionWrapperFactory         factory_;
+    std::list<QFunctionWrapperPtr>  init_func_wrappers_;
 private:
     void checkIfFinished()
     {
@@ -60,7 +56,7 @@ private:
             tasks_finished_ = 0;
         }
     }
-    void connectWrapper(std::shared_ptr<QFunctionWrapper>& wrapper)
+    void connectWrapper(const QFunctionWrapperPtr& wrapper)
     {
         QObject::connect(this , &WrappersList::callAll ,
                          wrapper.get() , &QFunctionWrapper::invoke);
@@ -68,11 +64,11 @@ private:
         QObject::connect(wrapper.get() , &QFunctionWrapper::finished ,
                          this , &WrappersList::updateCallState);
     }
-    void pushBack(std::shared_ptr<QFunctionWrapper> wrapper)
+    void pushBack(QFunctionWrapperPtr wrapper)
     {
         init_func_wrappers_.push_back(std::move(wrapper));
     }
-    void connectAndPush(std::shared_ptr<QFunctionWrapper> wrapper)
+    void connectAndPush(QFunctionWrapperPtr wrapper)
     {
         connectWrapper(wrapper);
         pushBack(std::move(wrapper));
@@ -91,24 +87,13 @@ public:
 
         connectAndPush(wrapper);
     }
-    void append(std::shared_ptr<QFunctionWrapper> wrapper)
+    void append(QFunctionWrapperPtr wrapper)
     {
         connectAndPush(wrapper);
     }
 signals:
     void callAll();
     void finished();
-};
-
-struct Utils
-{
-    WrappersList      wrappers_;
-    UIMock            ui_mock_;
-    DelayedEventLoop  event_loop_;
-public:
-    Utils(std::shared_ptr<Backend> backend);
-public:
-    void setBackend(std::shared_ptr<Backend> backend);
 };
 
 class QueryAboutPackage
@@ -206,10 +191,10 @@ class QueryAboutCaller : public QFunctionWrapper
     friend class QueryAboutCallerFactory;
     Q_OBJECT;
 private:
-    std::shared_ptr<ResultChecker>  checker_;
-    std::shared_ptr<Backend>        backend_;
-    QueryAboutPackage               query_package_;
-    std::shared_ptr<QueryAboutCaller> precall_;
+    ResultCheckerPtr    checker_;
+    BackendPtr          backend_;
+    QueryAboutPackage   query_package_;
+    QueryAboutCallerPtr precall_;
 private:
     void invokePrecall(QueryAboutPackage pack);
     void checkItself(QStringList result)
@@ -218,9 +203,9 @@ private:
         checker_->checkResult(result);
     }
 private:
-    QueryAboutCaller(std::shared_ptr<ResultChecker> checker,
-                     std::shared_ptr<Backend>       backend , 
-                     QueryAboutPackage              query_package):
+    QueryAboutCaller(ResultCheckerPtr   checker,
+                     BackendPtr         backend , 
+                     QueryAboutPackage  query_package):
             checker_{checker} ,
             backend_{backend} ,
             query_package_{std::move(query_package)}
@@ -250,7 +235,7 @@ public:
         tryInvokePrecall();
         QFunctionWrapper::invoke();
     }
-    QueryAboutCaller& setPrecall(std::shared_ptr<QueryAboutCaller> precall)
+    QueryAboutCaller& setPrecall(QueryAboutCallerPtr precall)
     {
         this->precall_ = precall;
         return *this->precall_;
@@ -260,23 +245,23 @@ public:
 class QueryAboutCallerFactory
 {
 private:
-    std::shared_ptr<ResultChecker>  checker_;
-    std::shared_ptr<Backend>        backend_;
+    ResultCheckerPtr  checker_;
+    BackendPtr        backend_;
 public:
-    QueryAboutCallerFactory(std::shared_ptr<ResultChecker>  checker ,
-                          std::shared_ptr<Backend>        backend):
+    QueryAboutCallerFactory(ResultCheckerPtr  checker ,
+                          BackendPtr          backend):
                 checker_{checker} ,
                 backend_{backend}
     {}
 public:
-    std::shared_ptr<QueryAboutCaller> produce(QueryAboutPackage query_package) const
+    QueryAboutCallerPtr produce(QueryAboutPackage query_package) const
     {
-        return std::shared_ptr<QueryAboutCaller>{new QueryAboutCaller{ checker_ , 
-                                                                       backend_ , 
-                                                                       query_package
-                                                                     }};
+        return QueryAboutCallerPtr{new QueryAboutCaller{ checker_ , 
+                                                         backend_ , 
+                                                         query_package
+                                                       }};
     }
-    void setBackend(std::shared_ptr<Backend> backend)
+    void setBackend(BackendPtr backend)
     {
         this->backend_ = backend;
     }
@@ -287,18 +272,18 @@ class RequestActionCaller : public QFunctionWrapper
     Q_OBJECT;
     friend class RequestActionCallerFactory;
 private:
-    QString                         command_;
-    std::shared_ptr<Backend>        backend_;
-    std::shared_ptr<MediatorMOCK>   expected_mock_to_call_;
+    QString           command_;
+    BackendPtr        backend_;
+    MediatorMOCKPtr   expected_mock_to_call_;
 private:
     RequestActionCaller(QString command , 
-                        std::shared_ptr<Backend> backend , 
-                        std::shared_ptr<MediatorMOCK>   expected_mock_to_call):
+                        BackendPtr backend , 
+                        MediatorMOCKPtr   expected_mock_to_call):
                 command_{command} , 
                 backend_{backend} ,
                 expected_mock_to_call_{expected_mock_to_call}
     {
-        QObject::connect(expected_mock_to_call_.get() , &MediatorMOCK::requestAction ,
+        QObject::connect(expected_mock_to_call_.get() , &MediatorMock::requestAction ,
             [this](auto requestedAction , auto args = {})
             {
                 EXPECT_STREQ(requestedAction.toStdString().c_str() , 
@@ -316,45 +301,93 @@ public:
 class RequestActionCallerFactory
 {
 private:
-    std::shared_ptr<Backend>  backend_;
+    BackendPtr  backend_;
 public:
-    RequestActionCallerFactory(std::shared_ptr<Backend> backend):
-                backend_{backend}
+    RequestActionCallerFactory(BackendPtr backend):
+            backend_{backend}
     {}
 public:
-    std::shared_ptr<RequestActionCaller> produce(QString command , 
-                                                 std::shared_ptr<MediatorMOCK> expected_mock_to_call) const
+    RequestActionCallerPtr produce(QString command , MediatorMOCKPtr expected_mock_to_call) const
     {
-        return std::shared_ptr<RequestActionCaller>{new RequestActionCaller{ 
-                                                                       command , 
-                                                                       backend_ , 
-                                                                       expected_mock_to_call
-                                                                     }};
+        return RequestActionCallerPtr{new RequestActionCaller{ 
+                                                                command , 
+                                                                backend_ , 
+                                                                expected_mock_to_call
+                                                             }};
     }
-    void setBackend(std::shared_ptr<Backend> backend)
+    void setBackend(BackendPtr backend)
     {
         this->backend_ = backend;
     }
 };
 
+struct Utils
+{
+    WrappersList                wrappers_;
+    DelayedEventLoop            event_loop_;
+    ResultCheckerPtr            checker_;
+    QueryAboutCallerFactory     query_factory_;
+    RequestActionCallerFactory  request_factory_;
+public:
+    Utils(BackendPtr backend):
+        checker_{new ResultChecker} ,
+        query_factory_{checker_ , nullptr} ,
+        request_factory_{nullptr}
+    {
+        QObject::connect(&event_loop_ , &DelayedEventLoop::runned , 
+                         &wrappers_ , &WrappersList::callAll);
+        QObject::connect(&wrappers_ , &WrappersList::finished , 
+                         &event_loop_ , &DelayedEventLoop::killTestEventLoop);
+    }
+public:
+    void setBackend(BackendPtr backend)
+    {
+        query_factory_.setBackend(backend);
+        request_factory_.setBackend(backend);
+    }
+
+};
 
 class BackendTEST : public ::testing::Test
 {
 public:
-    BackendTEST();
+    BackendTEST():
+        utils_{backend_},
+        backend_{nullptr}
+    {
+        BackendBuilder builder;
+
+        builder.addSubsystem("DataStorage" , mocks_.data_storage_)
+               .addSubsystem("Environment" , mocks_.environment_)
+               .addSubsystem("Settings" , mocks_.settings_);
+
+        builder.addSubsystemBinding("DataStorage" , "Search")
+               .addSubsystemBinding("DataStorage" , "Playlist")
+               .addSubsystemBinding("Settings"    , "Mediapaths")
+               .addSubsystemBinding("Settings"    , "Appdir")
+               .setThreadsCount(10);
+
+        backend_ = builder.build();
+
+        // expect that backend is initilized
+        EXPECT_NE(backend_.get() , nullptr);
+
+        // set dependency
+        utils_.setBackend(backend_);
+    }
     virtual ~BackendTEST(){}
 protected:
     Utils           utils_;
     MediatorsMocks  mocks_;
-    std::shared_ptr<ResultChecker> checker_;
-    QueryAboutCallerFactory query_factory_;
-    RequestActionCallerFactory request_factory_;
-
+    
     //tested object
-    std::shared_ptr<Backend>    backend_;
+    BackendPtr    backend_;
 protected:
 //tests setup
-    void startEventLoop();
+    void startEventLoop() 
+    {
+        utils_.event_loop_.startTestEventLoop();
+    }
     void appendFunctionToCallList(std::function<void()> function, int count = 1)
     {
         for(int i{0}; i < count; ++i)
@@ -362,32 +395,33 @@ protected:
             utils_.wrappers_.append(function);
         }
     }
-    void appendFunctionWrapperToCallList(std::shared_ptr<QFunctionWrapper> wrapper , int times = 1)
+    void appendFunctionWrapperToCallList(QFunctionWrapperPtr wrapper , int times = 1)
     {
         for(int i{0}; i < times; ++i)
         {
             utils_.wrappers_.append(wrapper);
         }    
     }
-    std::shared_ptr<QueryAboutCaller> createQueryAboutCaller(MediatorMOCK& target , 
-                                                             QueryAboutPackage pack , 
-                                                             int times = 1)
+    QueryAboutCallerPtr createQueryAboutCaller(MediatorMock& target , 
+                                               QueryAboutPackage pack , 
+                                               int times = 1)
     {
         expectQueryAboutCall(target , pack , times);//WTF? times not here
-        return query_factory_.produce(pack);
+        return utils_.query_factory_.produce(pack);
     }
     void appendRequestActionToList(QString command , 
-                                   std::shared_ptr<MediatorMOCK> expected_target , 
+                                   MediatorMOCKPtr expected_target , 
                                    int times = 1)
     {
-        appendFunctionWrapperToCallList(request_factory_.produce(command , expected_target), times );
+        appendFunctionWrapperToCallList(utils_.request_factory_.produce(command , expected_target) , 
+                                        times );
     }
     void start()
     {
         startEventLoop();
     }
 //calls expectations
-    void expectQueryAboutCall(MediatorMOCK& target ,
+    void expectQueryAboutCall(MediatorMock& target ,
                               QueryAboutPackage call_package , 
                               int times = 1 )
     {

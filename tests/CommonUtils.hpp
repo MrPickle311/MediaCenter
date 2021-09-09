@@ -43,6 +43,8 @@ public:
     virtual void setFunction(std::function<void()> func);
 };
 
+using QFunctionWrapperPtr = std::shared_ptr<QFunctionWrapper>;
+
 class QFunctionWrapperFactory
 {
 private:

@@ -8,6 +8,43 @@ IProxy::IProxy(QObject *parent):
     QObject(parent)
 {}
 
+// Matcher
+
+Matcher::Matcher(std::string regex_pattern):
+         matcher_body_{regex_pattern}
+    {}
+QString Matcher::extractSubsystemKey(const QString& command)
+{
+    thread_local static std::string str{command.toStdString()};
+    thread_local static std::smatch match_results;
+    if(std::regex_search(str , match_results  , matcher_body_))
+    {
+        return QString::fromStdString(match_results[0].str());
+    }
+    return "WrongCmd";
+}
+
+// BackendSubsystems
+
+BackendSubsystems::BackendSubsystems():
+        matcher_{"[A-Z]{1}[a-z]+"}
+    {}
+
+void BackendSubsystems::addSubsystem(const QString& subsys_name, IMediatorPtr subsystem)
+{
+    subsystems_[subsys_name] = subsystem;
+}
+
+IMediatorPtr& BackendSubsystems::getSubsystem(const QString& command) noexcept(false)
+{
+    return subsystems_.at(matcher_.extractSubsystemKey(command));
+}
+
+void BackendSubsystems::addSubsystemBinding( const QString& subsystem_name , const QString& binding_key)
+{
+    subsystems_[binding_key] = subsystems_.at(subsystem_name);
+}
+
 // backend
 
 Backend::Backend(uint threads_count) :
@@ -19,7 +56,7 @@ Backend::Backend(uint threads_count) :
 
 
 // !!! MAKE CONST REF EVERYWHERE U CAN !!!
-std::future<QStringList> Backend::makeQuery(QString command, QStringList args)
+std::future<QStringList> Backend::makeQuery(const QString& command, QStringList args)
 {
     return task_manager_.addTask(
         [&]
@@ -35,7 +72,7 @@ std::future<QStringList> Backend::makeQuery(QString command, QStringList args)
         });
 }
 
-void Backend::redirectRequestAction(QString action , QStringList args) 
+void Backend::redirectRequestAction(const QString& action , QStringList args) 
 {
     try//if command is correct resend request
     {
@@ -52,7 +89,7 @@ void Backend::redirectRequestAction(QString action , QStringList args)
     }
 }
 
-QStringList Backend::queryAbout(QString command, QStringList args)
+QStringList Backend::queryAbout(const QString& command, QStringList args)
 {
     return makeQuery(command , args).get();
 }

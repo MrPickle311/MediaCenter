@@ -99,10 +99,10 @@ public:
     {
         pool_.join();
     }
-    // @brief   This method adds a new task to the thread pool
-    // @param   Function object to call
-    // @param   Arguments its invokation
-    // @return  Return future associated with task's result
+    // @brief          This method adds a new task to the thread pool
+    // @param new_task Function object to call
+    // @param args     Arguments its invokation
+    // @return         Return future associated with task's result
     template<typename Function, typename ... Args>
     auto addTask(Function&& new_task, Args... args) -> std::future<decltype(new_task(args...))>
     {

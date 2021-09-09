@@ -59,11 +59,13 @@ public:
     virtual ~IMediator(){}
     explicit IMediator(QObject *parent = nullptr);
 public:
-    virtual QStringList queryAbout(QString command, QStringList args) = 0;
+    virtual QStringList queryAbout(const QString& command, QStringList args) = 0;
 signals:
-    void requestAction(QString requestedAction , QStringList args = {});
-    void requestUIAction(QString action);
+    void requestAction(const QString& requestedAction , QStringList args = {});
+    void requestUIAction(const QString& action);
 };
+
+using IMediatorPtr =  std::shared_ptr<IMediator>;
 
 class IProxy : public QObject
 {
@@ -71,57 +73,29 @@ class IProxy : public QObject
 public:
     explicit IProxy(QObject *parent = nullptr);
 public slots:
-    virtual void requestAction(QString action , QStringList args) = 0;
-    virtual QStringList requestData(QString what) = 0;
+    virtual void requestAction(const QString& action , QStringList args) = 0;
+    virtual QStringList requestData(const QString& what) = 0;
 };
-
 
 class Matcher
 {
 private:
-    // const std::regex matcher_body_;
+    const std::regex matcher_body_;
 public:
-    Matcher(std::string regex_pattern)//:
-        // matcher_body_{regex_pattern}
-    {}
-    QString extractSubsystemKey(const QString command)
-    {
-        thread_local static std::regex matcher_body_{"[A-Z]{1}[a-z]+"};
-        thread_local static std::string str{command.toStdString()};
-        thread_local static std::smatch match_results;
-
-        if(std::regex_search(str , match_results  , matcher_body_))
-        {
-            return QString::fromStdString(match_results[0].str());
-        }
-
-        return "WrongCmd";
-    }
+    Matcher(std::string regex_pattern);
+    QString extractSubsystemKey(const QString& command);
 };
 
 class BackendSubsystems
 {
-    using IMediatorPtr =  std::shared_ptr<IMediator>;
 private:
     Matcher                          matcher_;
     std::map<QString , IMediatorPtr> subsystems_;
-    // std::map<QString , IMediatorPtr> subsystems_;
 public:
-    BackendSubsystems():
-        matcher_{"[A-Z]{1}[a-z]+"}
-    {}
-    void addSubsystem(const QString& subsys_name, IMediatorPtr subsystem)
-    {
-        subsystems_[subsys_name] = subsystem;
-    }
-    IMediatorPtr& getSubsystem(const QString& command) noexcept(false)
-    {
-        return subsystems_.at(matcher_.extractSubsystemKey(command));
-    }
-    void addSubsystemBinding( const QString& subsystem_name , const QString& binding_key)
-    {
-        subsystems_[binding_key] = subsystems_.at(subsystem_name);
-    }
+    BackendSubsystems();
+    void addSubsystem(const QString& subsys_name, IMediatorPtr subsystem);
+    IMediatorPtr& getSubsystem(const QString& command) noexcept(false);
+    void addSubsystemBinding( const QString& subsystem_name , const QString& binding_key);
 };
 
 class Backend : public IMediator
@@ -136,11 +110,13 @@ private:
     //dependencies
     std::shared_ptr<BackendSubsystems> subsystems_;
 private:
-    std::future<QStringList> makeQuery(QString command, QStringList args);
-    void redirectRequestAction(QString action , QStringList args);
+    std::future<QStringList> makeQuery(const QString& command, QStringList args);
+    void redirectRequestAction(const QString& action , QStringList args);
 public slots:
-    virtual QStringList queryAbout(QString command, QStringList args) override;
+    virtual QStringList queryAbout(const QString& command, QStringList args) override;
 };
+
+using BackendPtr = std::shared_ptr<Backend>;
 
 class BackendBuilder
 {
@@ -154,7 +130,7 @@ public:
         subsystems_{new BackendSubsystems}
     {}
     std::shared_ptr<Backend> build();
-    BackendBuilder& addSubsystem(const QString& subsystem_name , std::shared_ptr<IMediator> subsystem);
+    BackendBuilder& addSubsystem(const QString& subsystem_name , IMediatorPtr subsystem);
     BackendBuilder& addSubsystemBinding(const QString& subsystem_name , const QString& binding_key);
-    BackendBuilder& setThreadsCount(u32 th_count);
+    BackendBuilder& setThreadsCount(uint th_count);
 };

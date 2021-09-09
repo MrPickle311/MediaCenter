@@ -5,72 +5,6 @@
 //The task in progress  
 // State machine ? https://www.boost.org/doc/libs/1_49_0/libs/msm/doc/HTML/examples/SimpleTutorial.cpp
 
-UIMock::UIMock(QObject *parent) :
-    QObject(parent),
-    backend_(nullptr)
-{}
-
-QStringList UIMock::queryAbout(QString command,  QStringList args)
-{
-    return backend_->queryAbout(command , args);
-}
-
-void UIMock::setBackend(std::shared_ptr<Backend> backend) 
-{
-    this->backend_ = backend;
-    QObject::connect(this , &UIMock::requestAction , backend_.get() , &Backend::requestAction );
-}
-
-Utils::Utils(std::shared_ptr<Backend> backend)
-{
-    QObject::connect(&event_loop_ , &DelayedEventLoop::runned , 
-                     &wrappers_ , &WrappersList::callAll);
-    QObject::connect(&wrappers_ , &WrappersList::finished , 
-                     &event_loop_ , &DelayedEventLoop::killTestEventLoop);
-}
-
-void Utils::setBackend(std::shared_ptr<Backend> backend)
-{
-    ui_mock_.setBackend(backend);
-}
-
-BackendTEST::BackendTEST():
-    utils_{backend_},
-    backend_{nullptr},
-    checker_{new ResultChecker} ,
-    query_factory_{checker_ , nullptr} ,
-    request_factory_{nullptr}
-{
-    BackendBuilder builder;
-
-    builder.addSubsystem("DataStorage" , mocks_.data_storage_)
-           .addSubsystem("Environment" , mocks_.environment_)
-           .addSubsystem("Settings" , mocks_.settings_);
-    
-    builder.addSubsystemBinding("DataStorage" , "Search")
-           .addSubsystemBinding("DataStorage" , "Playlist")
-           .addSubsystemBinding("Settings"    , "Mediapaths")
-           .addSubsystemBinding("Settings"    , "Appdir")
-           .setThreadsCount(10);
-
-    backend_ = builder.build();
-
-    // expect that backend is initilized
-    EXPECT_NE(backend_.get() , nullptr);
-
-    utils_.setBackend(backend_);
-    query_factory_.setBackend(backend_);
-    request_factory_.setBackend(backend_);
-}
-
-void BackendTEST::startEventLoop() 
-{
-    utils_.event_loop_.startTestEventLoop();
-}
-
-
-// Unit tests
-
 
 TEST_F(BackendTEST, AudioSearch)
 {
@@ -264,7 +198,7 @@ TEST_F(BackendTEST , MultipleCall)
 
 TEST_F(BackendTEST , MixedCalls)
 {
-    int calls_count{100};
+    int calls_count{10};
 
     QueryAboutPackage storage_pack;
 
