@@ -388,9 +388,9 @@ protected:
     {
         utils_.event_loop_.startTestEventLoop();
     }
-    void appendFunctionToCallList(std::function<void()> function, int count = 1)
+    void appendFunctionToCallList(std::function<void()> function, int times = 1)
     {
-        for(int i{0}; i < count; ++i)
+        for(int i{0}; i < times; ++i)
         {
             utils_.wrappers_.append(function);
         }
@@ -406,7 +406,7 @@ protected:
                                                QueryAboutPackage pack , 
                                                int times = 1)
     {
-        expectQueryAboutCall(target , pack , times);//WTF? times not here
+        expectQueryAboutCall(target , pack , times);
         return utils_.query_factory_.produce(pack);
     }
     void appendRequestActionToList(QString command , 

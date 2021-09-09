@@ -52,6 +52,8 @@ public:
     }
 };
 
+//@brief This is base class for each mediator which is first layer fo a module.
+//       Objects of this class are ... [finish it later] 
 class IMediator : public QObject
 {
     Q_OBJECT
