@@ -99,7 +99,8 @@ function(add_test name)
        Threads::Threads Qt5::Core Qt5::Quick  Qt5::Test Qt5::SerialPort ${test_libs} ${LIBS} ${Boost_LIBRARIES})
 endfunction()
 
-add_test(BackendTests)
+#add_test(BackendTests) DONE
+add_test(DataBackendTests)
 #add_test(ThreadsafeQueueTests)
 #add_test(TaskManagerTests)
 #add_test(EnvironmentTests)
