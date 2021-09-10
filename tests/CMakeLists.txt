@@ -82,7 +82,7 @@ function(add_test name)
 endfunction()
 
 add_test(BackendTests) 
-add_test(DataBackendTests)
+# add_test(DataBackendTests)
 #add_test(ThreadsafeQueueTests)
 #add_test(TaskManagerTests)
 #add_test(EnvironmentTests)

@@ -10,14 +10,14 @@ TEST_F(BackendTEST, AudioSearch)
 {
     QueryAboutPackage storage_pack;
 
-    storage_pack.command()       = "SearchAudio";
-    storage_pack.expectedResult()        = QStringList{"/home/abc/audio/song3.mp3"};
-    storage_pack.callArguments() = QStringList{"song3.mp3"};
+    storage_pack.setCommand()       = "SearchAudio";
+    storage_pack.setExpectedResult()        = QStringList{"/home/abc/audio/song3.mp3"};
+    storage_pack.setCallArguments() = QStringList{"song3.mp3"};
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "MediapathsAudio";
-    settings_pack.expectedResult()  =  QStringList{"/home/abc/audio"};
+    settings_pack.setCommand() =  "MediapathsAudio";
+    settings_pack.setExpectedResult()  =  QStringList{"/home/abc/audio"};
 
     auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack)};
     wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack));
@@ -27,25 +27,25 @@ TEST_F(BackendTEST, AudioSearch)
     start();
 }
 
-
+/*
 
 TEST_F(BackendTEST , AudioNotFullName)
 {
     QueryAboutPackage storage_pack;
 
-    storage_pack.command()       = "SearchAudio";
-    storage_pack.expectedResult()        = QStringList
+    storage_pack.setCommand()       = "SearchAudio";
+    storage_pack.setExpectedResult()        = QStringList
                                    {
                                        "/home/abc/audio/song1.mp3",
                                        "/home/abc/audio/song2.mp3",
                                        "/home/abc/audio/song3.mp3"
                                    };
-    storage_pack.callArguments() = QStringList{"song"};
+    storage_pack.setCallArguments() = QStringList{"song"};
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "MediapathsAudio";
-    settings_pack.expectedResult()  =  QStringList{"/home/abc/audio"};
+    settings_pack.setCommand() =  "MediapathsAudio";
+    settings_pack.setExpectedResult()  =  QStringList{"/home/abc/audio"};
     
     auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack)};
     wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack));
@@ -59,18 +59,18 @@ TEST_F(BackendTEST, AudioMultipleFileName)
 {
     QueryAboutPackage storage_pack;
 
-    storage_pack.command()       = "SearchAudio";
-    storage_pack.expectedResult()        = QStringList
+    storage_pack.setCommand()       = "SearchAudio";
+    storage_pack.setExpectedResult()        = QStringList
                                    {
                                        "/home/abc/audio/vol1/song3.mp3",
                                        "/home/abc/audio/vol2/song3.mp3"
                                    };
-    storage_pack.callArguments() = QStringList{"song3.mp3"};
+    storage_pack.setCallArguments() = QStringList{"song3.mp3"};
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "MediapathsAudio";
-    settings_pack.expectedResult()  =  QStringList{"/home/abc/audio"};
+    settings_pack.setCommand() =  "MediapathsAudio";
+    settings_pack.setExpectedResult()  =  QStringList{"/home/abc/audio"};
 
     auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack)};
     wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack));
@@ -94,14 +94,14 @@ TEST_F(BackendTEST , VideoSearch)
 {
     QueryAboutPackage storage_pack;
 
-    storage_pack.command()       = "SearchVideo";
-    storage_pack.expectedResult()        = QStringList{"/home/abc/video/video.mp4"};
-    storage_pack.callArguments() = QStringList{"video.mp4"};
+    storage_pack.setCommand()       = "SearchVideo";
+    storage_pack.setExpectedResult()        = QStringList{"/home/abc/video/video.mp4"};
+    storage_pack.setCallArguments() = QStringList{"video.mp4"};
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "MediapathsVideo";
-    settings_pack.expectedResult()  =  QStringList{"/home/abc/video"};
+    settings_pack.setCommand() =  "MediapathsVideo";
+    settings_pack.setExpectedResult()  =  QStringList{"/home/abc/video"};
     
     auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack)};
     wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack));
@@ -115,8 +115,8 @@ TEST_F(BackendTEST , AudioPlaylist)
 {
     QueryAboutPackage storage_pack;
 
-    storage_pack.command()  = "PlaylistAudio";
-    storage_pack.expectedResult()   = QStringList
+    storage_pack.setCommand()  = "PlaylistAudio";
+    storage_pack.setExpectedResult()   = QStringList
                               {
                                   "/home/abc/audio/song1.mp3",
                                   "/home/abc/audio/song2.mp3",
@@ -125,8 +125,8 @@ TEST_F(BackendTEST , AudioPlaylist)
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "MediapathsAudio";
-    settings_pack.expectedResult()  =  QStringList{"/home/abc/audio"};
+    settings_pack.setCommand() =  "MediapathsAudio";
+    settings_pack.setExpectedResult()  =  QStringList{"/home/abc/audio"};
 
     auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack)};
     wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack));
@@ -140,14 +140,14 @@ TEST_F(BackendTEST , ImageSearch)
 {
     QueryAboutPackage storage_pack;
 
-    storage_pack.command()       = "SearchImages";
-    storage_pack.expectedResult()        = QStringList{"/home/abc/img/image.jpg"};
-    storage_pack.callArguments() = QStringList{"image.jpg"};
+    storage_pack.setCommand()       = "SearchImages";
+    storage_pack.setExpectedResult()        = QStringList{"/home/abc/img/image.jpg"};
+    storage_pack.setCallArguments() = QStringList{"image.jpg"};
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "MediapathsImages";
-    settings_pack.expectedResult()  =  QStringList{"/home/abc/img"};
+    settings_pack.setCommand() =  "MediapathsImages";
+    settings_pack.setExpectedResult()  =  QStringList{"/home/abc/img"};
     
     auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack)};
     wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack));
@@ -161,8 +161,8 @@ TEST_F(BackendTEST , UnsupportedCommand)
 {
     QueryAboutPackage pack;
 
-    pack.command() = "XYZ";
-    pack.expectedResult()  = QStringList{"WrongCmd"};
+    pack.setCommand() = "XYZ";
+    pack.setExpectedResult()  = QStringList{"WrongCmd"};
 
     int expected_calls_count{0};
 
@@ -179,14 +179,14 @@ TEST_F(BackendTEST , MultipleCall)
 
     int calls_count{20};
 
-    storage_pack.command()       = "SearchImages";
-    storage_pack.expectedResult()        = QStringList{"/home/abc/img/image.jpg"};
-    storage_pack.callArguments() = QStringList{"image.jpg"};
+    storage_pack.setCommand()       = "SearchImages";
+    storage_pack.setExpectedResult()        = QStringList{"/home/abc/img/image.jpg"};
+    storage_pack.setCallArguments() = QStringList{"image.jpg"};
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "MediapathsImages";
-    settings_pack.expectedResult()  =  QStringList{"/home/abc/img"};
+    settings_pack.setCommand() =  "MediapathsImages";
+    settings_pack.setExpectedResult()  =  QStringList{"/home/abc/img"};
 
     auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack , calls_count)};
     wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack , calls_count));
@@ -202,8 +202,8 @@ TEST_F(BackendTEST , MixedCalls)
 
     QueryAboutPackage storage_pack;
 
-    storage_pack.command()  = "PlaylistAudio";
-    storage_pack.expectedResult()   = QStringList
+    storage_pack.setCommand()  = "PlaylistAudio";
+    storage_pack.setExpectedResult()   = QStringList
                               {
                                   "/home/abc/audio/song1.mp3",
                                   "/home/abc/audio/song2.mp3",
@@ -212,8 +212,8 @@ TEST_F(BackendTEST , MixedCalls)
 
     QueryAboutPackage settings_pack;
 
-    settings_pack.command() =  "MediapathsAudio";
-    settings_pack.expectedResult()  =  QStringList{"/home/abc/audio"};
+    settings_pack.setCommand() =  "MediapathsAudio";
+    settings_pack.setExpectedResult()  =  QStringList{"/home/abc/audio"};
 
     auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack , calls_count)};
     wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack , calls_count));
@@ -226,6 +226,8 @@ TEST_F(BackendTEST , MixedCalls)
 
     start();
 }
+
+*/
 
 //TEST IDEA MULTIPLE BACKEND CALLS , MIX CALLS
 

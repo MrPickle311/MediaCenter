@@ -10,6 +10,7 @@
 #include "common_utils/QFunctionWrapper.hpp"
 #include "common_utils/WrappersList.hpp"
 #include "common_utils/EventLoop.hpp"
+#include "common_utils/MediatorPackage.hpp"
 
 class ResultChecker;
 class QueryAboutCaller;
@@ -29,59 +30,6 @@ struct BackendMediatorsMocks
         environment_{new MediatorMock},
         settings_{new MediatorMock}
     {}
-};
-
-class QueryAboutPackage
-{
-private:
-    bool          is_empty_;
-    QString       command_;
-    QStringList   expected_result_;
-    QStringList   call_args_;
-private:
-    void setPackageNotEmpty()
-    {
-        is_empty_ = false;
-    }
-public:
-    QueryAboutPackage():
-        is_empty_{true},
-        call_args_{}
-    {}
-    operator bool() const
-    {
-        return !is_empty_;
-    }
-
-    QString& command()
-    {
-        setPackageNotEmpty();
-        return command_; 
-    }
-    const QString& command() const 
-    { 
-        return command_; 
-    }
-
-    QStringList& expectedResult()
-    {
-        setPackageNotEmpty();
-        return expected_result_; 
-    }
-    const QStringList& result() const 
-    { 
-        return expected_result_; 
-    }
-
-    QStringList& callArguments()
-    {
-        setPackageNotEmpty();
-        return call_args_; 
-    }
-    const QStringList& callArguments() const 
-    { 
-        return call_args_; 
-    }
 };
 
 class ResultChecker
@@ -134,7 +82,7 @@ private:
     void invokePrecall(QueryAboutPackage pack);
     void checkItself(QStringList result)
     {
-        checker_->pattern() = query_package_.expectedResult();
+        checker_->pattern() = query_package_.getExpectedResult();
         checker_->checkResult(result);
     }
 private:
@@ -148,8 +96,8 @@ private:
         std::function<void()> ui_action = [this]
         {
             //waits until searched QStringList is prepared
-            auto result = backend_->queryAbout(query_package_.command() ,
-                                               query_package_.callArguments());
+            auto result = backend_->queryAbout(query_package_.getCommand() ,
+                                               query_package_.getCallArguments());
                                   
             checkItself(result);
         };
@@ -364,10 +312,10 @@ protected:
         using ::testing::Return;
 
         EXPECT_CALL(target, 
-                    queryAbout(Eq(call_package.command()),
-                               Eq(call_package.callArguments())))
+                    queryAbout(Eq(call_package.getCommand()),
+                               Eq(call_package.getCallArguments())))
             .Times(times)
-            .WillRepeatedly(Return(call_package.result())
+            .WillRepeatedly(Return(call_package.getExpectedResult())
             );
     }
 };

@@ -1,0 +1,19 @@
+{
+    "AudioSearch1" : {
+        "command" : "SearchAudio" ,
+        "expectedResult" : [
+            "/home/abc/audio/song3.mp3"
+        ] ,
+        "callArguments" : [
+            "song3.mp3"
+        ]
+    } ,
+    "MediaPathsAudio1" : {
+        "command" : "MediapathsAudio" ,
+        "expectedResult" : [
+            "/home/abc/audio"
+        ] , 
+        "callArguments" :[]
+    }
+    
+}
