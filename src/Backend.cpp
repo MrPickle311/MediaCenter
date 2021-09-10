@@ -8,22 +8,6 @@ IProxy::IProxy(QObject *parent):
     QObject(parent)
 {}
 
-// Matcher
-
-Matcher::Matcher(std::string regex_pattern):
-         matcher_body_{regex_pattern}
-    {}
-QString Matcher::extractSubsystemKey(const QString& command)
-{
-    thread_local static std::string str{command.toStdString()};
-    thread_local static std::smatch match_results;
-    if(std::regex_search(str , match_results  , matcher_body_))
-    {
-        return QString::fromStdString(match_results[0].str());
-    }
-    return "WrongCmd";
-}
-
 // BackendSubsystems
 
 BackendSubsystems::BackendSubsystems():
@@ -37,7 +21,7 @@ void BackendSubsystems::addSubsystem(const QString& subsys_name, IMediatorPtr su
 
 IMediatorPtr& BackendSubsystems::getSubsystem(const QString& command) noexcept(false)
 {
-    return subsystems_.at(matcher_.extractSubsystemKey(command));
+    return subsystems_.at(matcher_.extractKey(command));
 }
 
 void BackendSubsystems::addSubsystemBinding( const QString& subsystem_name , const QString& binding_key)

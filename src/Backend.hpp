@@ -2,13 +2,11 @@
 
 #include <QObject>
 #include <map>
-#include <regex>
 #include "utilities/TaskManager.hpp"
+#include "Matcher.hpp"
+#include "Mediator.hpp"
 
-
-using u32 = uint;
-
-//generic string adapter
+//generic string adapter [MOVE IT SOMEWHERE]
 class String
 {
 private:
@@ -52,42 +50,6 @@ public:
     }
 };
 
-//@brief This is base class for each mediator which is first layer fo a module.
-//       Objects of this class are ... [finish it later] 
-class IMediator : public QObject
-{
-    Q_OBJECT
-public:
-    virtual ~IMediator(){}
-    explicit IMediator(QObject *parent = nullptr);
-public:
-    virtual QStringList queryAbout(const QString& command, QStringList args) = 0;
-signals:
-    void requestAction(const QString& requestedAction , QStringList args = {});
-    void requestUIAction(const QString& action);
-};
-
-using IMediatorPtr =  std::shared_ptr<IMediator>;
-
-class IProxy : public QObject
-{
-    Q_OBJECT
-public:
-    explicit IProxy(QObject *parent = nullptr);
-public slots:
-    virtual void requestAction(const QString& action , QStringList args) = 0;
-    virtual QStringList requestData(const QString& what) = 0;
-};
-
-class Matcher
-{
-private:
-    const std::regex matcher_body_;
-public:
-    Matcher(std::string regex_pattern);
-    QString extractSubsystemKey(const QString& command);
-};
-
 class BackendSubsystems
 {
 private:
@@ -99,6 +61,9 @@ public:
     IMediatorPtr& getSubsystem(const QString& command) noexcept(false);
     void addSubsystemBinding( const QString& subsystem_name , const QString& binding_key);
 };
+
+using BackendSubsystemsPtr = std::shared_ptr<BackendSubsystems>;
+
 
 class Backend : public IMediator
 {
@@ -123,8 +88,8 @@ using BackendPtr = std::shared_ptr<Backend>;
 class BackendBuilder
 {
 private:
-    uint threads_count_;
-    std::shared_ptr<BackendSubsystems> subsystems_;
+    uint                 threads_count_;
+    BackendSubsystemsPtr subsystems_;
 private:
     void resetSubsystems();
 public:

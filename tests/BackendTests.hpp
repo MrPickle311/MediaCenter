@@ -9,30 +9,19 @@
 #include <forward_list>
 #include <atomic>
 
-class MediatorMock;
-class QueryAboutPackage;
 class ResultChecker;
 class QueryAboutCaller;
 class RequestActionCaller;
 
-using MediatorMOCKPtr        = std::shared_ptr<MediatorMock>;
 using ResultCheckerPtr       = std::shared_ptr<ResultChecker>;
 using QueryAboutCallerPtr    = std::shared_ptr<QueryAboutCaller>;
 using RequestActionCallerPtr = std::shared_ptr<RequestActionCaller>;
 
-
-class MediatorMock: public IMediator
-{
-    Q_OBJECT;
-public:
-    MOCK_METHOD(QStringList , queryAbout , (const QString& , QStringList) );
-};
-
 struct MediatorsMocks
 {
-    MediatorMOCKPtr  data_storage_;
-    MediatorMOCKPtr  environment_;
-    MediatorMOCKPtr  settings_;
+    MediatorMockPtr  data_storage_;
+    MediatorMockPtr  environment_;
+    MediatorMockPtr  settings_;
     MediatorsMocks():
         data_storage_{new MediatorMock},
         environment_{new MediatorMock},
@@ -274,11 +263,11 @@ class RequestActionCaller : public QFunctionWrapper
 private:
     QString           command_;
     BackendPtr        backend_;
-    MediatorMOCKPtr   expected_mock_to_call_;
+    MediatorMockPtr   expected_mock_to_call_;
 private:
     RequestActionCaller(QString command , 
                         BackendPtr backend , 
-                        MediatorMOCKPtr   expected_mock_to_call):
+                        MediatorMockPtr   expected_mock_to_call):
                 command_{command} , 
                 backend_{backend} ,
                 expected_mock_to_call_{expected_mock_to_call}
@@ -307,7 +296,7 @@ public:
             backend_{backend}
     {}
 public:
-    RequestActionCallerPtr produce(QString command , MediatorMOCKPtr expected_mock_to_call) const
+    RequestActionCallerPtr produce(QString command , MediatorMockPtr expected_mock_to_call) const
     {
         return RequestActionCallerPtr{new RequestActionCaller{ 
                                                                 command , 
@@ -410,7 +399,7 @@ protected:
         return utils_.query_factory_.produce(pack);
     }
     void appendRequestActionToList(QString command , 
-                                   MediatorMOCKPtr expected_target , 
+                                   MediatorMockPtr expected_target , 
                                    int times = 1)
     {
         appendFunctionWrapperToCallList(utils_.request_factory_.produce(command , expected_target) , 

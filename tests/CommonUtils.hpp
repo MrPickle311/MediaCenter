@@ -53,3 +53,12 @@ public:
     void setFunction(std::function<void()> func);
     std::shared_ptr<QFunctionWrapper> produce() const;
 };
+
+class MediatorMock: public IMediator
+{
+    Q_OBJECT;
+public:
+    MOCK_METHOD(QStringList , queryAbout , (const QString& , QStringList) );
+};
+
+using MediatorMockPtr = std::shared_ptr<MediatorMock>;
