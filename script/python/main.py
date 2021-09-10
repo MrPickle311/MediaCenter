@@ -29,5 +29,5 @@ def runApplication():
 if __name__ == "__main__":
     tests = TestExamples()
     tests.test()
-    #runApplication()
+    runApplication()
 

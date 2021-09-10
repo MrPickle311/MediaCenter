@@ -6,8 +6,8 @@ Matcher::Matcher(std::string regex_pattern):
 
 QString Matcher::extractKey(const QString& command)
 {
-    thread_local static std::string str{command.toStdString()};
-    thread_local static std::smatch match_results;
+    std::string str{command.toStdString()};
+    std::smatch match_results;
     if(std::regex_search(str , match_results  , matcher_body_))
     {
         return QString::fromStdString(match_results[0].str());

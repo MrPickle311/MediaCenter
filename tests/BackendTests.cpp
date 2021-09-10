@@ -198,7 +198,7 @@ TEST_F(BackendTEST , MultipleCall)
 
 TEST_F(BackendTEST , MixedCalls)
 {
-    int calls_count{10};
+    int calls_count{300};
 
     QueryAboutPackage storage_pack;
 

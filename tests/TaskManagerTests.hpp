@@ -3,7 +3,8 @@
 #include <gmock/gmock.h>
 #include <TaskManager.hpp>
 
-#include "CommonUtils.hpp"
+#include "common_utils/EventLoop.hpp"
+#include "common_utils/QFunctionWrapper.hpp"
 
 // @brief Testing class , automatic number of threads 
 class ThreadPoolTests : public ::testing::Test

@@ -3,11 +3,13 @@
 #include <Backend.hpp>
 #include <gmock/gmock.h>
 
-#include <CommonUtils.hpp>
-#include <QSignalSpy>
-
 #include <forward_list>
 #include <atomic>
+
+#include "common_utils/Mock.hpp"
+#include "common_utils/QFunctionWrapper.hpp"
+#include "common_utils/WrappersList.hpp"
+#include "common_utils/EventLoop.hpp"
 
 class ResultChecker;
 class QueryAboutCaller;

@@ -4,6 +4,7 @@
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
 #include <functional>
+#include <QCoreApplication>
 
 int add(int a , int b)
 {

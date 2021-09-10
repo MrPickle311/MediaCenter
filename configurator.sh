@@ -101,15 +101,13 @@ fi
 
 while getopts ":tTcbr" opt; do
   case ${opt} in
-    t ) configureDir "tests/build" "${selected_qt_dir}"
-      ;;
-    T ) buildDir "tests/build"
-      ;;
     c ) configureDir "build" "${selected_qt_dir}" 
+      ;;
+    T ) buildDir "build/tests"
       ;;
     b ) buildDir "build"
       ;;
-    r ) runTests "tests/build"
+    r ) runTests "build/tests"
       ;;
     \? ) echo "Usage: cmd [-b] [-t]"
       ;;
