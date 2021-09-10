@@ -15,7 +15,7 @@ public:
     virtual QStringList queryAbout(const QString& command, QStringList args) = 0;
 signals:
     void requestAction(const QString& requestedAction , QStringList args = {});
-    void requestUIAction(const QString& action);
+    void requestUIAction(const QString& action);// [move it to another class]
 };
 
 using IMediatorPtr =  std::shared_ptr<IMediator>;

@@ -75,7 +75,8 @@
         "regex": "cpp",
         "shared_mutex": "cpp",
         "*.ipp": "cpp",
-        "qvariant": "cpp"
+        "qvariant": "cpp",
+        "qeventloop": "cpp"
     },
     "C_Cpp.default.cppStandard": "gnu++20",
     "C_Cpp.default.cStandard": "gnu17"

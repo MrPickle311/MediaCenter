@@ -1,26 +1,7 @@
 #pragma once
 
-#include <QTimer>
-#include <future>
-#include <QEventLoop>
-#include <QCoreApplication>
-
-class DelayedEventLoop : public QObject
-{
-    Q_OBJECT
-private:
-    QEventLoop                loop_;
-    std::chrono::milliseconds delay_;
-private:
-    void emitDelayedStartSignal();
-public:
-    DelayedEventLoop(int ms = 100);
-    void startTestEventLoop();
-public slots:
-    void killTestEventLoop();
-signals:
-    void runned();
-};
+#include <QObject>
+#include <memory>
 
 class IQFunctionWrapper : public QObject
 {
@@ -53,12 +34,3 @@ public:
     void setFunction(std::function<void()> func);
     std::shared_ptr<QFunctionWrapper> produce() const;
 };
-
-class MediatorMock: public IMediator
-{
-    Q_OBJECT;
-public:
-    MOCK_METHOD(QStringList , queryAbout , (const QString& , QStringList) );
-};
-
-using MediatorMockPtr = std::shared_ptr<MediatorMock>;

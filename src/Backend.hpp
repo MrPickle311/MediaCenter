@@ -64,7 +64,6 @@ public:
 
 using BackendSubsystemsPtr = std::shared_ptr<BackendSubsystems>;
 
-
 class Backend : public IMediator
 {
     Q_OBJECT;

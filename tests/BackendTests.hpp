@@ -17,72 +17,16 @@ using ResultCheckerPtr       = std::shared_ptr<ResultChecker>;
 using QueryAboutCallerPtr    = std::shared_ptr<QueryAboutCaller>;
 using RequestActionCallerPtr = std::shared_ptr<RequestActionCaller>;
 
-struct MediatorsMocks
+struct BackendMediatorsMocks
 {
     MediatorMockPtr  data_storage_;
     MediatorMockPtr  environment_;
     MediatorMockPtr  settings_;
-    MediatorsMocks():
+    BackendMediatorsMocks():
         data_storage_{new MediatorMock},
         environment_{new MediatorMock},
         settings_{new MediatorMock}
     {}
-};
-
-class WrappersList : public QObject
-{
-    Q_OBJECT;
-private:
-    std::atomic_int                 tasks_finished_;
-    QFunctionWrapperFactory         factory_;
-    std::list<QFunctionWrapperPtr>  init_func_wrappers_;
-private:
-    void checkIfFinished()
-    {
-        if(tasks_finished_ == init_func_wrappers_.size())
-        {
-            emit finished();
-            tasks_finished_ = 0;
-        }
-    }
-    void connectWrapper(const QFunctionWrapperPtr& wrapper)
-    {
-        QObject::connect(this , &WrappersList::callAll ,
-                         wrapper.get() , &QFunctionWrapper::invoke);
-
-        QObject::connect(wrapper.get() , &QFunctionWrapper::finished ,
-                         this , &WrappersList::updateCallState);
-    }
-    void pushBack(QFunctionWrapperPtr wrapper)
-    {
-        init_func_wrappers_.push_back(std::move(wrapper));
-    }
-    void connectAndPush(QFunctionWrapperPtr wrapper)
-    {
-        connectWrapper(wrapper);
-        pushBack(std::move(wrapper));
-    }
-private slots:
-    void updateCallState()
-    {
-        ++this->tasks_finished_;
-        checkIfFinished();
-    }
-public:
-    void append(std::function<void()> function)
-    {
-        factory_.setFunction(std::move(function));
-        auto wrapper {factory_.produce()};
-
-        connectAndPush(wrapper);
-    }
-    void append(QFunctionWrapperPtr wrapper)
-    {
-        connectAndPush(wrapper);
-    }
-signals:
-    void callAll();
-    void finished();
 };
 
 class QueryAboutPackage
@@ -367,7 +311,7 @@ public:
     virtual ~BackendTEST(){}
 protected:
     Utils           utils_;
-    MediatorsMocks  mocks_;
+    BackendMediatorsMocks  mocks_;
     
     //tested object
     BackendPtr    backend_;

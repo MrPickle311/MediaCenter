@@ -77,8 +77,8 @@ set(TESTED_HEADERS
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../src build)
 
 set(COMMON_UTILS
-    CommonUtils.cpp
-    CommonUtils.hpp
+    # CommonUtils.cpp
+    # CommonUtils.hpp
     )
 
 enable_testing()

@@ -1,4 +1,10 @@
 #include "DataBackendTests.hpp"
+#include <QCoreApplication>
+
+TEST(abc ,abcd)
+{
+    
+}
 
 int main(int argc, char *argv[])
 {
