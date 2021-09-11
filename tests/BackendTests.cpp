@@ -5,9 +5,11 @@
 //The task in progress  
 // State machine ? https://www.boost.org/doc/libs/1_49_0/libs/msm/doc/HTML/examples/SimpleTutorial.cpp
 
+#include "common_utils/MediatorPackage.hpp"
 
 TEST_F(BackendTEST, AudioSearch)
 {
+    /*
     QueryAboutPackage storage_pack;
 
     storage_pack.setCommand()       = "SearchAudio";
@@ -25,6 +27,25 @@ TEST_F(BackendTEST, AudioSearch)
     appendFunctionWrapperToCallList(std::move(wrapper));
     
     start();
+    */
+
+    QueryAboutPackageLoader loader{"test_data/BackendTestData.json"};
+
+    QueryAboutPackage pack {loader.loadPackage("AudioSearch1")};
+
+    std::cout << pack.getCallArguments().toStdList().front().toStdString() << std::endl;
+    std::cout << pack.getCommand().toStdString() << std::endl;
+    std::cout << pack.getExpectedResult().toStdList().front().toStdString() << std::endl;
+
+    pack = loader.loadPackage("MediaPathsAudio1");
+
+    if(pack.getCallArguments().isEmpty())
+    {
+        std::cout << "is ok \n";
+    }
+
+    std::cout << pack.getCommand().toStdString() << std::endl;
+    std::cout << pack.getExpectedResult().toStdList().front().toStdString() << std::endl;
 }
 
 /*

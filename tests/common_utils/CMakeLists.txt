@@ -3,6 +3,7 @@ set(common_utils_headers
     Mock.hpp
     EventLoop.hpp
     WrappersList.hpp
+    MediatorPackage.hpp
     )
 
 set(common_utils_sources
@@ -10,6 +11,7 @@ set(common_utils_sources
     Mock.cpp
     EventLoop.cpp
     WrappersList.cpp
+    MediatorPackage.cpp
     )
 
 add_library(COMMON_UTILS STATIC

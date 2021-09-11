@@ -42,14 +42,18 @@ private:
     QFile               json_file_;
     QJsonObject         loaded_object_;
 private:
-    QJsonObject readPackage(std::string pack_name) const;
+
     bool containsPackage(std::string pack_name) const;
-    void printError(std::string msg);
+    void printError(std::string msg) const;
     void checkIfFileExists() const;
+    bool isJsonPackValid(const QJsonObject& obj) const;
+
     void tryOpenJsonFile();
     void tryLoadJsonFile();
-    bool isJsonPackValid(const QJsonObject& obj) const;
+    QJsonObject readPackage(std::string pack_name) const;
+
     QueryAboutPackage extractQueryPackage(const QJsonObject& obj) const;
+    QStringList extractDataArray(const QJsonObject& obj , std::string element_name) const;
 public:
     QueryAboutPackageLoader(std::string relative_path_to_json);
     QueryAboutPackage loadPackage(std::string pack_name);

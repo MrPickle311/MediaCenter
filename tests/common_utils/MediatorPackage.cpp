@@ -50,14 +50,19 @@ const QStringList& QueryAboutPackage::getCallArguments() const
 }
 
 QueryAboutPackageLoader::QueryAboutPackageLoader(std::string relative_path_to_json):
-    json_file_{QString::fromStdString(std::filesystem::current_path().string() + relative_path_to_json)}
+    json_file_{}
 {
+    std::filesystem::path curr_path{PROJECT_FOLDER_NAME};
+    curr_path /= "data";
+    curr_path /= relative_path_to_json;
+    json_file_.setFileName(QString::fromStdString(curr_path.string()));
+
     this->checkIfFileExists();
     this->tryOpenJsonFile();
     this->tryLoadJsonFile();
 }
 
-void QueryAboutPackageLoader::printError(std::string msg) 
+void QueryAboutPackageLoader::printError(std::string msg) const
 {
     std::cout << "\n " << msg << " \n";
 }
@@ -95,11 +100,23 @@ QueryAboutPackage QueryAboutPackageLoader::extractQueryPackage(const QJsonObject
 {
     QueryAboutPackage pack;
 
-    pack.setCommand(obj["command"]);
-    pack.setExpectedResult(obj["expectedResult"]);
-    pack.setCallArguments(obj["callArguments"]);
+    pack.setCommand(obj["command"].toString());
+    pack.setExpectedResult(extractDataArray(obj , "expectedResult"));
+    pack.setCallArguments(extractDataArray(obj , "callArguments"));
 
     return pack;
+}
+
+QStringList QueryAboutPackageLoader::extractDataArray(const QJsonObject& obj , std::string element_name) const
+{
+    QStringList result{};
+
+    for(auto&& el : obj[QString::fromStdString(element_name)].toArray().toVariantList())
+    {
+        result.append(el.toString());
+    }
+
+    return result;
 }
 
 bool QueryAboutPackageLoader::containsPackage(std::string pack_name) const
