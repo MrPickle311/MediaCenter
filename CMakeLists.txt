@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.10)
 project(MediaCenter VERSION 0.1 LANGUAGES CXX)
 
 add_compile_definitions(PROJECT_FOLDER_NAME="${CMAKE_CURRENT_SOURCE_DIR}")
+add_compile_options(-Wall -Wextra)
+
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 

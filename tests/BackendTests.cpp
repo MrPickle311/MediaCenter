@@ -28,9 +28,7 @@ TEST_F(BackendTEST, AudioSearch)
     
     start();
     */
-
     QueryAboutPackageLoader loader{"test_data/BackendTestData.json"};
-
     QueryAboutPackage pack {loader.loadPackage("AudioSearch1")};
 
     std::cout << pack.getCallArguments().toStdList().front().toStdString() << std::endl;

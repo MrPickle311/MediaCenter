@@ -5,7 +5,9 @@
 QueryAboutPackage::QueryAboutPackage():
     is_empty_{true}
 {
-
+    appendString("command");
+    appendStringArray("expectedResult");
+    appendStringArray("callArguments");
 }
 
 void QueryAboutPackage::setPackageNotEmpty()
@@ -21,55 +23,40 @@ QueryAboutPackage::operator bool() const
 void QueryAboutPackage::setCommand(QString cmd)
 {
     this->setPackageNotEmpty();
-    this->command_ = cmd; 
+    this->setString("command", cmd);
 }
 
 const QString& QueryAboutPackage::getCommand() const 
-{ 
-    return this->command_; 
+{
+    return this->getString("command"); 
 }
 
 void QueryAboutPackage::setExpectedResult(const QStringList& res)
 {
     this->setPackageNotEmpty();
-    this->expected_result_ = res; 
+    this->setStringArray("expectedResult" , res);
 }
 
 const QStringList& QueryAboutPackage::getExpectedResult() const 
 { 
-    return this->expected_result_; 
+    return this->getStringArray("expectedResult");
 }
 
 void QueryAboutPackage::setCallArguments(const QStringList& args)
 {
     this->setPackageNotEmpty();
-    this->call_args_ = args; 
+    this->setStringArray("callArguments" , args);
 }
 
 const QStringList& QueryAboutPackage::getCallArguments() const 
 { 
-    return this->call_args_; 
+    return this->getStringArray("callArguments");
 }
 
-QueryAboutPackageFactory::QueryAboutPackageFactory() 
+QueryAboutPackageLoader::QueryAboutPackageLoader(std::string relative_path_to_json)
 {
-    pack_.data_.appendString("command");
-    pack_.data_.appendStringArray("expectedResult");
-    pack_.data_.appendStringArray("callArguments");
-}
-
-QueryAboutPackage QueryAboutPackageFactory::producePack() const
-{
-    return pack_;
-}
-
-QueryAboutPackageLoader::QueryAboutPackageLoader(std::string relative_path_to_json):
-    extractor_{loaded_object_}
-{
-    std::filesystem::path curr_path{PROJECT_FOLDER_NAME};
-    curr_path /= "data";
-    curr_path /= relative_path_to_json;
-    json_file_.setFileName(QString::fromStdString(curr_path.string()));
+    std::filesystem::path project_dir{PROJECT_FOLDER_NAME};
+    json_file_.setFileName({ ( project_dir / "data" / relative_path_to_json ).c_str() });
 
     this->checkIfFileExists();
     this->tryOpenJsonFile();
@@ -100,63 +87,7 @@ void QueryAboutPackageLoader::tryOpenJsonFile()
 void QueryAboutPackageLoader::tryLoadJsonFile() 
 {
     doc_ = QJsonDocument::fromJson(json_file_.readAll());
-    loaded_object_ = doc_.object();
-}
-
-bool PackageChecker::namesAreCorrect(QStringList names , const QJsonObject& obj) const
-{
-    return std::all_of(names.begin(), names.end() ,
-            [&obj](const QString& el)
-            {
-                return obj.contains(el);
-            });
-}
-
-bool PackageChecker::isPackageValid(const IJsonPackage& pack , const QJsonObject& obj) const
-{
-    return namesAreCorrect(pack.getStringNames() , obj) &&
-           namesAreCorrect(pack.getStringArrayNames() , obj);
-}
-
-bool PackageChecker::jsonObjectContainsPackage(const QJsonObject& obj , std::string pack_name) const
-{
-    QString pkg_name{QString::fromStdString(pack_name)};
-
-    return obj.contains(pkg_name) && obj[pkg_name].isObject();
-}
-
-QStringList PackageExtractor::extractArray(const QJsonObject& obj , QString name) const
-{
-    QStringList result;
-
-    for(auto&& el : obj[name].toArray())
-    {
-        result.append(el.toString());
-    }
-
-    return result;
-}
-
-void PackageExtractor::extractStringArrays(const QJsonObject& obj , JsonPackage& target) const
-{
-    for(auto&& name : target.getStringArrayNames())
-    {
-        target.setStringArray(name , extractArray(obj , name));
-    }
-}
-
-void PackageExtractor::extractStrings(const QJsonObject& obj , JsonPackage& target) const
-{
-    for(auto&& name : target.getStringNames())
-    {
-        target.setString(name , obj[name].toString());
-    }
-}
-
-void PackageExtractor::extractPackage(const QJsonObject& obj , JsonPackage& target) const
-{
-    extractStrings(obj , target);
-    extractStringArrays(obj , target);
+    entire_json_object_ = doc_.object();
 }
 
 QJsonObject QueryAboutPackageLoader::readPackage(std::string pack_name) const
@@ -167,72 +98,17 @@ QJsonObject QueryAboutPackageLoader::readPackage(std::string pack_name) const
 QueryAboutPackage QueryAboutPackageLoader::loadPackage(std::string pack_name) 
 {
     QJsonObject json_local_obj;
+    QueryAboutPackage result;
 
     if(checker_.jsonObjectContainsPackage(entire_json_object_ , pack_name))
     {
         json_local_obj = readPackage(pack_name);
     }
 
-    if(checker_.isPackageValid(  , json_local_obj ))
+    if(checker_.isPackageValid( result , json_local_obj  ))
     {
-        return extractor_.extractPackage(json_local_obj);
+        extractor_.extractPackage(json_local_obj , result );
     }
 
-    return {};
-}
-void JsonPackage::appendStringArray(QString name) 
-{
-    string_arrays_.insert(name , {});
-}
-
-void JsonPackage::appendString(QString name) 
-{
-    strings_.insert(name , {});
-}
-
-QStringList JsonPackage::getStringArray(QString name) 
-{
-    return string_arrays_.at(name);
-}
-
-void JsonPackage::setStringArray(QString name , QStringList value) 
-{
-    string_arrays_.at(name) = value;
-}
-
-QString JsonPackage::getString(QString name) 
-{
-    return strings_.at(name);
-}
-
-void JsonPackage::setString(QString name , QString value) 
-{
-    strings_.at(name) = value;
-}
-
-QStringList JsonPackage::getStringNames() const
-{
-   return getNames(strings_);
-}
-
-QStringList JsonPackage::getStringArrayNames() const
-{
-    return getNames(string_arrays_);
-}
-
-JsonPackageConfigurator& JsonPackageConfigurator::appendStringArray(QString name) 
-{
-    pack_.appendStringArray(name);
-    return *this;
-}
-
-JsonPackageConfigurator& JsonPackageConfigurator::appendString(QString name) 
-{
-    pack_.appendString(name);
-    return *this;
-}
-
-JsonPackage JsonPackageConfigurator::buildPack() const
-{
-    return pack_;
+    return result;
 }

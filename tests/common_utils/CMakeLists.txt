@@ -4,6 +4,7 @@ set(common_utils_headers
     EventLoop.hpp
     WrappersList.hpp
     MediatorPackage.hpp
+    JsonPackage.hpp
     )
 
 set(common_utils_sources
@@ -12,6 +13,7 @@ set(common_utils_sources
     EventLoop.cpp
     WrappersList.cpp
     MediatorPackage.cpp
+    JsonPackage.cpp
     )
 
 add_library(COMMON_UTILS STATIC
