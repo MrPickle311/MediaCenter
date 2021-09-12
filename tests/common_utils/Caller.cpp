@@ -85,6 +85,29 @@ void CallerFactory::setChecker(ResultCheckerPtr checker)
     this->checker_ = checker;
 }
 
+RequestActionCaller::RequestActionCaller(RequestActionPackage pack ,
+                                         ResultCheckerPtr     checker,
+                                         BackendPtr           backend , 
+                                         MediatorMockPtr      expected_mock_to_call):
+        Caller{checker , backend} ,
+        pack_{pack} , 
+        expected_mock_to_call_{expected_mock_to_call}
+{
+    QObject::connect(expected_mock_to_call_.get() , &MediatorMock::requestAction ,
+        [this](auto command ,  auto args = {})
+        {
+            checker_->expectStringsEqual(command , pack_.getCommand());
+            checker_->expectStringListsEqual(args , pack_.getCallArguments());
+            
+            emit finished();
+        });
+}
+
+void RequestActionCaller::invoke()
+{
+    backend_->requestAction(pack_.getCommand() , pack_.getCallArguments());
+}
+
 QueryAboutCallerPtr QueryAboutCallerFactory::produce(QueryAboutPackage query_package) const
 {
     return QueryAboutCallerPtr{new QueryAboutCaller{ checker_ , 

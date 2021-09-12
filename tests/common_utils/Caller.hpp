@@ -69,25 +69,9 @@ private:
     RequestActionCaller(RequestActionPackage pack ,
                         ResultCheckerPtr     checker,
                         BackendPtr           backend , 
-                        MediatorMockPtr      expected_mock_to_call):
-                Caller{checker , backend} ,
-                pack_{pack} , 
-                expected_mock_to_call_{expected_mock_to_call}
-    {
-        QObject::connect(expected_mock_to_call_.get() , &MediatorMock::requestAction ,
-            [this](auto command ,  auto args = {})
-            {
-                checker_->expectStringsEqual(command , pack_.getCommand());
-                checker_->expectStringListsEqual(args , pack_.getCallArguments());
-                
-                emit finished();
-            });
-    }
+                        MediatorMockPtr      expected_mock_to_call);
 public:
-    virtual void invoke()
-    {
-        backend_->requestAction(pack_.getCommand() , pack_.getCallArguments());
-    }
+    virtual void invoke();
 };
 
 class CallerFactory
