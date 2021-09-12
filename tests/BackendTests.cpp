@@ -21,7 +21,7 @@ TEST_F(BackendTEST, AudioMultipleFileName)
 
 TEST_F(BackendTEST, AppendAudioDir)
 {
-    appendRequestActionToList("AppdirAudio" , mocks_.settings_);
+    appendRequestActionToList(action_loader_.loadPackage("AppendAudioDir") , mocks_.settings_);
     start();
 }
 
@@ -78,7 +78,7 @@ TEST_F(BackendTEST , MixedCalls)
 
     appendFunctionWrapperToCallList(std::move(wrapper) , calls_count);
 
-    appendRequestActionToList("AppdirAudio" , mocks_.settings_ , calls_count);
+    appendRequestActionToList(action_loader_.loadPackage("AppendAudioDir") , mocks_.settings_ , calls_count);
 
     start();
 }

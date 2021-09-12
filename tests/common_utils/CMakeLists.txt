@@ -5,6 +5,7 @@ set(common_utils_headers
     WrappersList.hpp
     MediatorPackage.hpp
     JsonPackage.hpp
+    Caller.hpp
     )
 
 set(common_utils_sources
@@ -14,6 +15,7 @@ set(common_utils_sources
     WrappersList.cpp
     MediatorPackage.cpp
     JsonPackage.cpp
+    Caller.cpp
     )
 
 add_library(COMMON_UTILS STATIC

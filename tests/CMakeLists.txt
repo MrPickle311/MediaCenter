@@ -31,9 +31,11 @@ if (NOT ${GMockSrc} STREQUAL "")
     list(APPEND GTestIncludes ${GMockSrc} ${GMockSrc}/include)
 endif ()
 
-add_subdirectory(common_utils)
+
 
 include_directories(${GTestIncludes})
+
+add_subdirectory(common_utils)
 include_directories(common_utils)
 
 set(INCLUDES

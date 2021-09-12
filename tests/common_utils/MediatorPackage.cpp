@@ -2,33 +2,53 @@
 #include <iostream>
 #include <algorithm>
 
-QueryAboutPackage::QueryAboutPackage():
+MediatorPackage::MediatorPackage():
     is_empty_{true}
-{
-    appendString("command");
-    appendStringArray("expectedResult");
-    appendStringArray("callArguments");
-}
+{}
 
-void QueryAboutPackage::setPackageNotEmpty()
+void MediatorPackage::setPackageNotEmpty()
 {
     this->is_empty_ = false;
 }
 
-QueryAboutPackage::operator bool() const
+MediatorPackage::operator bool() const
 {
     return !this->is_empty_;
 }
 
-void QueryAboutPackage::setCommand(QString cmd)
+CallablePackage::CallablePackage()
+{
+    appendString("command");
+    appendStringArray("callArguments");  
+}
+
+void CallablePackage::setCommand(QString cmd)
 {
     this->setPackageNotEmpty();
     this->setString("command", cmd);
 }
 
-const QString& QueryAboutPackage::getCommand() const 
+const QString& CallablePackage::getCommand() const 
 {
     return this->getString("command"); 
+}
+
+void CallablePackage::setCallArguments(const QStringList& args)
+{
+    this->setPackageNotEmpty();
+    this->setStringArray("callArguments" , args);
+}
+
+const QStringList& CallablePackage::getCallArguments() const 
+{ 
+    return this->getStringArray("callArguments");
+}
+
+QueryAboutPackage::QueryAboutPackage()
+{
+    appendString("command");
+    appendStringArray("expectedResult");
+    appendStringArray("callArguments");
 }
 
 void QueryAboutPackage::setExpectedResult(const QStringList& res)
@@ -42,33 +62,21 @@ const QStringList& QueryAboutPackage::getExpectedResult() const
     return this->getStringArray("expectedResult");
 }
 
-void QueryAboutPackage::setCallArguments(const QStringList& args)
+JsonFile::JsonFile(QString path):
+    json_file_{path}
 {
-    this->setPackageNotEmpty();
-    this->setStringArray("callArguments" , args);
+    if(!path.isEmpty())
+    {
+        this->tryOpenJsonFile();
+    } 
 }
 
-const QStringList& QueryAboutPackage::getCallArguments() const 
-{ 
-    return this->getStringArray("callArguments");
-}
-
-QueryAboutPackageLoader::QueryAboutPackageLoader(std::string relative_path_to_json)
-{
-    std::filesystem::path project_dir{PROJECT_FOLDER_NAME};
-    json_file_.setFileName({ ( project_dir / "data" / relative_path_to_json ).c_str() });
-
-    this->checkIfFileExists();
-    this->tryOpenJsonFile();
-    this->tryLoadJsonFile();
-}
-
-void QueryAboutPackageLoader::printError(std::string msg) const
+void JsonFile::printError(std::string msg) const
 {
     std::cout << "\n " << msg << " \n";
 }
 
-void QueryAboutPackageLoader::checkIfFileExists() const
+void JsonFile::checkIfFileExists() const
 {
     if(!json_file_.exists())
     {
@@ -76,39 +84,79 @@ void QueryAboutPackageLoader::checkIfFileExists() const
     }
 }
 
-void QueryAboutPackageLoader::tryOpenJsonFile() 
+void JsonFile::tryOpenJsonFile() 
 {
+    this->checkIfFileExists();
+
     if(!json_file_.open(QIODevice::ReadOnly))
     {
         printError("Couldn't open the JSON file!");
     }
 }
 
-void QueryAboutPackageLoader::tryLoadJsonFile() 
+QJsonObject JsonFile::tryLoadJsonObject() 
 {
-    doc_ = QJsonDocument::fromJson(json_file_.readAll());
-    entire_json_object_ = doc_.object();
+    return QJsonDocument::fromJson(json_file_.readAll()).object();
 }
 
-QJsonObject QueryAboutPackageLoader::readPackage(std::string pack_name) const
+void JsonFile::setPath(QString path) 
+{
+    this->json_file_.setFileName(path);
+    tryOpenJsonFile();
+}
+
+JsonPackageLoader::JsonPackageLoader(std::string relative_path_to_json)
+{
+    std::filesystem::path project_dir{PROJECT_FOLDER_NAME};
+
+    this->file_.setPath({ ( project_dir / "data" / relative_path_to_json ).c_str() });
+
+    entire_json_object_ = file_.tryLoadJsonObject();
+}
+
+QJsonObject JsonPackageLoader::readPackage(std::string pack_name) const
 {
     return entire_json_object_[QString::fromStdString(pack_name)].toObject();
 }
 
-QueryAboutPackage QueryAboutPackageLoader::loadPackage(std::string pack_name) 
+QJsonObject JsonPackageLoader::tryLoadLocalPackage(std::string pack_name) const
 {
-    QJsonObject json_local_obj;
-    QueryAboutPackage result;
-
     if(checker_.jsonObjectContainsPackage(entire_json_object_ , pack_name))
     {
-        json_local_obj = readPackage(pack_name);
+        return readPackage(pack_name);
     }
 
-    if(checker_.isPackageValid( result , json_local_obj  ))
+    return {};
+}
+
+void JsonPackageLoader::tryExtractResult(const QJsonObject& obj , JsonPackage& pack) 
+{
+    if(checker_.isPackageValid( pack , obj  ))
     {
-        extractor_.extractPackage(json_local_obj , result );
+        extractor_.extractPackage(obj , pack );
     }
+}
+
+void JsonPackageLoader::tryExtract(JsonPackage& result , std::string pack_name) 
+{
+    auto json_local_obj{tryLoadLocalPackage(pack_name)};
+    tryExtractResult(json_local_obj , result);
+}
+
+QueryAboutPackage QueryAboutPackageLoader::loadPackage(std::string pack_name) 
+{
+    QueryAboutPackage result;
+
+    tryExtract(result , pack_name);
+    
+    return result;
+}
+
+RequestActionPackage RequestActionPackageLoader::loadPackage(std::string pack_name) 
+{
+    RequestActionPackage result;
+
+    tryExtract(result , pack_name);
 
     return result;
 }
