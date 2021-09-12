@@ -167,7 +167,7 @@ private:
                 expected_mock_to_call_{expected_mock_to_call}
     {
         QObject::connect(expected_mock_to_call_.get() , &MediatorMock::requestAction ,
-            [this](auto requestedAction , auto args = {})
+            [this](auto requestedAction , [[maybe_unused]] auto args = {})
             {
                 EXPECT_STREQ(requestedAction.toStdString().c_str() , 
                              command_.toStdString().c_str() );
@@ -209,13 +209,13 @@ struct Utils
     WrappersList                wrappers_;
     DelayedEventLoop            event_loop_;
     ResultCheckerPtr            checker_;
-    QueryAboutCallerFactory     query_factory_;
-    RequestActionCallerFactory  request_factory_;
+    QueryAboutCallerFactory     query_caller_factory_;
+    RequestActionCallerFactory  request_caller_factory_;
 public:
-    Utils(BackendPtr backend):
+    Utils():
         checker_{new ResultChecker} ,
-        query_factory_{checker_ , nullptr} ,
-        request_factory_{nullptr}
+        query_caller_factory_{checker_ , nullptr} ,
+        request_caller_factory_{nullptr}
     {
         QObject::connect(&event_loop_ , &DelayedEventLoop::runned , 
                          &wrappers_ , &WrappersList::callAll);
@@ -225,8 +225,8 @@ public:
 public:
     void setBackend(BackendPtr backend)
     {
-        query_factory_.setBackend(backend);
-        request_factory_.setBackend(backend);
+        query_caller_factory_.setBackend(backend);
+        request_caller_factory_.setBackend(backend);
     }
 
 };
@@ -235,8 +235,7 @@ class BackendTEST : public ::testing::Test
 {
 public:
     BackendTEST():
-        utils_{backend_},
-        backend_{nullptr}
+        query_loader_{"test_data/BackendTestData.json"}
     {
         BackendBuilder builder;
 
@@ -263,6 +262,8 @@ protected:
     Utils           utils_;
     BackendMediatorsMocks  mocks_;
     
+    QueryAboutPackageLoader query_loader_;
+
     //tested object
     BackendPtr    backend_;
 protected:
@@ -290,13 +291,13 @@ protected:
                                                int times = 1)
     {
         expectQueryAboutCall(target , pack , times);
-        return utils_.query_factory_.produce(pack);
+        return utils_.query_caller_factory_.produce(pack);
     }
     void appendRequestActionToList(QString command , 
                                    MediatorMockPtr expected_target , 
                                    int times = 1)
     {
-        appendFunctionWrapperToCallList(utils_.request_factory_.produce(command , expected_target) , 
+        appendFunctionWrapperToCallList(utils_.request_caller_factory_.produce(command , expected_target) , 
                                         times );
     }
     void start()
@@ -317,6 +318,20 @@ protected:
             .Times(times)
             .WillRepeatedly(Return(call_package.getExpectedResult())
             );
+    }
+    //special cases
+    void simpleTest(std::string call_data ,  std::string precall_data , int calls_count = 1)
+    {
+        auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , 
+                                             query_loader_.loadPackage(call_data) ,
+                                             calls_count)};
+        wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , 
+                                                   query_loader_.loadPackage(precall_data) ,
+                                                   calls_count));
+
+        appendFunctionWrapperToCallList(std::move(wrapper) , calls_count);
+
+        start();  
     }
 };
 
