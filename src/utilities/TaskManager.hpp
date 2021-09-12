@@ -104,7 +104,7 @@ public:
     // @param args     Arguments its invokation
     // @return         Return future associated with task's result
     template<typename Function, typename ... Args>
-    auto addTask(Function&& new_task, Args... args) -> std::future<decltype(new_task(args...))>
+    decltype(auto) addTask(Function&& new_task, Args... args)
     {
         using ResultType = decltype(new_task(args...));// new_task return type
 
