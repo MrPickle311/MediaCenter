@@ -22,9 +22,9 @@ void ResultChecker::expectStringListsEqual(const QStringList& first , const QStr
 }
 
 Caller::Caller(ResultCheckerPtr   checker  ,
-               BackendPtr         backend):
+               IMediatorPtr       mediator):
         checker_{checker},
-        backend_{backend} 
+        mediator_{mediator} 
 {}
 
 void QueryAboutCaller::checkItself(const QStringList& result)
@@ -33,15 +33,15 @@ void QueryAboutCaller::checkItself(const QStringList& result)
 }
 
 QueryAboutCaller::QueryAboutCaller(ResultCheckerPtr   checker,
-                                   BackendPtr         backend , 
+                                   IMediatorPtr       mediator , 
                                    QueryAboutPackage  query_package):
-        Caller{checker , backend} ,
+        Caller{checker , mediator} ,
         query_package_{std::move(query_package)}
 {
     std::function<void()> ui_action = [this]
     {
         //waits until searched QStringList is prepared
-        auto result = backend_->queryAbout(query_package_.getCommand() ,
+        auto result = mediator_->queryAbout(query_package_.getCommand() ,
                                            query_package_.getCallArguments());
                               
         checkItself(result);
@@ -70,14 +70,14 @@ QueryAboutCaller& QueryAboutCaller::setPrecall(QueryAboutCallerPtr precall)
 }
 
 CallerFactory::CallerFactory(ResultCheckerPtr checker,
-                             BackendPtr backend):
+                             IMediatorPtr mediator):
         checker_{checker} ,
-        backend_{backend}
+        backend_{mediator}
 {}
 
-void CallerFactory::setBackend(BackendPtr backend)
+void CallerFactory::setMediator(IMediatorPtr mediator)
 {
-    this->backend_ = backend;
+    this->backend_ = mediator;
 }
 
 void CallerFactory::setChecker(ResultCheckerPtr checker) 
@@ -87,9 +87,9 @@ void CallerFactory::setChecker(ResultCheckerPtr checker)
 
 RequestActionCaller::RequestActionCaller(RequestActionPackage pack ,
                                          ResultCheckerPtr     checker,
-                                         BackendPtr           backend , 
+                                         IMediatorPtr         mediator , 
                                          MediatorMockPtr      expected_mock_to_call):
-        Caller{checker , backend} ,
+        Caller{checker , mediator} ,
         pack_{pack} , 
         expected_mock_to_call_{expected_mock_to_call}
 {
@@ -105,7 +105,7 @@ RequestActionCaller::RequestActionCaller(RequestActionPackage pack ,
 
 void RequestActionCaller::invoke()
 {
-    backend_->requestAction(pack_.getCommand() , pack_.getCallArguments());
+    mediator_->requestAction(pack_.getCommand() , pack_.getCallArguments());
 }
 
 QueryAboutCallerPtr QueryAboutCallerFactory::produce(QueryAboutPackage query_package) const

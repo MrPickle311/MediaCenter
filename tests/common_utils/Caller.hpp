@@ -4,7 +4,7 @@
 #include <atomic>
 #include <QStringList>
 #include <memory>
-#include <Backend.hpp>
+#include <Mediator.hpp>
 
 #include "MediatorPackage.hpp"
 #include "QFunctionWrapper.hpp"
@@ -32,10 +32,10 @@ class Caller : public QFunctionWrapper
 {
 protected:
     ResultCheckerPtr    checker_;
-    BackendPtr          backend_;
+    IMediatorPtr         mediator_;
 public:
     Caller(ResultCheckerPtr   checker  ,
-            BackendPtr         backend);
+           IMediatorPtr       mediator);
 };
 
 class QueryAboutCaller : public Caller
@@ -49,7 +49,7 @@ private:
     void checkItself(const QStringList& result);
 private:
     QueryAboutCaller(ResultCheckerPtr   checker,
-                     BackendPtr         backend , 
+                     IMediatorPtr       mediator , 
                      QueryAboutPackage  query_package);
 private:
     void tryInvokePrecall();
@@ -68,7 +68,7 @@ private:
 private:
     RequestActionCaller(RequestActionPackage pack ,
                         ResultCheckerPtr     checker,
-                        BackendPtr           backend , 
+                        IMediatorPtr         mediator , 
                         MediatorMockPtr      expected_mock_to_call);
 public:
     virtual void invoke();
@@ -77,13 +77,13 @@ public:
 class CallerFactory
 {
 protected:
-    ResultCheckerPtr  checker_;
-    BackendPtr        backend_;
+    ResultCheckerPtr    checker_;
+    IMediatorPtr        backend_;
 public:
     CallerFactory(ResultCheckerPtr  checker,
-                  BackendPtr backend);
+                  IMediatorPtr      mediator);
 public:
-    void setBackend(BackendPtr backend); 
+    void setMediator(IMediatorPtr backend); 
     void setChecker(ResultCheckerPtr checker);
 };
 

@@ -6,47 +6,48 @@
 
 TEST_F(BackendTEST, AudioSearch)
 {
-    simpleTest("AudioSearch1" , "MediaPathsAudio1");
+    simpleMultimediaEngineTest("AudioSearch1" , "MediaPathsAudio1");
 }
 
 TEST_F(BackendTEST , AudioNotFullName)
 {
-    simpleTest("AudioSearch2" , "MediaPathsAudio1");
+    simpleMultimediaEngineTest("AudioSearch2" , "MediaPathsAudio1");
 }
 
 TEST_F(BackendTEST, AudioMultipleFileName)
 {
-    simpleTest("AudioSearch3" , "MediaPathsAudio1");
+    simpleMultimediaEngineTest("AudioSearch3" , "MediaPathsAudio1");
 }
 
 TEST_F(BackendTEST, AppendAudioDir)
 {
-    appendRequestActionToList(action_loader_.loadPackage("AppendAudioDir") , mocks_.settings_);
+    appendRequestActionToList( factories_.loadRequestPackage("AppendAudioDir") , 
+                               mocks_.settings_);
     start();
 }
 
 TEST_F(BackendTEST , VideoSearch)
 {
-    simpleTest("VideoSearch1" , "MediaPathsVideo1");
+    simpleMultimediaEngineTest("VideoSearch1" , "MediaPathsVideo1");
 }
 
 
 TEST_F(BackendTEST , AudioPlaylist)
 {
-    simpleTest("AudioPlaylist1" , "MediaPathsAudio1");
+    simpleMultimediaEngineTest("AudioPlaylist1" , "MediaPathsAudio1");
 }
 
 
 
 TEST_F(BackendTEST , ImageSearch)
 {
-    simpleTest("ImagesSearch1" , "MediaPathsImages1");
+    simpleMultimediaEngineTest("ImagesSearch1" , "MediaPathsImages1");
 }
 
 
 TEST_F(BackendTEST , UnsupportedCommand)
 {
-    QueryAboutPackage pack{query_loader_.loadPackage("UnsupportedCommand1")};
+    QueryAboutPackage pack{factories_.loadQueryPackage("UnsupportedCommand1")};
 
     int expected_calls_count{0};
 
@@ -62,23 +63,23 @@ TEST_F(BackendTEST , MultipleCall)
 {
     int calls_count{20};
 
-    simpleTest("ImagesSearch1" , "MediaPathsImages1" , calls_count);
+    simpleMultimediaEngineTest("ImagesSearch1" , "MediaPathsImages1" , calls_count);
 }
 
 TEST_F(BackendTEST , MixedCalls)
 {
     int calls_count{300};
 
-    QueryAboutPackage storage_pack{query_loader_.loadPackage("AudioPlaylist1")};
+    QueryAboutPackage storage_pack{factories_.loadQueryPackage("AudioPlaylist1")};
 
-    QueryAboutPackage settings_pack{query_loader_.loadPackage("MediaPathsAudio1")};
+    QueryAboutPackage settings_pack{factories_.loadQueryPackage("MediaPathsAudio1")};
 
     auto wrapper {createQueryAboutCaller(*mocks_.data_storage_ , storage_pack , calls_count)};
     wrapper->setPrecall(createQueryAboutCaller(*mocks_.settings_  , settings_pack , calls_count));
 
     appendFunctionWrapperToCallList(std::move(wrapper) , calls_count);
 
-    appendRequestActionToList(action_loader_.loadPackage("AppendAudioDir") , mocks_.settings_ , calls_count);
+    appendRequestActionToList(factories_.loadRequestPackage("AppendAudioDir") , mocks_.settings_ , calls_count);
 
     start();
 }
