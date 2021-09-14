@@ -50,21 +50,7 @@ public:
     }
 };
 
-class BackendSubsystems
-{
-private:
-    Matcher                          matcher_;
-    std::map<QString , IMediatorPtr> subsystems_;
-public:
-    BackendSubsystems();
-    void addSubsystem(const QString& subsys_name, IMediatorPtr subsystem);
-    IMediatorPtr& getSubsystem(const QString& command) noexcept(false);
-    void addSubsystemBinding( const QString& subsystem_name , const QString& binding_key);
-};
-
-using BackendSubsystemsPtr = std::shared_ptr<BackendSubsystems>;
-
-class Backend : public IMediator
+class Backend : public Mediator
 {
     Q_OBJECT;
     friend class BackendBuilder;
@@ -72,31 +58,19 @@ private:
     Backend(uint threads_count);
 private:
     TaskManager task_manager_;
-
-    //dependencies
-    std::shared_ptr<BackendSubsystems> subsystems_;
 private:
-    std::future<QStringList> makeQuery(const QString& command, QStringList args);
-    void redirectRequestAction(const QString& action , QStringList args);
+    virtual std::future<QStringList> makeQuery(const QString& command, const QStringList& args); 
 public slots:
-    virtual QStringList queryAbout(const QString& command, QStringList args) override;
+    virtual QStringList queryAbout(const QString& command, const QStringList& args) override;
 };
 
 using BackendPtr = std::shared_ptr<Backend>;
 
-class BackendBuilder
+class BackendBuilder : public MediatorBuilder
 {
 private:
-    uint                 threads_count_;
-    BackendSubsystemsPtr subsystems_;
-private:
-    void resetSubsystems();
+    uint  threads_count_;
 public:
-    BackendBuilder():
-        subsystems_{new BackendSubsystems}
-    {}
-    std::shared_ptr<Backend> build();
-    BackendBuilder& addSubsystem(const QString& subsystem_name , IMediatorPtr subsystem);
-    BackendBuilder& addSubsystemBinding(const QString& subsystem_name , const QString& binding_key);
+    BackendPtr buildBackend();
     BackendBuilder& setThreadsCount(uint th_count);
 };

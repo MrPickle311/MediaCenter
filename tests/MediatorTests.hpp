@@ -32,10 +32,11 @@ public:
         builder.addSubsystemBinding("DataStorage" , "Search")
                .addSubsystemBinding("DataStorage" , "Playlist")
                .addSubsystemBinding("Settings"    , "Mediapaths")
-               .addSubsystemBinding("Settings"    , "Appdir")
-               .setThreadsCount(10);
+               .addSubsystemBinding("Settings"    , "Appdir");
+               
+        builder.setThreadsCount(10);
 
-        tested_mediator_ = builder.build();
+        tested_mediator_ = builder.buildBackend();
 
         // expect that backend is initilized
         EXPECT_NE(tested_mediator_.get() , nullptr);
@@ -61,6 +62,8 @@ protected:
         start();  
     }
 };
+
+/*
 
 struct MultimediaEngineMocks
 {
@@ -102,3 +105,5 @@ protected:
 protected:
     
 };
+
+*/

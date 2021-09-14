@@ -82,6 +82,8 @@ TEST_F(BackendTEST , MixedCalls)
     start();
 }
 
+/*
+
 TEST_F(MultimediaEngineTests , MultipleCall)
 {
     int calls_count{40};
@@ -108,6 +110,8 @@ TEST_F(MultimediaEngineTests , MultipleCall)
 
     start();
 }
+
+*/
 
 //TEST IDEA MULTIPLE BACKEND CALLS , MIX CALLS
 
