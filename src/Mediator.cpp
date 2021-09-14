@@ -6,8 +6,8 @@ IMediator::IMediator(QObject *parent):
 {}
 
 MediatorSubsystems::MediatorSubsystems():
-        matcher_{"[A-Z]{1}[a-z]+"}
-    {}
+    matcher_{0}
+{}
 
 void MediatorSubsystems::addSubsystem(const QString& subsys_name, IMediatorPtr subsystem)
 {
@@ -24,7 +24,12 @@ void MediatorSubsystems::addSubsystemBinding( const QString& subsystem_name , co
     subsystems_[binding_key] = subsystems_.at(subsystem_name);
 }
 
-Mediator::Mediator() 
+void MediatorSubsystems::setDesiredParserPos(int desired_parser_pos) 
+{
+    this->matcher_.setDesiredParsedPos(desired_parser_pos);
+}
+
+Mediator::Mediator()
 {
     QObject::connect(this , &Mediator::requestAction ,
                      this , &Mediator::redirectRequestAction);
@@ -34,6 +39,7 @@ void Mediator::redirectRequestAction(const QString& action , const QStringList& 
 {
     try//if command is correct resend request
     {
+        #pragma message "You call requestAction() directly , change to emit requestAction()!! " 
         subsystems_->getSubsystem(action)->requestAction(action , args);
     }
     catch(const std::out_of_range& e)
@@ -60,6 +66,10 @@ QStringList Mediator::queryAbout(const QString& command, const QStringList& args
 }
 
 // builder
+
+MediatorBuilder::MediatorBuilder():
+        subsystems_{new MediatorSubsystems}
+{}
 
 void MediatorBuilder::resetSubsystems() 
 {

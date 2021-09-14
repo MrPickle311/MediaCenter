@@ -2,10 +2,21 @@
 
 #include <Mediator.hpp>
 
-class MultimediaEngine : public IMediator
+
+class MultimediaEngine : public Mediator
 {
+    friend class MultimediaEngineBuilder;
+private:
+    MultimediaEngine(){}
 public:
     virtual ~MultimediaEngine(){}
+};
+
+using MultimediaEnginePtr = std::shared_ptr<MultimediaEngine>;
+
+class MultimediaEngineBuilder : public MediatorBuilder
+{
 public:
-    virtual QStringList queryAbout(const QString& command, QStringList args);
+    virtual ~MultimediaEngineBuilder(){}
+    MultimediaEnginePtr buildMultimediaEngine();
 };

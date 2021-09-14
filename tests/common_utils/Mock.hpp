@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <Mediator.hpp>
+#include <Proxy.hpp>
 #include <gmock/gmock.h>
 
 class MediatorMock: public IMediator
@@ -12,3 +13,7 @@ public:
 };
 
 using MediatorMockPtr = std::shared_ptr<MediatorMock>;
+
+using ProxyMock = MediatorMock;
+
+using ProxyMockPtr = MediatorMockPtr;

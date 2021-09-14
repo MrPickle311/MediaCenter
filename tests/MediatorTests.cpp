@@ -82,36 +82,36 @@ TEST_F(BackendTEST , MixedCalls)
     start();
 }
 
-/*
+
 
 TEST_F(MultimediaEngineTests , MultipleCall)
 {
-    int calls_count{40};
+    int calls_count{1};
 
 
     auto audio_pack{factories_.loadQueryPackage("AudioSearch1")};
-    auto audio_backend_precall_pack{factories_.loadQueryPackage("MediaPathsAudio1")};
+    // auto audio_backend_precall_pack{factories_.loadQueryPackage("MediaPathsAudio1")};
 
     auto audio_wrapper {createQueryAboutCaller(*mocks_.audio_ , audio_pack , calls_count)};
-    audio_wrapper->setPrecall(createQueryAboutCaller(*mocks_.backend_  , audio_backend_precall_pack , calls_count));
+    // audio_wrapper->setPrecall(createQueryAboutCaller(*mocks_.backend_  , audio_backend_precall_pack , calls_count));
 
     appendFunctionWrapperToCallList(std::move(audio_wrapper), calls_count );
 
 
 
-    auto video_pack{factories_.loadQueryPackage("VideoSearch1")};
-    auto video_backend_precall_pack{factories_.loadQueryPackage("MediaPathsVideo1")};
-
-    auto video_wrapper {createQueryAboutCaller(*mocks_.video , video_pack , calls_count)};
-    video_wrapper->setPrecall(createQueryAboutCaller(*mocks_.backend_  , video_backend_precall_pack , calls_count));
-
-    appendFunctionWrapperToCallList(std::move(video_wrapper) , calls_count );
+    // auto video_pack{factories_.loadQueryPackage("VideoSearch1")};
+    // auto video_backend_precall_pack{factories_.loadQueryPackage("MediaPathsVideo1")};
+// 
+    // auto video_wrapper {createQueryAboutCaller(*mocks_.video_ , video_pack , calls_count)};
+    // video_wrapper->setPrecall(createQueryAboutCaller(*mocks_.backend_  , video_backend_precall_pack , calls_count));
+// 
+    // appendFunctionWrapperToCallList(std::move(video_wrapper) , calls_count );
 
 
     start();
 }
 
-*/
+
 
 //TEST IDEA MULTIPLE BACKEND CALLS , MIX CALLS
 

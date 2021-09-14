@@ -13,13 +13,15 @@ class Matcher : public IMatcher
 {
 protected:
     const std::regex matcher_body_;
+    int desired_parse_pos_;
 public:
-    Matcher(std::string regex_pattern);
+    Matcher(std::string regex_pattern , int desired_parse_pos);
     virtual QString extractKey(const QString& command);
+    void  setDesiredParsedPos(int desired_parse_pos);
 };
 
 class CommandMatcher : public Matcher
 {
 public:
-    CommandMatcher();
+    CommandMatcher(int desired_parser_pos);
 };

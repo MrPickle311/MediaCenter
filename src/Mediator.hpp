@@ -24,7 +24,7 @@ using IMediatorPtr =  std::shared_ptr<IMediator>;
 class MediatorSubsystems
 {
 private:
-    Matcher                          matcher_;
+    CommandMatcher                   matcher_;
     std::map<QString , IMediatorPtr> subsystems_;
 public:
     MediatorSubsystems();
@@ -32,6 +32,7 @@ public:
     void addSubsystem(const QString& subsys_name, IMediatorPtr subsystem);
     IMediatorPtr& getSubsystem(const QString& command) noexcept(false);
     void addSubsystemBinding( const QString& subsystem_name , const QString& binding_key);
+    void setDesiredParserPos(int desired_parser_pos);
 };
 
 using MediatorSubsystemsPtr = std::shared_ptr<MediatorSubsystems>;
@@ -41,6 +42,8 @@ class Mediator : public IMediator
     friend class MediatorBuilder;
 protected:
     Mediator();
+public:
+    virtual ~Mediator(){}
 protected:
     std::shared_ptr<MediatorSubsystems> subsystems_;
 protected:
@@ -58,9 +61,7 @@ protected:
 protected:
     void resetSubsystems();
 public:
-    MediatorBuilder():
-        subsystems_{new MediatorSubsystems}
-    {}
+    MediatorBuilder();
 public:
     MediatorBuilder& addSubsystem(const QString& subsystem_name , IMediatorPtr subsystem);
     MediatorBuilder& addSubsystemBinding(const QString& subsystem_name , const QString& binding_key);

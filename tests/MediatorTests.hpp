@@ -4,6 +4,7 @@
 
 #include"common_utils/MediatorTester.hpp"
 #include <Backend.hpp>
+#include <multimedia_engine/MultimediaEngine.hpp>
 
 struct BackendMediatorsMocks
 {
@@ -63,18 +64,19 @@ protected:
     }
 };
 
-/*
+
 
 struct MultimediaEngineMocks
 {
-    ProxyMockPtr  audio_;
-    ProxyMockPtr  video_;
-    ProxyMockPtr  images_;
-    MediatorMock  backend_;
+    ProxyMockPtr     audio_;
+    ProxyMockPtr     video_;
+    ProxyMockPtr     images_;
+    MediatorMockPtr  backend_;
     MultimediaEngineMocks():
-        audio_{new MediatorMock},
-        video_{new MediatorMock},
-        images_{new MediatorMock}
+        audio_{new ProxyMock} ,
+        video_{new ProxyMock} ,
+        images_{new ProxyMock} ,
+        backend_{new MediatorMock}
     {}
 };
 
@@ -91,7 +93,7 @@ public:
                .addSubsystem("Images" , mocks_.images_)
                .addSubsystem("Backend" , mocks_.backend_);
 
-        tested_mediator_ = builder.build();
+        tested_mediator_ = builder.buildMultimediaEngine();
 
         // expect that backend is initilized
         EXPECT_NE(tested_mediator_.get() , nullptr);
@@ -106,4 +108,3 @@ protected:
     
 };
 
-*/
