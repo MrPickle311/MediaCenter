@@ -12,7 +12,7 @@ set(backend_sources
     Mediator.cpp
     Proxy.cpp)
 
-add_subdirectory(data_backend)
+add_subdirectory(multimedia_engine)
 add_subdirectory(utilities)
 
 add_library(ALL_LIBRARIES STATIC

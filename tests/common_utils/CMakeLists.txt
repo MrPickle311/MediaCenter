@@ -6,6 +6,7 @@ set(common_utils_headers
     MediatorPackage.hpp
     JsonPackage.hpp
     Caller.hpp
+    MediatorTester.hpp
     )
 
 set(common_utils_sources
@@ -16,6 +17,7 @@ set(common_utils_sources
     MediatorPackage.cpp
     JsonPackage.cpp
     Caller.cpp
+    MediatorTester.cpp
     )
 
 add_library(COMMON_UTILS STATIC

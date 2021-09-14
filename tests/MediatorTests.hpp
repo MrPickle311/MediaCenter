@@ -62,3 +62,43 @@ protected:
     }
 };
 
+struct MultimediaEngineMocks
+{
+    ProxyMockPtr  audio_;
+    ProxyMockPtr  video_;
+    ProxyMockPtr  images_;
+    MediatorMock  backend_;
+    MultimediaEngineMocks():
+        audio_{new MediatorMock},
+        video_{new MediatorMock},
+        images_{new MediatorMock}
+    {}
+};
+
+class MultimediaEngineTests : public MediatorTester
+{
+public:
+    MultimediaEngineTests():
+        MediatorTester{"test_data/QueryAboutData.json" , "test_data/RequestActionData.json"}
+    {
+        MultimediaEngineBuilder builder;
+
+        builder.addSubsystem("Audio" , mocks_.audio_)
+               .addSubsystem("Video" , mocks_.video_)
+               .addSubsystem("Images" , mocks_.images_)
+               .addSubsystem("Backend" , mocks_.backend_);
+
+        tested_mediator_ = builder.build();
+
+        // expect that backend is initilized
+        EXPECT_NE(tested_mediator_.get() , nullptr);
+
+        // set dependency
+        factories_.setMediator(tested_mediator_);
+    }
+    virtual ~MultimediaEngineTests() {}
+protected:
+    MultimediaEngineMocks mocks_;
+protected:
+    
+};
