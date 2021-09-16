@@ -66,15 +66,23 @@ QStringList Mediator::queryAbout(const QString& command, const QStringList& args
     }
 }
 
+void SubsystemProxy::setSubsystems(MediatorSubsystemsPtr subsys) 
+{
+    this->subsystems_ = subsys;
+}
+
 // builder
 
 MediatorBuilder::MediatorBuilder():
-        subsystems_{new MediatorSubsystems}
-{}
+        subsystems_{std::make_shared<MediatorSubsystems>()}
+{
+    proxy_.setSubsystems(subsystems_);
+}
 
 void MediatorBuilder::resetSubsystems() 
 {
     this->subsystems_.reset(new MediatorSubsystems);
+    proxy_.setSubsystems(subsystems_);
 }
 
 MediatorBuilder& MediatorBuilder::addSubsystem(const QString& subsystem_name , std::shared_ptr<IMediator> subsystem)
@@ -83,9 +91,15 @@ MediatorBuilder& MediatorBuilder::addSubsystem(const QString& subsystem_name , s
     return *this;
 }
 
-MediatorBuilder& MediatorBuilder::addSubsystemBinding(const QString& subsystem_name , const QString& binding_key) 
+SubsystemProxy& MediatorBuilder::at(const QString& subsystem_name) 
 {
-    subsystems_->addSubsystemBinding(subsystem_name , binding_key);
+    proxy_.current_subsystem_ = subsystem_name;
+    return proxy_;
+}
+
+SubsystemProxy& SubsystemProxy::addBinding(const QString& command) 
+{
+    subsystems_->addSubsystemBinding(current_subsystem_ , command);
     return *this;
 }
 

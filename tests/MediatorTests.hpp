@@ -31,15 +31,18 @@ public:
                .addSubsystem("Settings" , mocks_.settings_);
 
         #pragma warning "Change it into variadic template to simplifie code"
-        builder.addSubsystemBinding("MultimediaEngine" , "SearchAudio")
-               .addSubsystemBinding("MultimediaEngine" , "SearchVideo")
-               .addSubsystemBinding("MultimediaEngine" , "SearchImages")
-               .addSubsystemBinding("MultimediaEngine" , "PlaylistAudio")
 
-               .addSubsystemBinding("Settings"    , "MediapathsAudio")
-               .addSubsystemBinding("Settings"    , "MediapathsVideo")
-               .addSubsystemBinding("Settings"    , "MediapathsImages")
-               .addSubsystemBinding("Settings"    , "AppdirAudio");
+        builder.at("MultimediaEngine")
+               .addBinding("SearchAudio")
+               .addBinding("SearchVideo")
+               .addBinding("SearchImages")
+               .addBinding("PlaylistAudio");
+        
+        builder.at("Settings")
+               .addBinding("MediapathsAudio")
+               .addBinding("MediapathsVideo")
+               .addBinding("MediapathsImages")
+               .addBinding("AppdirAudio");
                
         builder.setThreadsCount(10);
 
@@ -97,16 +100,22 @@ public:
         builder.addSubsystem("Audio" , mocks_.audio_)
                .addSubsystem("Video" , mocks_.video_)
                .addSubsystem("Images" , mocks_.images_)
-               .addSubsystem("Backend" , mocks_.backend_)
+               .addSubsystem("Backend" , mocks_.backend_);
+               
+        builder.at("Audio")
+               .addBinding("SearchAudio")
+               .addBinding("PlaylistAudio");
 
-               .addSubsystemBinding("Audio" , "SearchAudio")
-               .addSubsystemBinding("Video" , "SearchVideo")
-               .addSubsystemBinding("Images" , "SearchImages")
-               .addSubsystemBinding("Audio" , "PlaylistAudio")
+        builder.at("Video")
+               .addBinding("SearchVideo");
 
-               .addSubsystemBinding("Backend"    , "MediapathsAudio")
-               .addSubsystemBinding("Backend"    , "MediapathsVideo")
-               .addSubsystemBinding("Backend"    , "MediapathsImages");
+        builder.at("Images")
+               .addBinding("SearchImages");
+
+        builder.at("Backend")
+               .addBinding("MediapathsAudio")
+               .addBinding("MediapathsVideo")
+               .addBinding("MediapathsImages");
 
         tested_mediator_ = builder.buildMultimediaEngine();
 

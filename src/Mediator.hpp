@@ -54,16 +54,32 @@ public:
 
 using MediatorPtr = std::shared_ptr<Mediator>;
 
+class SubsystemProxy
+{
+    friend class MediatorBuilder;
+private:
+    void setSubsystems(MediatorSubsystemsPtr subsys);
+private:
+    MediatorSubsystemsPtr subsystems_;
+    QString               current_subsystem_;
+public:
+    SubsystemProxy& addBinding(const QString& command);
+};
+
 class MediatorBuilder
 {
 protected:
     MediatorSubsystemsPtr subsystems_;
+    SubsystemProxy        proxy_;
 protected:
     void resetSubsystems();
 public:
     MediatorBuilder();
 public:
     MediatorBuilder& addSubsystem(const QString& subsystem_name , IMediatorPtr subsystem);
-    MediatorBuilder& addSubsystemBinding(const QString& subsystem_name , const QString& command);
+    // MediatorBuilder& addSubsystemBinding(const QString& subsystem_name , const QString& command);
+
+    SubsystemProxy& at(const QString& subsystem_name );
+
     MediatorPtr      build();
 };
