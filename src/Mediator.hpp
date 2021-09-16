@@ -43,7 +43,7 @@ class Mediator : public IMediator
 protected:
     Mediator();
 public:
-    virtual ~Mediator(){}
+    virtual ~Mediator() = default;
 protected:
     std::shared_ptr<MediatorSubsystems> subsystems_;
 protected:

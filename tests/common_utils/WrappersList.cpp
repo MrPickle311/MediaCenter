@@ -31,6 +31,10 @@ void WrappersList::updateCallState()
     checkIfFinished();
 }
 
+WrappersList::WrappersList():
+    tasks_finished_{0}
+{}
+
 void WrappersList::append(std::function<void()> function)
 {
     factory_.setFunction(std::move(function));

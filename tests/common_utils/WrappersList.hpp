@@ -17,7 +17,7 @@ class WrappersList : public IWrappersList
 {
     Q_OBJECT;
 private:
-    std::atomic_int                 tasks_finished_;
+    std::atomic_uint                 tasks_finished_;
     QFunctionWrapperFactory         factory_;
     std::list<QFunctionWrapperPtr>  init_func_wrappers_;
 private:
@@ -28,6 +28,7 @@ private:
 private slots:
     void updateCallState();
 public:
+    WrappersList();
     virtual void append(std::function<void()> function);
     virtual void append(QFunctionWrapperPtr wrapper);
 };

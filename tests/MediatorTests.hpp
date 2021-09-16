@@ -45,7 +45,7 @@ public:
         // set dependency
         factories_.setMediator(tested_mediator_);
     }
-    virtual ~BackendTEST(){}
+    virtual ~BackendTEST() = default;
 protected:
     BackendMediatorsMocks  mocks_;
     //special cases
@@ -101,10 +101,8 @@ public:
         // set dependency
         factories_.setMediator(tested_mediator_);
     }
-    virtual ~MultimediaEngineTests() {}
+    virtual ~MultimediaEngineTests()  = default;
 protected:
     MultimediaEngineMocks mocks_;
-protected:
-    
 };
 

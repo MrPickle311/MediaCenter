@@ -38,7 +38,7 @@ protected:
     TestsEngine  engine_;
     Factories factories_;
 
-    IMediatorPtr                tested_mediator_;
+    IMediatorPtr tested_mediator_;
 public:
     virtual ~MediatorTester(){}
     MediatorTester(std::string queries_path , std::string requests_path);
