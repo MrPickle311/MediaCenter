@@ -16,7 +16,8 @@ void MediatorSubsystems::addSubsystem(const QString& subsys_name, IMediatorPtr s
 
 IMediatorPtr& MediatorSubsystems::getSubsystem(const QString& command) noexcept(false)
 {
-    return subsystems_.at(matcher_.extractKey(command));
+    return subsystems_.at(command);
+    // return subsystems_.at(matcher_.extractKey(command));
 }
 
 void MediatorSubsystems::addSubsystemBinding( const QString& subsystem_name , const QString& binding_key)

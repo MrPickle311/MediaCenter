@@ -26,14 +26,20 @@ public:
     {
         BackendBuilder builder;
 
-        builder.addSubsystem("DataStorage" , mocks_.data_storage_)
+        builder.addSubsystem("MultimediaEngine" , mocks_.data_storage_)
                .addSubsystem("Environment" , mocks_.environment_)
                .addSubsystem("Settings" , mocks_.settings_);
 
-        builder.addSubsystemBinding("DataStorage" , "Search")
-               .addSubsystemBinding("DataStorage" , "Playlist")
-               .addSubsystemBinding("Settings"    , "Mediapaths")
-               .addSubsystemBinding("Settings"    , "Appdir");
+        #pragma warning "Change it into variadic template to simplifie code"
+        builder.addSubsystemBinding("MultimediaEngine" , "SearchAudio")
+               .addSubsystemBinding("MultimediaEngine" , "SearchVideo")
+               .addSubsystemBinding("MultimediaEngine" , "SearchImages")
+               .addSubsystemBinding("MultimediaEngine" , "PlaylistAudio")
+
+               .addSubsystemBinding("Settings"    , "MediapathsAudio")
+               .addSubsystemBinding("Settings"    , "MediapathsVideo")
+               .addSubsystemBinding("Settings"    , "MediapathsImages")
+               .addSubsystemBinding("Settings"    , "AppdirAudio");
                
         builder.setThreadsCount(10);
 
@@ -91,7 +97,16 @@ public:
         builder.addSubsystem("Audio" , mocks_.audio_)
                .addSubsystem("Video" , mocks_.video_)
                .addSubsystem("Images" , mocks_.images_)
-               .addSubsystem("Backend" , mocks_.backend_);
+               .addSubsystem("Backend" , mocks_.backend_)
+
+               .addSubsystemBinding("Audio" , "SearchAudio")
+               .addSubsystemBinding("Video" , "SearchVideo")
+               .addSubsystemBinding("Images" , "SearchImages")
+               .addSubsystemBinding("Audio" , "PlaylistAudio")
+
+               .addSubsystemBinding("Backend"    , "MediapathsAudio")
+               .addSubsystemBinding("Backend"    , "MediapathsVideo")
+               .addSubsystemBinding("Backend"    , "MediapathsImages");
 
         tested_mediator_ = builder.buildMultimediaEngine();
 

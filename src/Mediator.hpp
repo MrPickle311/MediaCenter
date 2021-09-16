@@ -31,7 +31,7 @@ public:
 public:
     void addSubsystem(const QString& subsys_name, IMediatorPtr subsystem);
     IMediatorPtr& getSubsystem(const QString& command) noexcept(false);
-    void addSubsystemBinding( const QString& subsystem_name , const QString& binding_key);
+    void addSubsystemBinding( const QString& subsystem_name , const QString& command);
     void setDesiredParserPos(int desired_parser_pos);
 };
 
@@ -64,6 +64,6 @@ public:
     MediatorBuilder();
 public:
     MediatorBuilder& addSubsystem(const QString& subsystem_name , IMediatorPtr subsystem);
-    MediatorBuilder& addSubsystemBinding(const QString& subsystem_name , const QString& binding_key);
+    MediatorBuilder& addSubsystemBinding(const QString& subsystem_name , const QString& command);
     MediatorPtr      build();
 };
