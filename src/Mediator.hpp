@@ -77,9 +77,13 @@ public:
     MediatorBuilder();
 public:
     MediatorBuilder& addSubsystem(const QString& subsystem_name , IMediatorPtr subsystem);
-    // MediatorBuilder& addSubsystemBinding(const QString& subsystem_name , const QString& command);
-
-    SubsystemProxy& at(const QString& subsystem_name );
-
+    SubsystemProxy&  at(const QString& subsystem_name );
     MediatorPtr      build();
+};
+
+//double builder
+
+class PairBuilder
+{
+
 };

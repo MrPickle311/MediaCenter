@@ -130,3 +130,20 @@ protected:
     MultimediaEngineMocks mocks_;
 };
 
+class MultimediaEngineIntegrationTests : public MediatorTester
+{
+public:
+    MultimediaEngineIntegrationTests()
+    {
+        MultimediaEngineBuilder me_builder;
+        BackendBuilder          backend_builder;
+        AudioBuilder            audio_builder;
+
+        backend_builder.addSubsystem("Audio" , mocks_.audio_);
+
+        backend_builder.at("Audio")
+                       .addBinding("SearchAudio");
+        
+
+    }
+};

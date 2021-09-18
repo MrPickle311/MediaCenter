@@ -111,6 +111,23 @@ TEST_F(MultimediaEngineTests , MultipleCall)
 
 
 
+TEST_F(MultimediaEngineIntegrationTests , Logic)
+{
+    auto audio_pack{factories_.loadQueryPackage("AudioSearch1")};
+
+    factories_.setMediator(backend);
+
+    auto audio_wrapper {factories_.produceQueryCaller(audio_pack)};
+
+    expectQueryAboutCall(audio , audio_pack);
+
+    appendFunctionWrapperToCallList(std::move(audio_wrapper));
+
+    start();
+}
+
+
+
 //TEST IDEA MULTIPLE BACKEND CALLS , MIX CALLS
 
 int main(int argc, char *argv[])
