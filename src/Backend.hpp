@@ -54,7 +54,7 @@ class Backend : public Mediator
 {
     Q_OBJECT;
     friend class BackendBuilder;
-private:
+public:
     Backend(uint threads_count);
 private:
     TaskManager task_manager_;

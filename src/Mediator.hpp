@@ -10,7 +10,7 @@ class IMediator : public QObject
 {
     Q_OBJECT
 public:
-    virtual ~IMediator(){}
+    virtual ~IMediator() = default;
     explicit IMediator(QObject *parent = nullptr);
 public:
     virtual QStringList queryAbout(const QString& command, const QStringList& args) = 0;
@@ -40,10 +40,8 @@ using MediatorSubsystemsPtr = std::shared_ptr<MediatorSubsystems>;
 class Mediator : public IMediator
 {
     friend class MediatorBuilder;
-protected:
-    Mediator();
 public:
-    virtual ~Mediator() = default;
+    Mediator();
 protected:
     std::shared_ptr<MediatorSubsystems> subsystems_;
 protected:
@@ -83,7 +81,8 @@ public:
 
 //double builder
 
-class PairBuilder
+class SystemBuilder
 {
-
+public:
+    SystemBuilder(){}
 };

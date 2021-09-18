@@ -30,7 +30,8 @@ void MediatorSubsystems::setDesiredParserPos(int desired_parser_pos)
     this->matcher_.setDesiredParsedPos(desired_parser_pos);
 }
 
-Mediator::Mediator()
+Mediator::Mediator():
+    subsystems_{nullptr}
 {
     QObject::connect(this , &Mediator::requestAction ,
                      this , &Mediator::redirectRequestAction);
