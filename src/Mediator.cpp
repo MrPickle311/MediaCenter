@@ -31,7 +31,7 @@ void MediatorSubsystems::setDesiredParserPos(int desired_parser_pos)
 }
 
 Mediator::Mediator():
-    subsystems_{nullptr}
+    subsystems_{std::make_shared<MediatorSubsystems>()}
 {
     QObject::connect(this , &Mediator::requestAction ,
                      this , &Mediator::redirectRequestAction);
@@ -117,4 +117,33 @@ MediatorPtr MediatorBuilder::build()
     resetSubsystems();
 
     return mediator;
+}
+
+void SystemConfigurator::connection_engine(const QString& first , const QString& second)
+{
+    mediators_subsystems_.at(first)->addSubsystem(second , mediators_.at(second));
+}
+
+void SystemConfigurator::addMediator(MediatorPtr mediator , const QString& subsystem_name)
+{
+    mediators_[subsystem_name] = mediator;
+    mediators_subsystems_[subsystem_name] = mediator->subsystems_;
+}
+
+void SystemConfigurator::connect(const QString& first , const QString& second)
+{
+    connection_engine(first , second);
+    connection_engine(second , first);
+}
+
+SystemConfigurator&  SystemConfigurator::from(const QString& subsystem_name)
+{
+    proxy_.setSubsystems(mediators_subsystems_.at(subsystem_name));
+    return *this;
+}
+
+SubsystemProxy& SystemConfigurator::to(const QString& subsystem_name)
+{
+    proxy_.setTargetToBind(subsystem_name);
+    return proxy_;
 }

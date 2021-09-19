@@ -93,44 +93,13 @@ private:
 
     QString current_mediator;
 
+
     SubsystemProxy  proxy_;
 private:
-    void connection_engine(const QString& first , const QString& second)
-    {
-        mediators_subsystems_.at(first)->addSubsystem(first , mediators_.at(second));
-    }
+    void connection_engine(const QString& first , const QString& second);
 public:
-    void addMediator(MediatorPtr mediator , const QString& subsystem_name)
-    {
-        mediators_[subsystem_name] = mediator;
-        mediators_subsystems_[subsystem_name] = std::make_shared<MediatorSubsystems>();
-    }
-    void connect(const QString& first , const QString& second)
-    {
-        connection_engine(first , second);
-        connection_engine(second , first);
-    }
-
-    SystemConfigurator&  from(const QString& subsystem_name)
-    {
-        proxy_.setSubsystems(mediators_subsystems_.at(subsystem_name));
-        return *this;
-    }
-
-    SubsystemProxy& to(const QString& subsystem_name)
-    {
-        proxy_.setTargetToBind(subsystem_name);
-        return proxy_;
-    }
-
-    void configure()
-    {
-        for(auto&& pair : mediators_)
-        {
-            auto& key{pair.first};
-
-            mediators_.at(key)->subsystems_ = mediators_subsystems_.at(key); 
-        }
-    }
-
+    void addMediator(MediatorPtr mediator , const QString& subsystem_name);
+    void connect(const QString& first , const QString& second);
+    SystemConfigurator&  from(const QString& subsystem_name);
+    SubsystemProxy& to(const QString& subsystem_name);
 };

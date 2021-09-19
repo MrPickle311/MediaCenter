@@ -165,7 +165,5 @@ public:
 
         conf.from("MultimediaEngine").to("Backend")
                 .addBinding("MediapathsAudio");
-
-        conf.configure();
     }
 };
