@@ -67,11 +67,6 @@ QStringList Mediator::queryAbout(const QString& command, const QStringList& args
     }
 }
 
-void SubsystemProxy::setSubsystems(MediatorSubsystemsPtr subsys) 
-{
-    this->subsystems_ = subsys;
-}
-
 // builder
 
 MediatorBuilder::MediatorBuilder():
@@ -94,13 +89,23 @@ MediatorBuilder& MediatorBuilder::addSubsystem(const QString& subsystem_name , s
 
 SubsystemProxy& MediatorBuilder::at(const QString& subsystem_name) 
 {
-    proxy_.current_subsystem_ = subsystem_name;
+    proxy_.target_to_bind_ = subsystem_name;
     return proxy_;
+}
+
+void SubsystemProxy::setSubsystems(MediatorSubsystemsPtr subsys) 
+{
+    this->subsystems_ = subsys;
+}
+
+void SubsystemProxy::setTargetToBind(const QString& target_name) 
+{
+    this->target_to_bind_ = target_name;
 }
 
 SubsystemProxy& SubsystemProxy::addBinding(const QString& command) 
 {
-    subsystems_->addSubsystemBinding(current_subsystem_ , command);
+    subsystems_->addSubsystemBinding(target_to_bind_ , command);
     return *this;
 }
 

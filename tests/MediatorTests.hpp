@@ -130,19 +130,22 @@ protected:
     MultimediaEngineMocks mocks_;
 };
 
+using AudioEngine = Mediator;
+
 class MultimediaEngineIntegrationTests : public MediatorTester
 {
 protected:
-    IMediatorPtr backend_;
-    IMediatorPtr multimedia_engine_;
-    IMediatorPtr audio_engine_;
+    MediatorPtr backend_;
+    MediatorPtr multimedia_engine_;
+    MediatorPtr audio_engine_;
 public:
     MultimediaEngineIntegrationTests():
-        backend_{std::make_shared<Backend>()} ,
+        MediatorTester{"test_data/QueryAboutData.json" , "test_data/RequestActionData.json"} ,
+        backend_{std::make_shared<Backend>(5)} ,
         multimedia_engine_{std::make_shared<MultimediaEngine>()} ,
         audio_engine_{std::make_shared<AudioEngine>()}
     {
-        Configurator conf;
+        SystemConfigurator conf;
 
         conf.addMediator(backend_ , "Backend");
         conf.addMediator(multimedia_engine_ , "MultimediaEngine");
@@ -152,10 +155,10 @@ public:
         conf.connect("MultimediaEngine" , "AudioEngine");
 
         conf.from("Backend").to("MultimediaEngine")
-                .addBinding("SearchAudio")
+                .addBinding("SearchAudio");
         
         conf.from("MultimediaEngine").to("AudioEngine")
-                .addBinding("SearchAudio")
+                .addBinding("SearchAudio");
         
         conf.from("AudioEngine").to("MultimediaEngine")
                 .addBinding("MediapathsAudio");
