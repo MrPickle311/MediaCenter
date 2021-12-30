@@ -4,13 +4,13 @@ cleanupDir(){
     rm -rf $1 && mkdir $1
 }
 
-# it selects the latest Qt 5.* version
-# @return /home/USER/Qt/5.* list
+# it selects the latest Qt 6.* version
+# @return /home/USER/Qt/6.* list
 detectQtVersion(){
     declare -n arr="$1"
     while read -d $'\0' file ;do
         arr+=($file)
-    done < <(find /home/$USER/Qt -maxdepth 1 -name "5.*" -print0)
+    done < <(find /home/$USER/Qt -maxdepth 1 -name "6.*" -print0)
 }
 
 # this function returns selected /home/USER/Qt/5.* via first argument
@@ -20,7 +20,7 @@ promptAboutQtVersion(){
     detectQtVersion qt_versions
 
     if [ ${#qt_versions[@]} -gt 1 ]; then
-        echo "Multiple Qt5 versions detected:" 
+        echo "Multiple Qt6 versions detected:" 
         printf '%s\n' "${qt_versions[@]}"
 
         echo "Pass the desired Qt5 version ( SELECT INDEX , which starts from 0 ): "

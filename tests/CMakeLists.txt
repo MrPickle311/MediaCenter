@@ -35,8 +35,6 @@ endif ()
 
 include_directories(${GTestIncludes})
 
-add_subdirectory(common_utils)
-include_directories(common_utils)
 
 set(INCLUDES
     ${GTestIncludes}
@@ -50,17 +48,27 @@ set(INCLUDES
 
 
 set(LIBS
-    ALL_LIBRARIES
+    Common
     COMMON_UTILS
 )
 
+set(SourceDir ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+set(CommonDir ${SourceDir}/Common)
+set(ModulesEssentialsDir ${CommonDir}/ModulesEssentials)
+
+include_directories(${ModulesEssentialsDir})
+
+add_subdirectory(common_utils)
+include_directories(common_utils)
+
 set(TESTED_HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/Backend.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/Environment.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/Mediator.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/Proxy.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utilities/ThreadsafeQueue.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/utilities/TaskManager.hpp
+    ${ModulesEssentialsDir}/Backend.hpp
+    ${ModulesEssentialsDir}/MultimediaEngine.hpp
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../src/Environment.hpp
+    ${ModulesEssentialsDir}/Mediator.hpp
+    ${ModulesEssentialsDir}/Proxy.hpp
+    ${ModulesEssentialsDir}/ThreadsafeQueue.hpp
+    ${ModulesEssentialsDir}/TaskManager.hpp
 )
 
 enable_testing()
@@ -79,8 +87,14 @@ function(add_test name)
        PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
     gtest_discover_tests(${name})
     target_link_libraries(${name} PRIVATE
-       Threads::Threads Qt5::Core Qt5::Quick Qt5::SerialPort 
-       ${LIBS} ${Boost_LIBRARIES} )
+       Threads::Threads 
+       Qt6::Core 
+       Qt6::Quick 
+       Qt6::SerialPort 
+       Qt6::DBus 
+       ${LIBS} 
+       ${Boost_LIBRARIES} 
+       )
 endfunction()
 
 add_test(MediatorTests) 

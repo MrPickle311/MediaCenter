@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 
 project(MediaCenter VERSION 0.1 LANGUAGES CXX)
 
@@ -15,59 +15,64 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Quick Multimedia SerialPort  REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Quick Multimedia SerialPort REQUIRED)
+find_package(QT NAMES Qt6 COMPONENTS Core Quick Multimedia SerialPort DBus  REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Quick Multimedia SerialPort DBus REQUIRED)
 find_package(Boost 1.71.0)
 
 if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(MediaCenter
-        MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
-    )
-else()
-    if(ANDROID)
-        add_library(MediaCenter SHARED
-            ${PROJECT_SOURCES}
-        )
-    else()
-        add_executable(MediaCenter
-          ${PROJECT_SOURCES}
-        )
-    endif()
-endif()
-
-target_compile_definitions(MediaCenter
-  PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
-target_link_libraries(MediaCenter
-  PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Quick Qt${QT_VERSION_MAJOR}::Multimedia)
-
-set_target_properties(MediaCenter PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-)
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    CXX_STANDARD 17
-    CMAKE_CXX_STANDARD_REQUIRED ON
-    )
-
-
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_import_qml_plugins(MediaCenter)
-    qt_finalize_executable(MediaCenter)
-endif()
-
-set(HEADERS_DIRS 
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_SOURCE_DIR}/src/utilities
-    )
-
-include_directories(${HEADERS_DIRS})
+# if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+#     qt_add_executable(MediaCenter
+#         MANUAL_FINALIZATION
+#         ${PROJECT_SOURCES}
+#     )
+# else()
+#     if(ANDROID)
+#         add_library(MediaCenter SHARED
+#             ${PROJECT_SOURCES}
+#         )
+#     else()
+#         add_executable(MediaCenter
+#           ${PROJECT_SOURCES}
+#         )
+#     endif()
+# endif()
 
 add_subdirectory(src)
+
+target_compile_definitions(Common
+    PUBLIC $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
+
+target_link_libraries(Common
+  	Qt${QT_VERSION_MAJOR}::Core 
+  	Qt${QT_VERSION_MAJOR}::Quick 
+  	Qt${QT_VERSION_MAJOR}::Multimedia
+  	Qt${QT_VERSION_MAJOR}::DBus)
+
+# set_target_properties(MediaCenter PROPERTIES
+#     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
+#     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+#     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+# )
+
+set_target_properties(Common PROPERTIES
+    CXX_STANDARD 17
+    CMAKE_CXX_STANDARD_REQUIRED ON
+)
+
+
+# if(QT_VERSION_MAJOR EQUAL 6)
+#     qt_import_qml_plugins(MediaCenter)
+#     qt_finalize_executable(MediaCenter)
+# endif()
+
+# set(HEADERS_DIRS 
+#     ${PROJECT_SOURCE_DIR}/src
+#     ${PROJECT_SOURCE_DIR}/src/utilities
+#     )
+
+# include_directories(${HEADERS_DIRS})
+
 add_subdirectory(tests)

@@ -21,7 +21,8 @@
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "visualizerFile": "/home/damiano/.config/Code/User/workspaceStorage/46322d05f52671aa6e430165b8515654/tonka3000.qtvsctools/qt.natvis.xml"
         }
     ]
 }
