@@ -1,4 +1,4 @@
-set(common_utils_headers
+set(headers
     QFunctionWrapper.hpp
     Mock.hpp
     EventLoop.hpp
@@ -9,7 +9,7 @@ set(common_utils_headers
     MediatorTester.hpp
     )
 
-set(common_utils_sources
+set(sources
     QFunctionWrapper.cpp
     Mock.cpp
     EventLoop.cpp
@@ -20,10 +20,10 @@ set(common_utils_sources
     MediatorTester.cpp
     )
 
-add_library(COMMON_UTILS STATIC
-    ${common_utils_headers}
-    ${common_utils_sources} )
+add_library(TestingUtils STATIC
+    ${headers}
+    ${sources} )
 
-target_link_libraries(COMMON_UTILS Qt6::Core)
+target_link_libraries(TestingUtils Qt6::Core)
 
-set_target_properties(COMMON_UTILS PROPERTIES LINKER_LANGUAGE CXX CMAKE_CXX_STANDARD 17 )
+set_target_properties(TestingUtils PROPERTIES LINKER_LANGUAGE CXX CMAKE_CXX_STANDARD 17 )

@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.5)
-
 project(Tests LANGUAGES CXX)
 
 ##generated stuff
@@ -36,9 +34,9 @@ endif ()
 include_directories(${GTestIncludes})
 
 
-set(INCLUDES
+set(Includes
     ${GTestIncludes}
-    common_utils
+    TestingUtils
     )
 ##generated stuff END
 
@@ -47,9 +45,9 @@ set(INCLUDES
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../src build)
 
 
-set(LIBS
+set(Libs
     Common
-    COMMON_UTILS
+    TestingUtils
 )
 
 set(SourceDir ${CMAKE_CURRENT_SOURCE_DIR}/../src)
@@ -58,10 +56,10 @@ set(ModulesEssentialsDir ${CommonDir}/ModulesEssentials)
 
 include_directories(${ModulesEssentialsDir})
 
-add_subdirectory(common_utils)
-include_directories(common_utils)
+add_subdirectory(TestingUtils)
+include_directories(TestingUtils)
 
-set(TESTED_HEADERS
+set(TestedHeaders
     ${ModulesEssentialsDir}/Backend.hpp
     ${ModulesEssentialsDir}/MultimediaEngine.hpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/../src/Environment.hpp
@@ -82,7 +80,7 @@ endif()
 
 function(add_test name)
     add_executable(${name} ${name}.hpp ${name}.cpp ${GTestFiles} ${TESTED_HEADERS})
-    target_include_directories(${name} PUBLIC ${INCLUDES})
+    target_include_directories(${name} PUBLIC ${Includes})
     target_compile_definitions(${name}
        PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
     gtest_discover_tests(${name})
@@ -92,7 +90,7 @@ function(add_test name)
        Qt6::Quick 
        Qt6::SerialPort 
        Qt6::DBus 
-       ${LIBS} 
+       ${Libs} 
        ${Boost_LIBRARIES} 
        )
 endfunction()

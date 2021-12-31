@@ -2,7 +2,7 @@
 
 #include <gmock/gmock.h>
 
-#include "common_utils/MediatorTester.hpp"
+#include "TestingUtils/MediatorTester.hpp"
 #include <Backend.hpp>
 #include <MultimediaEngine.hpp>
 
