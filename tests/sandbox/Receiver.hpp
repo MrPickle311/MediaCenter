@@ -13,12 +13,8 @@ public:
   Receiver();
 
 private:
-  std::unique_ptr<QDBusInterface> caller_iface_;
-  QDBusServiceWatcher watcher_;
+  QDBusInterface caller_iface_;
 public slots:
   Q_NOREPLY void coughtReply(QString msg);
-  void call();
-  void initInterface(const QString &service);
-signals:
-  void query(QString msg);
+  QString callForString(const QString &args);
 };

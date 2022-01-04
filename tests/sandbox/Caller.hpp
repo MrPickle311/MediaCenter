@@ -15,6 +15,5 @@ private:
 public slots:
   Q_NOREPLY void coughtReply(QString msg);
   void call();
-signals:
-  void query(QString msg);
+  void blockingCall();
 };

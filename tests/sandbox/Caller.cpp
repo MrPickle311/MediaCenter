@@ -25,15 +25,20 @@ void Caller::call() {
   receceiver_iface_.call("coughtReply", "Hello!");
 }
 
+void Caller::blockingCall() {
+  QDBusReply<QString> res = receceiver_iface_.call("callForString", "Hello ");
+  std::cout << res.value().toStdString() << '\n';
+}
+
 int main(int argc, char **argv) {
   QCoreApplication app(argc, argv);
 
   Caller caller;
 
+  QDBusConnection::sessionBus().registerService(service_name);
   QDBusConnection::sessionBus().registerObject("/caller", &caller,
                                                QDBusConnection::ExportAllSlots);
 
-  QDBusConnection::sessionBus().registerService(service_name);
-  QTimer::singleShot(100, &caller, &Caller::call);
+  QTimer::singleShot(100, &caller, &Caller::blockingCall);
   return app.exec();
 }

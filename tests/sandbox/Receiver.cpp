@@ -6,30 +6,17 @@ static constexpr auto service_name{"org.receiver"};
 static constexpr auto remote_service_name{"org.caller"};
 
 Receiver::Receiver()
-    : QObject{nullptr}, caller_iface_{nullptr},
-      watcher_{remote_service_name, QDBusConnection::sessionBus()} {
-
-  connect(&watcher_, &QDBusServiceWatcher::serviceRegistered, this,
-          &Receiver::initInterface);
-}
-
-void Receiver::initInterface(const QString &service) {
-
-  std::cout << "Service registered!\n";
-  caller_iface_ = std::make_unique<QDBusInterface>(
-      remote_service_name, "/caller", "", QDBusConnection::sessionBus());
-
-  if (caller_iface_->isValid()) {
-    std::cout << "Caller interface is valid!\n";
-  }
-}
+    : QObject{nullptr}, caller_iface_{remote_service_name, "/caller", "",
+                                      QDBusConnection::sessionBus()} {}
 
 void Receiver::coughtReply(QString msg) {
   std::cout << "Receiver cought a reply! : " << msg.toStdString() << '\n';
-  auto sth = caller_iface_->call("coughtReply", "Hello!");
+  auto sth = caller_iface_.call("coughtReply", "Hello!");
 }
 
-void Receiver::call() {}
+QString Receiver::callForString(const QString &args) {
+  return args + " World!";
+}
 
 int main(int argc, char **argv) {
   QCoreApplication app(argc, argv);
