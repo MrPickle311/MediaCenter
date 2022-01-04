@@ -49,7 +49,8 @@ target_link_libraries(Common
   	Qt${QT_VERSION_MAJOR}::Core 
   	Qt${QT_VERSION_MAJOR}::Quick 
   	Qt${QT_VERSION_MAJOR}::Multimedia
-  	Qt${QT_VERSION_MAJOR}::DBus)
+  	Qt${QT_VERSION_MAJOR}::DBus
+)
 
 # set_target_properties(MediaCenter PROPERTIES
 #     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

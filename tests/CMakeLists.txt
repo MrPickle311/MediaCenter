@@ -56,6 +56,7 @@ set(ModulesEssentialsDir ${CommonDir}/ModulesEssentials)
 
 include_directories(${ModulesEssentialsDir})
 
+add_subdirectory(sandbox)
 add_subdirectory(TestingUtils)
 include_directories(TestingUtils)
 
@@ -95,7 +96,7 @@ function(add_test name)
        )
 endfunction()
 
-add_test(MediatorTests) 
+# add_test(MediatorTests) 
 #add_test(MultimediaEngineTests)
 #add_test(ThreadsafeQueueTests)
 #add_test(TaskManagerTests)
