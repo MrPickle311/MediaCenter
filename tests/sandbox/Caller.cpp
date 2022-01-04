@@ -22,7 +22,7 @@ void Caller::coughtReply(QString msg) {
 
 void Caller::call() {
   std::cout << "Timer works!\n";
-  receceiver_iface_.asyncCall("coughtReply", "Hello!");
+  receceiver_iface_.call("coughtReply", "Hello!");
 }
 
 int main(int argc, char **argv) {

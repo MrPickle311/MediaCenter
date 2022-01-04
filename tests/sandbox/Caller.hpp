@@ -13,7 +13,7 @@ public:
 private:
   QDBusInterface receceiver_iface_;
 public slots:
-  void coughtReply(QString msg);
+  Q_NOREPLY void coughtReply(QString msg);
   void call();
 signals:
   void query(QString msg);

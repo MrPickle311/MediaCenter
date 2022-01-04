@@ -16,7 +16,7 @@ private:
   std::unique_ptr<QDBusInterface> caller_iface_;
   QDBusServiceWatcher watcher_;
 public slots:
-  void coughtReply(QString msg);
+  Q_NOREPLY void coughtReply(QString msg);
   void call();
   void initInterface(const QString &service);
 signals:

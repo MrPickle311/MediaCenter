@@ -26,7 +26,7 @@ void Receiver::initInterface(const QString &service) {
 
 void Receiver::coughtReply(QString msg) {
   std::cout << "Receiver cought a reply! : " << msg.toStdString() << '\n';
-  caller_iface_->asyncCall("coughtReply", "Hello!");
+  auto sth = caller_iface_->call("coughtReply", "Hello!");
 }
 
 void Receiver::call() {}
