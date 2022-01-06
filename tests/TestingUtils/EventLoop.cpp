@@ -1,17 +1,17 @@
 #include "EventLoop.hpp"
+
+#include <QTimer>
 #include <thread>
 
-void DelayedEventLoop::emitDelayedStartSignal() {
-  std::this_thread::sleep_for(this->delay_);
-  emit runned();
+DelayedEventLoop::DelayedEventLoop(TimeType delay) : delay_{delay} {}
+
+void DelayedEventLoop::startTestEventLoop()
+{
+    QTimer::singleShot(delay_, this, &DelayedEventLoop::runned);
+    loop_.exec();
 }
 
-DelayedEventLoop::DelayedEventLoop(int ms) : delay_{ms} {}
-
-void DelayedEventLoop::startTestEventLoop() {
-  std::thread th{&DelayedEventLoop::emitDelayedStartSignal, this};
-  loop_.exec();
-  th.join();
+void DelayedEventLoop::killTestEventLoop()
+{
+    loop_.quit();
 }
-
-void DelayedEventLoop::killTestEventLoop() { loop_.quit(); }

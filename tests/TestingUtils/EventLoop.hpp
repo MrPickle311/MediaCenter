@@ -1,12 +1,13 @@
 #pragma once
 
-#include <QObject>
 #include <QEventLoop>
+#include <QObject>
 #include <future>
 
 class IEventLoop : public QObject
 {
     Q_OBJECT;
+
 public:
     virtual void startTestEventLoop() = 0;
 public slots:
@@ -18,13 +19,16 @@ signals:
 class DelayedEventLoop : public IEventLoop
 {
     Q_OBJECT;
-private:
-    QEventLoop                loop_;
-    std::chrono::milliseconds delay_;
-private:
-    void emitDelayedStartSignal();
+
 public:
-    DelayedEventLoop(int ms = 100);
+    using TimeType = std::chrono::milliseconds;
+
+private:
+    QEventLoop loop_;
+    TimeType delay_;
+
+public:
+    DelayedEventLoop(TimeType delay = TimeType{100});
     virtual void startTestEventLoop();
 public slots:
     virtual void killTestEventLoop();

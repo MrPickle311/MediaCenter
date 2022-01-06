@@ -53,8 +53,10 @@ set(Libs
 set(SourceDir ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 set(CommonDir ${SourceDir}/Common)
 set(ModulesEssentialsDir ${CommonDir}/ModulesEssentials)
+set(SystemNodeDir ${ModulesEssentialsDir}/SystemNode)
 
 include_directories(${ModulesEssentialsDir})
+include_directories(${SystemNodeDir})
 
 add_subdirectory(sandbox)
 add_subdirectory(TestingUtils)
@@ -70,6 +72,7 @@ set(TestedHeaders
     ${ModulesEssentialsDir}/Proxy.hpp
     ${ModulesEssentialsDir}/ThreadsafeQueue.hpp
     ${ModulesEssentialsDir}/TaskManager.hpp
+    ${SystemNodeDir}/SystemNode.hpp
 )
 
 enable_testing()
@@ -86,7 +89,7 @@ function(add_test name)
     target_include_directories(${name} PUBLIC ${Includes})
     target_compile_definitions(${name}
        PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)
-    gtest_discover_tests(${name})
+    gtest_discover_tests(${name} DISCOVERY_TIMEOUT 300)
     target_link_libraries(${name} PRIVATE
        Threads::Threads 
        Qt6::Core 
