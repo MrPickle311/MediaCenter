@@ -7,7 +7,7 @@ static constexpr auto service_name{"org.caller"};
 static constexpr auto remote_service_name{"org.receiver"};
 
 Caller::Caller()
-    : QObject{nullptr}, receceiver_iface_{remote_service_name, "/receiver", "",
+    : QObject{nullptr}, receceiver_iface_{remote_service_name, "/", "",
                                           QDBusConnection::sessionBus()} {
   if (receceiver_iface_.connection().isConnected()) {
     std::cout << "Receiver interface is valid!\n";
@@ -36,9 +36,10 @@ int main(int argc, char **argv) {
   Caller caller;
 
   QDBusConnection::sessionBus().registerService(service_name);
-  QDBusConnection::sessionBus().registerObject("/caller", &caller,
+  QDBusConnection::sessionBus().registerObject("/", &caller,
                                                QDBusConnection::ExportAllSlots);
 
-  QTimer::singleShot(100, &caller, &Caller::blockingCall);
+  QTimer::singleShot(100, &caller, &Caller::call);
+  // QTimer::singleShot(200, &caller, &Caller::blockingCall);
   return app.exec();
 }
