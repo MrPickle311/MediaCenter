@@ -3,9 +3,6 @@ project(sandbox LANGUAGES CXX)
 set(CallerName Caller)
 set(ReceiverName  Receiver)
 
-find_package(QT NAMES Qt6 COMPONENTS Core DBus  REQUIRED)
-find_package(Qt6 COMPONENTS Core DBus REQUIRED)
-
 set(${CallerName}_sources
     ${CallerName}.cpp
 )

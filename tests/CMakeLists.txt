@@ -58,6 +58,8 @@ include_directories(${ModulesEssentialsDir})
 
 add_subdirectory(sandbox)
 add_subdirectory(TestingUtils)
+
+
 include_directories(TestingUtils)
 
 set(TestedHeaders
@@ -95,6 +97,8 @@ function(add_test name)
        ${Boost_LIBRARIES} 
        )
 endfunction()
+
+add_subdirectory(Common)
 
 # add_test(MediatorTests) 
 #add_test(MultimediaEngineTests)
