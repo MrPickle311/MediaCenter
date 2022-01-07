@@ -2,6 +2,8 @@
 
 #include <QDBusConnection>
 #include <QDBusInterface>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QMap>
 
 #define DBusIncomingSignal Q_NOREPLY
@@ -19,13 +21,25 @@ public:
 class ISystemNodeEnvironment
 {
 public:
+    virtual ~ISystemNodeEnvironment() = default;
     virtual void addSystemNode(QString node_name) = 0;
     virtual INodeHandle& getNodeHandle(QString node_name) = 0;
+};
+
+class IBehaviourController
+{
+public:
+    virtual ~IBehaviourController() = default;
+    virtual void onCoughtSignal(QJsonDocument message) = 0;
+    virtual QJsonDocument onRequestedData(QJsonDocument command) = 0;
 };
 
 class ISystemNode : public QObject
 {
     Q_OBJECT;
+
+public:
+    ~ISystemNode() = default;
 protected slots:
     virtual DBusIncomingSignal void coughtSignal(QByteArray message) = 0;
 
@@ -43,6 +57,8 @@ class NodeHandle : public INodeHandle
 
 private:
     NodeHandleInternalType iface_;
+    static const QString coughtSignal_;
+    static const QString requestedData_;
 
 private:
     NodeHandleInternalType createNewNodeHandle(QString node_name);
@@ -55,6 +71,7 @@ public:
     virtual QByteArray requestData(QByteArray command);
 };
 
+
 // class SystemNodeEnvironment : public ISystemNodeEnvironment
 // {
 // private:
@@ -66,23 +83,28 @@ public:
 
 class SystemNode : public ISystemNode
 {
+    Q_OBJECT;
     friend class SystemNodeBuilder;
 
-    using NodeEnvironmentType = std::unique_ptr<ISystemNodeEnvironment>;
+    using NodeEnvironmentType = std::shared_ptr<ISystemNodeEnvironment>;
+    using BehaviourControllerType = std::shared_ptr<IBehaviourController>;
 
 private:
     QString node_name_;
 
     NodeEnvironmentType env_;
+    BehaviourControllerType behaviour__controller_;
 
 private:
     void registerThisNode(const QString& node_name);
 
 public:
-    SystemNode(const QString& node_name, NodeEnvironmentType environment);
+    SystemNode(const QString& node_name,
+               NodeEnvironmentType environment,
+               BehaviourControllerType behaviour__controller);
 protected slots:
-    DBusIncomingSignal virtual void coughtSignal(QByteArray message);
-    QByteArray virtual requestedData(QByteArray command);
+    virtual void coughtSignal(QByteArray message);
+    virtual QByteArray requestedData(QByteArray command);
 public slots:
     virtual void sendSignal(QString target_node, QByteArray message);
     virtual QByteArray requestData(QString name, QByteArray command);
