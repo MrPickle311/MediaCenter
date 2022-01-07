@@ -1,3 +1,7 @@
+add_subdirectory(SystemNode)
+
+set(Library ModulesEssentials)
+
 set(sources
     Matcher.cpp
     Mediator.cpp
@@ -17,11 +21,11 @@ set(headers
     Backend.hpp
 )
 
-add_library(ModulesEssentials STATIC
+add_library(${Library} STATIC
             ${sources}
             ${headers}
 )
 
-target_link_libraries(ModulesEssentials Qt6::Core)
+target_link_libraries(${Library} Qt6::Core SystemNode)
 
-set_target_properties(ModulesEssentials PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(${Library} PROPERTIES LINKER_LANGUAGE CXX)
