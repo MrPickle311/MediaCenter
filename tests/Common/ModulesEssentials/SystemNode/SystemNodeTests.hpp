@@ -9,6 +9,13 @@
 namespace tests
 {
 
+class NodeHandleMock : public common::INodeHandle
+{
+public:
+    MOCK_METHOD(void, sendSignal, (QByteArray message), (override));
+    MOCK_METHOD(QByteArray, requestData, (QByteArray command), (override));
+};
+
 class SystemNodeEnvironmentMock : public common::ISystemNodeEnvironment
 {
 public:
@@ -29,10 +36,21 @@ public:
                 (override));
 };
 
+// class DBusTester : public common::NodeHandle
+// {
+//     Q_OBJECT;
+
+// public:
+//     DBusTester(QString tested_node_name);
+// };
+
 class SystemNodeTests : public ::testing::Test
 {
 public:
     SystemNodeTests();
+
+protected:
+    const QString test_node_name_{"org.media.testing"};
 
 protected:
     std::shared_ptr<SystemNodeEnvironmentMock> env_mock_;

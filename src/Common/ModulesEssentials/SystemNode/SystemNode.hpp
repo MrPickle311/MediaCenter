@@ -14,6 +14,7 @@ namespace common
 class INodeHandle
 {
 public:
+    virtual ~INodeHandle() = default;
     virtual void sendSignal(QByteArray message) = 0;
     virtual QByteArray requestData(QByteArray command) = 0;
 };
@@ -59,12 +60,13 @@ private:
     NodeHandleInternalType iface_;
     static const QString coughtSignal_;
     static const QString requestedData_;
+    static const QString no_interface_;
 
 private:
-    NodeHandleInternalType createNewNodeHandle(QString node_name);
+    NodeHandleInternalType createNewNodeHandle(QString node_name, QString path);
 
 public:
-    NodeHandle(QString node_name);
+    NodeHandle(QString node_name, QString default_path = {"/"});
 
 public:
     virtual void sendSignal(QByteArray message);
@@ -97,17 +99,18 @@ private:
 
 private:
     void registerThisNode(const QString& node_name);
+    void makeNodeAvailable();
 
 public:
     SystemNode(const QString& node_name,
                NodeEnvironmentType environment,
                BehaviourControllerType behaviour__controller);
-protected slots:
+public slots:
     virtual void coughtSignal(QByteArray message);
     virtual QByteArray requestedData(QByteArray command);
 public slots:
     virtual void sendSignal(QString target_node, QByteArray message);
-    virtual QByteArray requestData(QString name, QByteArray command);
+    virtual QByteArray requestData(QString target_node, QByteArray command);
 };
 
 } // namespace common

@@ -1,22 +1,40 @@
 #include "SystemNode.hpp"
 
 #include <QDBusReply>
+#include <iostream>
 
 namespace common
 {
 
 const QString NodeHandle::coughtSignal_{"coughtSignal"};
 const QString NodeHandle::requestedData_{"requestedData"};
+const QString NodeHandle::no_interface_{""};
 
 NodeHandle::NodeHandleInternalType
-NodeHandle::createNewNodeHandle(QString node_name)
+NodeHandle::createNewNodeHandle(QString node_name, QString path)
 {
-    return std::make_unique<QDBusInterface>(
-        node_name, "/", "", QDBusConnection::sessionBus());
+    std::unique_ptr<QDBusInterface> temp;
+    try
+    {
+        temp = std::make_unique<QDBusInterface>(
+            node_name, path, no_interface_, QDBusConnection::sessionBus());
+    }
+    catch (const std::exception& e)
+    {
+        if (!temp)
+        {
+            std::cout << "Nullptr!\n";
+        }
+        std::cout << "Error : " << e.what() << '\n';
+        throw;
+    }
+
+
+    return temp;
 }
 
-NodeHandle::NodeHandle(QString node_name) :
-    iface_{createNewNodeHandle(node_name)}
+NodeHandle::NodeHandle(QString node_name, QString default_path) :
+    iface_{createNewNodeHandle(node_name, default_path)}
 {}
 
 void NodeHandle::sendSignal(QByteArray command)
@@ -26,7 +44,16 @@ void NodeHandle::sendSignal(QByteArray command)
 
 QByteArray NodeHandle::requestData(QByteArray command)
 {
-    QDBusReply<QByteArray> result = iface_->call(requestedData_, command);
+    QDBusReply<QByteArray> result;
+    try
+    {
+        result = iface_->call(requestedData_, command);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+
     return result;
 }
 
@@ -39,15 +66,32 @@ SystemNode::SystemNode(const QString& node_name,
     behaviour__controller_{behaviour__controller}
 {
     registerThisNode(node_name);
+    makeNodeAvailable();
 }
 
-void SystemNode::coughtSignal(QByteArray message) {}
+void SystemNode::coughtSignal(QByteArray message)
+{
+    QJsonDocument doc{QJsonDocument::fromJson(message)};
 
-QByteArray SystemNode::requestedData(QByteArray command) {}
+    behaviour__controller_->onCoughtSignal(doc);
+}
 
-void SystemNode::sendSignal(QString target_node, QByteArray message) {}
+QByteArray SystemNode::requestedData(QByteArray command)
+{
+    QJsonDocument doc{QJsonDocument::fromJson(command)};
 
-QByteArray SystemNode::requestData(QString name, QByteArray command) {}
+    return behaviour__controller_->onRequestedData(doc).toJson();
+}
+
+void SystemNode::sendSignal(QString target_node, QByteArray message)
+{
+    env_->getNodeHandle(target_node).sendSignal(std::move(message));
+}
+
+QByteArray SystemNode::requestData(QString target_node, QByteArray command)
+{
+    return env_->getNodeHandle(target_node).requestData(command);
+}
 
 // Void SystemNode::addSystemNode(QString name)
 // {
@@ -60,7 +104,12 @@ QByteArray SystemNode::requestData(QString name, QByteArray command) {}
 
 void SystemNode::registerThisNode(const QString& node_name)
 {
-    QDBusConnection::sessionBus().registerService(node_name);
+    auto state = QDBusConnection::sessionBus().registerService(node_name);
 }
 
+void SystemNode::makeNodeAvailable()
+{
+    auto state = QDBusConnection::sessionBus().registerObject(
+        "/", this, QDBusConnection::ExportAllSlots);
+}
 } // namespace common
