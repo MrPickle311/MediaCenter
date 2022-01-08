@@ -4,7 +4,7 @@
 #include <QDBusInterface>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QMap>
+#include <map>
 
 #define DBusIncomingSignal Q_NOREPLY
 
@@ -17,6 +17,7 @@ public:
     virtual ~INodeHandle() = default;
     virtual void sendSignal(QByteArray message) = 0;
     virtual QByteArray requestData(QByteArray command) = 0;
+    virtual QString getNodeName() const = 0;
 };
 
 class ISystemNodeEnvironment
@@ -25,6 +26,7 @@ public:
     virtual ~ISystemNodeEnvironment() = default;
     virtual void addSystemNode(QString node_name) = 0;
     virtual INodeHandle& getNodeHandle(QString node_name) = 0;
+    virtual uint getNodeHandlesCount() const = 0;
 };
 
 class IBehaviourController
@@ -57,10 +59,13 @@ class NodeHandle : public INodeHandle
     using NodeHandleInternalType = std::unique_ptr<QDBusInterface>;
 
 private:
-    NodeHandleInternalType iface_;
     static const QString coughtSignal_;
     static const QString requestedData_;
     static const QString no_interface_;
+
+private:
+    NodeHandleInternalType iface_;
+    QString name_;
 
 private:
     NodeHandleInternalType createNewNodeHandle(QString node_name, QString path);
@@ -71,17 +76,20 @@ public:
 public:
     virtual void sendSignal(QByteArray message);
     virtual QByteArray requestData(QByteArray command);
+    virtual QString getNodeName() const;
 };
 
 
-// class SystemNodeEnvironment : public ISystemNodeEnvironment
-// {
-// private:
-//     QMap<QString, INodeHandle> nodes_;
+class SystemNodeEnvironment : public ISystemNodeEnvironment
+{
+private:
+    std::map<QString, std::shared_ptr<INodeHandle>> nodes_;
 
-// private:
-//     void connectToNode(const QString& node_name);
-// };
+public:
+    virtual void addSystemNode(QString node_name);
+    virtual INodeHandle& getNodeHandle(QString node_name);
+    virtual uint getNodeHandlesCount() const;
+};
 
 class SystemNode : public ISystemNode
 {

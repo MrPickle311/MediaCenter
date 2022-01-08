@@ -34,7 +34,7 @@ NodeHandle::createNewNodeHandle(QString node_name, QString path)
 }
 
 NodeHandle::NodeHandle(QString node_name, QString default_path) :
-    iface_{createNewNodeHandle(node_name, default_path)}
+    iface_{createNewNodeHandle(node_name, default_path)}, name_{node_name}
 {}
 
 void NodeHandle::sendSignal(QByteArray command)
@@ -57,6 +57,27 @@ QByteArray NodeHandle::requestData(QByteArray command)
     return result;
 }
 
+QString NodeHandle::getNodeName() const
+{
+    return name_;
+}
+
+void SystemNodeEnvironment::addSystemNode(QString node_name)
+{
+    nodes_.insert(
+        std::make_pair(node_name, std::make_shared<NodeHandle>(node_name)));
+}
+
+INodeHandle& SystemNodeEnvironment::getNodeHandle(QString node_name)
+{
+    return *nodes_.at(node_name);
+}
+
+uint SystemNodeEnvironment::getNodeHandlesCount() const
+{
+    return nodes_.size();
+}
+
 
 SystemNode::SystemNode(const QString& node_name,
                        NodeEnvironmentType environment,
@@ -73,14 +94,14 @@ void SystemNode::coughtSignal(QByteArray message)
 {
     QJsonDocument doc{QJsonDocument::fromJson(message)};
 
-    behaviour__controller_->onCoughtSignal(doc);
+    behaviour__controller_->onCoughtSignal(std::move(doc));
 }
 
 QByteArray SystemNode::requestedData(QByteArray command)
 {
     QJsonDocument doc{QJsonDocument::fromJson(command)};
 
-    return behaviour__controller_->onRequestedData(doc).toJson();
+    return behaviour__controller_->onRequestedData(std::move(doc)).toJson();
 }
 
 void SystemNode::sendSignal(QString target_node, QByteArray message)
@@ -92,15 +113,6 @@ QByteArray SystemNode::requestData(QString target_node, QByteArray command)
 {
     return env_->getNodeHandle(target_node).requestData(command);
 }
-
-// Void SystemNode::addSystemNode(QString name)
-// {
-//     if (!nodes_.contains(name))
-//     {
-//         nodes_.insert(name, createNewNodeHandle(name));
-//         connectToNode(name);
-//     }
-// }
 
 void SystemNode::registerThisNode(const QString& node_name)
 {

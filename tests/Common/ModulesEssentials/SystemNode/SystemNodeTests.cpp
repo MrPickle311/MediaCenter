@@ -29,6 +29,92 @@ void SystemNodeTests::start()
     loop_.startTestEventLoop();
 }
 
+TEST(SystemNodeEnvironmentTests, AddingTest)
+{
+    QString node_name_1{"org.App.Node1"};
+    QString node_name_2{"org.App.Node2"};
+
+    common::SystemNodeEnvironment env;
+
+    EXPECT_EQ(env.getNodeHandlesCount(), 0);
+
+    env.addSystemNode(node_name_1);
+
+    EXPECT_EQ(env.getNodeHandlesCount(), 1);
+
+    env.addSystemNode(node_name_2);
+
+    EXPECT_EQ(env.getNodeHandlesCount(), 2);
+
+    env.addSystemNode(node_name_2);
+
+    EXPECT_EQ(env.getNodeHandlesCount(), 2);
+}
+
+void expectNodeNameEqualTo(common::INodeHandle& handle, QString name)
+{
+    EXPECT_STREQ(handle.getNodeName().toStdString().c_str(),
+                 name.toStdString().c_str());
+}
+
+TEST(SystemNodeEnvironmentTests, GettingTest)
+{
+    QString node_name_1{"org.App.Node1"};
+    QString node_name_2{"org.App.Node2"};
+
+    common::SystemNodeEnvironment env;
+
+    env.addSystemNode(node_name_1);
+
+    auto& node_handle_1 = env.getNodeHandle(node_name_1);
+
+    expectNodeNameEqualTo(node_handle_1, node_name_1);
+
+    EXPECT_EQ(env.getNodeHandlesCount(), 1);
+
+    env.addSystemNode(node_name_2);
+
+    auto& node_handle_2 = env.getNodeHandle(node_name_2);
+
+    expectNodeNameEqualTo(node_handle_2, node_name_2);
+
+    EXPECT_EQ(env.getNodeHandlesCount(), 2);
+
+    auto& node_handle_1a = env.getNodeHandle(node_name_1);
+
+    expectNodeNameEqualTo(node_handle_1a, node_name_1);
+}
+
+TEST(SystemNodeEnvironmentTests, SignalsTest)
+{
+    QString node_name_1{"org.App.Node1"};
+
+    common::SystemNodeEnvironment env;
+
+    env.addSystemNode(node_name_1);
+
+    auto& node_handle_1 = env.getNodeHandle(node_name_1);
+
+    node_handle_1.sendSignal(QByteArray{});
+
+    EXPECT_EQ(env.getNodeHandlesCount(), 1);
+}
+
+TEST(SystemNodeEnvironmentTests, ExceptionsTest)
+{
+    QString node_name_1{"org.App.Node1"};
+
+    common::SystemNodeEnvironment env;
+
+    env.addSystemNode(node_name_1);
+
+    auto& node_handle_1 = env.getNodeHandle(node_name_1);
+
+    node_handle_1.sendSignal(QByteArray{});
+
+    EXPECT_THROW(env.getNodeHandle("ABCD"), std::out_of_range);
+}
+
 TEST_F(SystemNodeTests, LocalTest)
 {
     QString node_name_1{"org.App.Node1"};

@@ -14,6 +14,7 @@ class NodeHandleMock : public common::INodeHandle
 public:
     MOCK_METHOD(void, sendSignal, (QByteArray message), (override));
     MOCK_METHOD(QByteArray, requestData, (QByteArray command), (override));
+    MOCK_METHOD(QString, getNodeName, (), (const));
 };
 
 class SystemNodeEnvironmentMock : public common::ISystemNodeEnvironment
@@ -24,6 +25,7 @@ public:
                 getNodeHandle,
                 (QString node_name),
                 (override));
+    MOCK_METHOD(uint, getNodeHandlesCount, (), (const));
 };
 
 class BehaviourControllerMock : public common::IBehaviourController
@@ -35,14 +37,6 @@ public:
                 (QJsonDocument command),
                 (override));
 };
-
-// class DBusTester : public common::NodeHandle
-// {
-//     Q_OBJECT;
-
-// public:
-//     DBusTester(QString tested_node_name);
-// };
 
 class SystemNodeTests : public ::testing::Test
 {
