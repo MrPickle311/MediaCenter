@@ -24,7 +24,6 @@ add_library(${Library} STATIC
 )
 
 target_link_libraries(${Library} 
-    Qt6::Core 
     SystemNode 
     Mediator
 )

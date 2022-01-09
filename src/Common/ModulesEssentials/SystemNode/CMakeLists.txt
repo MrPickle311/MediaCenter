@@ -13,6 +13,9 @@ add_library(${Library} STATIC
             ${headers}
 )
 
-target_link_libraries(${Library} Qt6::Core Qt6::DBus)
+target_link_libraries(${Library} 
+    Qt6::Core 
+    Qt6::DBus
+)
 
 set_target_properties(${Library} PROPERTIES LINKER_LANGUAGE CXX)

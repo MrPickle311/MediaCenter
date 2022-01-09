@@ -69,12 +69,12 @@ include_directories(TestingUtils)
 set(TestedHeaders
     ${ModulesEssentialsDir}/Backend.hpp
     ${ModulesEssentialsDir}/MultimediaEngine.hpp
-    # ${CMAKE_CURRENT_SOURCE_DIR}/../src/Environment.hpp
-    ${MediatorDir}/Mediator.hpp
     ${ModulesEssentialsDir}/Proxy.hpp
     ${ModulesEssentialsDir}/ThreadsafeQueue.hpp
     ${ModulesEssentialsDir}/TaskManager.hpp
     ${SystemNodeDir}/SystemNode.hpp
+    ${MediatorDir}/Mediator.hpp
+    ${MediatorDir}/Matcher.hpp
 )
 
 enable_testing()
@@ -87,7 +87,7 @@ if(Boost_FOUND)
 endif()
 
 function(add_test name)
-    add_executable(${name} ${name}.hpp ${name}.cpp ${GTestFiles} ${TESTED_HEADERS})
+    add_executable(${name} ${name}.hpp ${name}.cpp ${GTestFiles} ${TestedHeaders})
     target_include_directories(${name} PUBLIC ${Includes})
     target_compile_definitions(${name}
        PRIVATE $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>)

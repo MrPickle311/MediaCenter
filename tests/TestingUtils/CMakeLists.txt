@@ -24,6 +24,6 @@ add_library(TestingUtils STATIC
     ${headers}
     ${sources} )
 
-target_link_libraries(TestingUtils Qt6::Core)
+target_link_libraries(TestingUtils Qt6::Core Qt6::DBus)
 
 set_target_properties(TestingUtils PROPERTIES LINKER_LANGUAGE CXX CMAKE_CXX_STANDARD 17 )
