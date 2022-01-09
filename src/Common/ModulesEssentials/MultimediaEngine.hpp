@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Mediator.hpp>
+#include "Mediator/Mediator.hpp"
 
 
 class MultimediaEngine : public Mediator

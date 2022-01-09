@@ -1,10 +1,9 @@
 add_subdirectory(SystemNode)
+add_subdirectory(Mediator)
 
 set(Library ModulesEssentials)
 
 set(sources
-    Matcher.cpp
-    Mediator.cpp
     Proxy.cpp
     MultimediaEngine.cpp
     TaskManager.cpp
@@ -12,8 +11,6 @@ set(sources
 )
 
 set(headers
-    Matcher.hpp
-    Mediator.hpp
     Proxy.hpp
     MultimediaEngine.hpp
     TaskManager.hpp
@@ -26,6 +23,10 @@ add_library(${Library} STATIC
             ${headers}
 )
 
-target_link_libraries(${Library} Qt6::Core SystemNode)
+target_link_libraries(${Library} 
+    Qt6::Core 
+    SystemNode 
+    Mediator
+)
 
 set_target_properties(${Library} PROPERTIES LINKER_LANGUAGE CXX)

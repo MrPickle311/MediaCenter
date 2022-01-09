@@ -54,9 +54,11 @@ set(SourceDir ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 set(CommonDir ${SourceDir}/Common)
 set(ModulesEssentialsDir ${CommonDir}/ModulesEssentials)
 set(SystemNodeDir ${ModulesEssentialsDir}/SystemNode)
+set(MediatorDir ${ModulesEssentialsDir}/Mediator)
 
 include_directories(${ModulesEssentialsDir})
 include_directories(${SystemNodeDir})
+include_directories(${MediatorDir})
 
 add_subdirectory(sandbox)
 add_subdirectory(TestingUtils)
@@ -68,7 +70,7 @@ set(TestedHeaders
     ${ModulesEssentialsDir}/Backend.hpp
     ${ModulesEssentialsDir}/MultimediaEngine.hpp
     # ${CMAKE_CURRENT_SOURCE_DIR}/../src/Environment.hpp
-    ${ModulesEssentialsDir}/Mediator.hpp
+    ${MediatorDir}/Mediator.hpp
     ${ModulesEssentialsDir}/Proxy.hpp
     ${ModulesEssentialsDir}/ThreadsafeQueue.hpp
     ${ModulesEssentialsDir}/TaskManager.hpp

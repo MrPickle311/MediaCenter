@@ -1,11 +1,11 @@
 #pragma once
-#include "Mediator.hpp"
+#include "Mediator/Mediator.hpp"
 
 class IProxy : public IMediator
 {
     Q_OBJECT
 public:
-    explicit IProxy(QObject *parent = nullptr);
+    explicit IProxy(QObject* parent = nullptr);
 };
 
-using IProxyPtr =  std::shared_ptr<IProxy>;
+using IProxyPtr = std::shared_ptr<IProxy>;
