@@ -2,9 +2,10 @@
 
 #include <iostream>
 
-IMediator::IMediator(QObject* parent) : QObject(parent) {}
+namespace common
+{
 
-MediatorSubsystems::MediatorSubsystems() : matcher_{0} {}
+MediatorSubsystems::MediatorSubsystems() : matcher_{ 0 } {}
 
 void MediatorSubsystems::addSubsystem(const QString& subsys_name,
                                       IMediatorPtr subsystem)
@@ -30,49 +31,25 @@ void MediatorSubsystems::setDesiredParserPos(int desired_parser_pos)
     this->matcher_.setDesiredParsedPos(desired_parser_pos);
 }
 
-Mediator::Mediator() : subsystems_{std::make_shared<MediatorSubsystems>()}
+Mediator::Mediator(SendSignalFunctionType signal_sender,
+                   RequestDataFunctionType data_requester) :
+    signal_sender_{ signal_sender }, data_requester_{ data_requester }
+{}
+
+QString Mediator::redirectRequestAction(QJsonDocument& message) {}
+
+void Mediator::onCoughtSignal(QJsonDocument message)
 {
-    QObject::connect(
-        this, &Mediator::requestAction, this, &Mediator::redirectRequestAction);
+    auto target{ redirectRequestAction };
+    signal_sender_()
 }
 
-void Mediator::redirectRequestAction(const QString& action,
-                                     const QStringList& args)
-{
-    try // if command is correct resend request
-    {
-#pragma message \
-    "You call requestAction() directly , change to emit requestAction()!! "
-        subsystems_->getSubsystem(action)->requestAction(action, args);
-    }
-    catch (const std::out_of_range& e)
-    {
-        std::cout << "\n Backend::redirectRequestAction : Requested action not "
-                     "found \n ";
-        // nothing will happen otherwise
-    }
-    catch (...)
-    {
-        std::cout << "\n Backend::redirectRequestAction : Unexpected error \n ";
-    }
-}
-
-QStringList Mediator::queryAbout(const QString& command, const QStringList& args)
-{
-    try
-    {
-        return subsystems_->getSubsystem(command)->queryAbout(command, args);
-    }
-    catch (const std::out_of_range& e)
-    {
-        return QStringList{"WrongCmd"};
-    }
-}
+QJsonDocument Mediator::onRequestedData(QJsonDocument command) {}
 
 // builder
 
 MediatorBuilder::MediatorBuilder() :
-    subsystems_{std::make_shared<MediatorSubsystems>()}
+    subsystems_{ std::make_shared<MediatorSubsystems>() }
 {
     proxy_.setSubsystems(subsystems_);
 }
@@ -115,7 +92,7 @@ SubsystemProxy& SubsystemProxy::addBinding(const QString& command)
 
 MediatorPtr MediatorBuilder::build()
 {
-    MediatorPtr mediator{new Mediator};
+    MediatorPtr mediator{ new Mediator };
 
     mediator->subsystems_ = std::move(this->subsystems_);
     resetSubsystems();
@@ -153,3 +130,5 @@ SubsystemProxy& SystemConfigurator::to(const QString& subsystem_name)
     proxy_.setTargetToBind(subsystem_name);
     return proxy_;
 }
+
+} // namespace common

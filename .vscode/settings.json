@@ -78,8 +78,10 @@
         "qvariant": "cpp",
         "qeventloop": "cpp",
         "qstring": "cpp",
-        "qtimer": "cpp"
+        "qtimer": "cpp",
+        "qdbusconnection": "cpp"
     },
     "C_Cpp.default.cppStandard": "gnu++20",
-    "C_Cpp.default.cStandard": "gnu17"
+    "C_Cpp.default.cStandard": "gnu17",
+    "ros.distro": "noetic"
 }

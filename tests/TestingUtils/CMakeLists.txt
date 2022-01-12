@@ -1,23 +1,23 @@
 set(headers
     QFunctionWrapper.hpp
-    Mock.hpp
+    # Mock.hpp
     EventLoop.hpp
     WrappersList.hpp
-    MediatorPackage.hpp
+    # MediatorPackage.hpp
     JsonPackage.hpp
-    Caller.hpp
-    MediatorTester.hpp
+    # Caller.hpp
+    # MediatorTester.hpp
     )
 
 set(sources
     QFunctionWrapper.cpp
-    Mock.cpp
+    # Mock.cpp
     EventLoop.cpp
     WrappersList.cpp
-    MediatorPackage.cpp
+    # MediatorPackage.cpp
     JsonPackage.cpp
-    Caller.cpp
-    MediatorTester.cpp
+    # Caller.cpp
+    # MediatorTester.cpp
     )
 
 add_library(TestingUtils STATIC

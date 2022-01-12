@@ -10,10 +10,10 @@ using ::testing::Return;
 using ::testing::ReturnRef;
 
 SystemNodeTests::SystemNodeTests() :
-    env_mock_{std::make_shared<SystemNodeEnvironmentMock>()},
-    behaviour_controller_mock_{std::make_shared<BehaviourControllerMock>()},
-    functions_{Qt::QueuedConnection},
-    node_{test_node_name_, env_mock_, behaviour_controller_mock_}
+    env_mock_{ std::make_shared<SystemNodeEnvironmentMock>() },
+    behaviour_controller_mock_{ std::make_shared<BehaviourControllerMock>() },
+    functions_{ Qt::QueuedConnection },
+    node_{ test_node_name_, env_mock_, behaviour_controller_mock_ }
 {
     QObject::connect(
         &loop_, &DelayedEventLoop::runned, &functions_, &WrappersList::callAll);
@@ -31,8 +31,8 @@ void SystemNodeTests::start()
 
 TEST(SystemNodeEnvironmentTests, AddingTest)
 {
-    QString node_name_1{"org.App.Node1"};
-    QString node_name_2{"org.App.Node2"};
+    QString node_name_1{ "org.App.Node1" };
+    QString node_name_2{ "org.App.Node2" };
 
     common::SystemNodeEnvironment env;
 
@@ -59,8 +59,8 @@ void expectNodeNameEqualTo(common::INodeHandle& handle, QString name)
 
 TEST(SystemNodeEnvironmentTests, GettingTest)
 {
-    QString node_name_1{"org.App.Node1"};
-    QString node_name_2{"org.App.Node2"};
+    QString node_name_1{ "org.App.Node1" };
+    QString node_name_2{ "org.App.Node2" };
 
     common::SystemNodeEnvironment env;
 
@@ -87,7 +87,7 @@ TEST(SystemNodeEnvironmentTests, GettingTest)
 
 TEST(SystemNodeEnvironmentTests, SignalsTest)
 {
-    QString node_name_1{"org.App.Node1"};
+    QString node_name_1{ "org.App.Node1" };
 
     common::SystemNodeEnvironment env;
 
@@ -102,7 +102,7 @@ TEST(SystemNodeEnvironmentTests, SignalsTest)
 
 TEST(SystemNodeEnvironmentTests, ExceptionsTest)
 {
-    QString node_name_1{"org.App.Node1"};
+    QString node_name_1{ "org.App.Node1" };
 
     common::SystemNodeEnvironment env;
 
@@ -117,14 +117,14 @@ TEST(SystemNodeEnvironmentTests, ExceptionsTest)
 
 TEST_F(SystemNodeTests, LocalTest)
 {
-    QString node_name_1{"org.App.Node1"};
-    QString node_name_2{"org.App.Node2"};
+    QString node_name_1{ "org.App.Node1" };
+    QString node_name_2{ "org.App.Node2" };
 
     NodeHandleMock handle_mock;
 
-    EXPECT_CALL(*env_mock_, addSystemNode(QString{node_name_1})).Times(1);
+    EXPECT_CALL(*env_mock_, addSystemNode(QString{ node_name_1 })).Times(1);
 
-    EXPECT_CALL(*env_mock_, addSystemNode(QString{node_name_2})).Times(1);
+    EXPECT_CALL(*env_mock_, addSystemNode(QString{ node_name_2 })).Times(1);
 
     EXPECT_CALL(*env_mock_, getNodeHandle(node_name_1))
         .WillOnce(ReturnRef(handle_mock));
@@ -139,8 +139,8 @@ TEST_F(SystemNodeTests, LocalTest)
     });
 
     addToExecutionList([=, this] {
-        this->node_.sendSignal(node_name_1, QByteArray{});
-        this->node_.sendSignal(node_name_2, QByteArray{});
+        this->node_.sendSignal(node_name_1, QJsonDocument{});
+        this->node_.sendSignal(node_name_2, QJsonDocument{});
     });
 
     start();
@@ -148,10 +148,10 @@ TEST_F(SystemNodeTests, LocalTest)
 
 TEST_F(SystemNodeTests, SelfRemoteTest)
 {
-    common::NodeHandle handle{test_node_name_};
+    common::NodeHandle handle{ test_node_name_ };
 
-    QByteArray message{"abcd"};
-    QByteArray return_value{"efgh"};
+    QByteArray message{ "abcd" };
+    QByteArray return_value{ "efgh" };
     QJsonDocument json{};
 
     EXPECT_CALL(*behaviour_controller_mock_, onCoughtSignal(json)).Times(1);
@@ -174,7 +174,7 @@ TEST_F(SystemNodeTests, SelfRemoteTest)
 
 int main(int argc, char* argv[])
 {
-    QCoreApplication app{argc, argv};
+    QCoreApplication app{ argc, argv };
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }

@@ -43,14 +43,15 @@ class ISystemNode : public QObject
 
 public:
     ~ISystemNode() = default;
+
 protected slots:
     virtual DBusIncomingSignal void coughtSignal(QByteArray message) = 0;
-
     virtual QByteArray requestedData(QByteArray command) = 0;
+
 public slots:
-    virtual void sendSignal(QString target_node_node, QByteArray message) = 0;
-    virtual QByteArray requestData(QString target_node_name,
-                                   QByteArray command) = 0;
+    virtual void sendSignal(QString target_node_node, QJsonDocument message) = 0;
+    virtual QJsonDocument requestData(QString target_node_name,
+                                      QJsonDocument command) = 0;
 };
 
 
@@ -71,7 +72,7 @@ private:
     NodeHandleInternalType createNewNodeHandle(QString node_name, QString path);
 
 public:
-    NodeHandle(QString node_name, QString default_path = {"/"});
+    NodeHandle(QString node_name, QString default_path = { "/" });
 
 public:
     virtual void sendSignal(QByteArray message);
@@ -113,12 +114,17 @@ public:
     SystemNode(const QString& node_name,
                NodeEnvironmentType environment,
                BehaviourControllerType behaviour__controller);
+
+protected:
+    INodeHandle& getNodeHandle(QString node_name);
+
 public slots:
-    virtual void coughtSignal(QByteArray message);
-    virtual QByteArray requestedData(QByteArray command);
+    virtual void coughtSignal(QByteArray message) override;
+    virtual QByteArray requestedData(QByteArray command) override;
 public slots:
-    virtual void sendSignal(QString target_node, QByteArray message);
-    virtual QByteArray requestData(QString target_node, QByteArray command);
+    virtual void sendSignal(QString target_node, QJsonDocument message) override;
+    virtual QJsonDocument requestData(QString target_node,
+                                      QJsonDocument command) override;
 };
 
 } // namespace common

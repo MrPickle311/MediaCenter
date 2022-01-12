@@ -6,9 +6,9 @@
 namespace common
 {
 
-const QString NodeHandle::coughtSignal_{"coughtSignal"};
-const QString NodeHandle::requestedData_{"requestedData"};
-const QString NodeHandle::no_interface_{""};
+const QString NodeHandle::coughtSignal_{ "coughtSignal" };
+const QString NodeHandle::requestedData_{ "requestedData" };
+const QString NodeHandle::no_interface_{ "" };
 
 NodeHandle::NodeHandleInternalType
 NodeHandle::createNewNodeHandle(QString node_name, QString path)
@@ -29,12 +29,11 @@ NodeHandle::createNewNodeHandle(QString node_name, QString path)
         throw;
     }
 
-
     return temp;
 }
 
 NodeHandle::NodeHandle(QString node_name, QString default_path) :
-    iface_{createNewNodeHandle(node_name, default_path)}, name_{node_name}
+    iface_{ createNewNodeHandle(node_name, default_path) }, name_{ node_name }
 {}
 
 void NodeHandle::sendSignal(QByteArray command)
@@ -82,9 +81,9 @@ uint SystemNodeEnvironment::getNodeHandlesCount() const
 SystemNode::SystemNode(const QString& node_name,
                        NodeEnvironmentType environment,
                        BehaviourControllerType behaviour__controller) :
-    node_name_{node_name},
-    env_{environment},
-    behaviour__controller_{behaviour__controller}
+    node_name_{ node_name },
+    env_{ environment },
+    behaviour__controller_{ behaviour__controller }
 {
     registerThisNode(node_name);
     makeNodeAvailable();
@@ -92,26 +91,29 @@ SystemNode::SystemNode(const QString& node_name,
 
 void SystemNode::coughtSignal(QByteArray message)
 {
-    QJsonDocument doc{QJsonDocument::fromJson(message)};
+    QJsonDocument doc{ QJsonDocument::fromJson(message) };
 
     behaviour__controller_->onCoughtSignal(std::move(doc));
 }
 
 QByteArray SystemNode::requestedData(QByteArray command)
 {
-    QJsonDocument doc{QJsonDocument::fromJson(command)};
+    QJsonDocument doc{ QJsonDocument::fromJson(command) };
 
     return behaviour__controller_->onRequestedData(std::move(doc)).toJson();
 }
 
-void SystemNode::sendSignal(QString target_node, QByteArray message)
+void SystemNode::sendSignal(QString target_node, QJsonDocument message)
 {
-    env_->getNodeHandle(target_node).sendSignal(std::move(message));
+    auto bytes{ message.toJson() };
+    env_->getNodeHandle(target_node).sendSignal(std::move(bytes));
 }
 
-QByteArray SystemNode::requestData(QString target_node, QByteArray command)
+QJsonDocument SystemNode::requestData(QString target_node, QJsonDocument command)
 {
-    return env_->getNodeHandle(target_node).requestData(command);
+    auto bytes{ command.toJson() };
+    return QJsonDocument::fromJson(
+        env_->getNodeHandle(target_node).requestData(std::move(bytes)));
 }
 
 void SystemNode::registerThisNode(const QString& node_name)
