@@ -24,11 +24,12 @@ protected:
 protected:
     SendSignalFunctionType signal_sender_;
     RequestDataFunctionType data_requester_;
-    Matcher& matcher_;
+    IMatcher& matcher_;
 
 public:
     Mediator(SendSignalFunctionType signal_sender,
-             RequestDataFunctionType data_requester);
+             RequestDataFunctionType data_requester,
+             IMatcher& matcher);
 
 protected:
     QString redirectRequestAction(QJsonDocument& message);
