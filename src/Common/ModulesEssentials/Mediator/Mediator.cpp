@@ -5,6 +5,8 @@
 namespace common
 {
 
+/**
+
 MediatorSubsystems::MediatorSubsystems() : matcher_{ 0 } {}
 
 void MediatorSubsystems::addSubsystem(const QString& subsys_name,
@@ -31,23 +33,35 @@ void MediatorSubsystems::setDesiredParserPos(int desired_parser_pos)
     this->matcher_.setDesiredParsedPos(desired_parser_pos);
 }
 
+**/
+
 Mediator::Mediator(SendSignalFunctionType signal_sender,
-                   RequestDataFunctionType data_requester) :
-    signal_sender_{ signal_sender }, data_requester_{ data_requester }
+                   RequestDataFunctionType data_requester,
+                   IMatcher& matcher) :
+    signal_sender_{ signal_sender },
+    data_requester_{ data_requester },
+    matcher_{ matcher }
 {}
 
-QString Mediator::redirectRequestAction(QJsonDocument& message) {}
+QString Mediator::redirectRequestAction(QJsonDocument& message)
+{
+    return matcher_.extractKey(message);
+}
 
 void Mediator::onCoughtSignal(QJsonDocument message)
 {
-    auto target{ redirectRequestAction };
-    signal_sender_()
+    auto target{ redirectRequestAction(message) };
+    signal_sender_(target, message);
 }
 
-QJsonDocument Mediator::onRequestedData(QJsonDocument command) {}
+QJsonDocument Mediator::onRequestedData(QJsonDocument command)
+{
+    auto target{ redirectRequestAction(command) };
+    return data_requester_(target, command);
+}
 
 // builder
-
+/**
 MediatorBuilder::MediatorBuilder() :
     subsystems_{ std::make_shared<MediatorSubsystems>() }
 {
@@ -130,5 +144,5 @@ SubsystemProxy& SystemConfigurator::to(const QString& subsystem_name)
     proxy_.setTargetToBind(subsystem_name);
     return proxy_;
 }
-
+**/
 } // namespace common

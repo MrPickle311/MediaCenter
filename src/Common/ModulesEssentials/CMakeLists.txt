@@ -1,5 +1,5 @@
 add_subdirectory(SystemNode)
-# add_subdirectory(Mediator)
+add_subdirectory(Mediator)
 
 set(Library ModulesEssentials)
 
@@ -25,7 +25,7 @@ add_library(${Library} STATIC
 
 target_link_libraries(${Library} 
     SystemNode 
-    # Mediator
+    Mediator
 )
 
 set_target_properties(${Library} PROPERTIES LINKER_LANGUAGE CXX)

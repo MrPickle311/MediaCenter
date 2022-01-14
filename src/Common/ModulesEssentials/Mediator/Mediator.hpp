@@ -18,8 +18,9 @@ class Mediator : public common::IBehaviourController
     friend class SystemConfigurator;
 
 protected:
-    using SendSignalFunctionType = decltype(ISystemNode::sendSignal);
-    using RequestDataFunctionType = decltype(ISystemNode::requestData);
+    using SendSignalFunctionType = std::function<void(QString, QJsonDocument)>;
+    using RequestDataFunctionType =
+        std::function<QJsonDocument(QString, QJsonDocument)>;
 
 protected:
     SendSignalFunctionType signal_sender_;
@@ -40,7 +41,7 @@ public:
 };
 
 using MediatorPtr = std::shared_ptr<Mediator>;
-
+/**
 // TODO: change meaning of this class
 class MediatorSubsystems
 {
@@ -121,5 +122,5 @@ public:
     SystemConfigurator& from(const QString& subsystem_name);
     SubsystemProxy& to(const QString& subsystem_name);
 };
-
+**/
 } // namespace common

@@ -12,8 +12,8 @@ using ::testing::ReturnRef;
 SystemNodeTests::SystemNodeTests() :
     env_mock_{ std::make_shared<SystemNodeEnvironmentMock>() },
     behaviour_controller_mock_{ std::make_shared<BehaviourControllerMock>() },
-    functions_{ Qt::QueuedConnection },
-    node_{ test_node_name_, env_mock_, behaviour_controller_mock_ }
+    node_{ test_node_name_, env_mock_, behaviour_controller_mock_ },
+    functions_{ Qt::QueuedConnection }
 {
     QObject::connect(
         &loop_, &DelayedEventLoop::runned, &functions_, &WrappersList::callAll);
@@ -36,19 +36,19 @@ TEST(SystemNodeEnvironmentTests, AddingTest)
 
     common::SystemNodeEnvironment env;
 
-    EXPECT_EQ(env.getNodeHandlesCount(), 0);
+    EXPECT_EQ(env.getNodeHandlesCount(), uint{ 0 });
 
     env.addSystemNode(node_name_1);
 
-    EXPECT_EQ(env.getNodeHandlesCount(), 1);
+    EXPECT_EQ(env.getNodeHandlesCount(), uint{ 1 });
 
     env.addSystemNode(node_name_2);
 
-    EXPECT_EQ(env.getNodeHandlesCount(), 2);
+    EXPECT_EQ(env.getNodeHandlesCount(), uint{ 2 });
 
     env.addSystemNode(node_name_2);
 
-    EXPECT_EQ(env.getNodeHandlesCount(), 2);
+    EXPECT_EQ(env.getNodeHandlesCount(), uint{ 2 });
 }
 
 void expectNodeNameEqualTo(common::INodeHandle& handle, QString name)
@@ -70,7 +70,7 @@ TEST(SystemNodeEnvironmentTests, GettingTest)
 
     expectNodeNameEqualTo(node_handle_1, node_name_1);
 
-    EXPECT_EQ(env.getNodeHandlesCount(), 1);
+    EXPECT_EQ(env.getNodeHandlesCount(), uint{ 1 });
 
     env.addSystemNode(node_name_2);
 
@@ -78,7 +78,7 @@ TEST(SystemNodeEnvironmentTests, GettingTest)
 
     expectNodeNameEqualTo(node_handle_2, node_name_2);
 
-    EXPECT_EQ(env.getNodeHandlesCount(), 2);
+    EXPECT_EQ(env.getNodeHandlesCount(), uint{ 2 });
 
     auto& node_handle_1a = env.getNodeHandle(node_name_1);
 
@@ -97,7 +97,7 @@ TEST(SystemNodeEnvironmentTests, SignalsTest)
 
     node_handle_1.sendSignal(QByteArray{});
 
-    EXPECT_EQ(env.getNodeHandlesCount(), 1);
+    EXPECT_EQ(env.getNodeHandlesCount(), uint{ 1 });
 }
 
 TEST(SystemNodeEnvironmentTests, ExceptionsTest)
@@ -133,12 +133,12 @@ TEST_F(SystemNodeTests, LocalTest)
         .WillOnce(ReturnRef(handle_mock));
 
 
-    addToExecutionList([=, this] {
+    addToExecutionList([node_name_1, node_name_2, this] {
         this->env_mock_->addSystemNode(node_name_1);
         this->env_mock_->addSystemNode(node_name_2);
     });
 
-    addToExecutionList([=, this] {
+    addToExecutionList([node_name_1, node_name_2, this] {
         this->node_.sendSignal(node_name_1, QJsonDocument{});
         this->node_.sendSignal(node_name_2, QJsonDocument{});
     });

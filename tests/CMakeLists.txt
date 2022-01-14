@@ -58,7 +58,7 @@ set(MediatorDir ${ModulesEssentialsDir}/Mediator)
 
 include_directories(${ModulesEssentialsDir})
 include_directories(${SystemNodeDir})
-# include_directories(${MediatorDir})
+include_directories(${MediatorDir})
 
 # add_subdirectory(sandbox)
 add_subdirectory(TestingUtils)
@@ -73,8 +73,8 @@ set(TestedHeaders
     # ${ModulesEssentialsDir}/ThreadsafeQueue.hpp
     # ${ModulesEssentialsDir}/TaskManager.hpp
     ${SystemNodeDir}/SystemNode.hpp
-    # ${MediatorDir}/Mediator.hpp
-    # ${MediatorDir}/Matcher.hpp
+    ${MediatorDir}/Mediator.hpp
+    ${MediatorDir}/Matcher.hpp
 )
 
 enable_testing()

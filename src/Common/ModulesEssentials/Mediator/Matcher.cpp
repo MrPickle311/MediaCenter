@@ -1,6 +1,8 @@
 #include "Matcher.hpp"
 #include <iostream>
 
+namespace common{
+
 Matcher::Matcher(std::string regex_pattern, int desired_parse_pos):
          matcher_body_{regex_pattern} , 
          desired_parse_pos_{desired_parse_pos}
@@ -44,3 +46,5 @@ void Matcher::setDesiredParsedPos(int desired_parse_pos)
 CommandMatcher::CommandMatcher(int desired_parser_pos):
     Matcher{"[A-Z]{1}[a-z]+" , desired_parser_pos}
 {}
+
+}

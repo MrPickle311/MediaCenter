@@ -4,6 +4,9 @@
 #include <QString>
 #include <regex>
 
+namespace common
+{
+
 class IMatcher
 {
 public:
@@ -27,3 +30,5 @@ class CommandMatcher : public Matcher
 public:
     CommandMatcher(int desired_parser_pos);
 };
+
+} // namespace common

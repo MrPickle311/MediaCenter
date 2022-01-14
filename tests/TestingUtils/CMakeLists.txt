@@ -7,6 +7,7 @@ set(headers
     JsonPackage.hpp
     # Caller.hpp
     # MediatorTester.hpp
+    SimpleSequentialCodeRunner.hpp
     )
 
 set(sources
