@@ -1,6 +1,0 @@
-{
-    "AppendAudioDir" : {
-        "command" : "AppdirAudio" ,
-        "callArguments" : []
-    }
-}
