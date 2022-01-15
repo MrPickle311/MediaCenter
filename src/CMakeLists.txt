@@ -1,7 +1,7 @@
 add_subdirectory(Common)
 # add_subdirectory(DataStorage)
 # add_subdirectory(Environment)
-# add_subdirectory(Frontend)
+add_subdirectory(Modules)
 # add_subdirectory(MainMediator)
 # add_subdirectory(Settings)
 
