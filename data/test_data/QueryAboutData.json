@@ -1,0 +1,88 @@
+{
+    "AudioSearch1" : {
+        "command" : "SearchAudio" ,
+        "expectedResult" : [
+            "/home/abc/audio/song3.mp3"
+        ] ,
+        "callArguments" : [
+            "song3.mp3"
+        ]
+    } ,
+    "AudioSearch2" : {
+        "command" : "SearchAudio" ,
+        "expectedResult" : [
+            "/home/abc/audio/song1.mp3",
+            "/home/abc/audio/song2.mp3",
+            "/home/abc/audio/song3.mp3"
+        ] ,
+        "callArguments" : [
+            "song"
+        ]
+    } ,
+    "AudioSearch3" : {
+        "command" : "SearchAudio" ,
+        "expectedResult" : [
+            "/home/abc/audio/vol1/song3.mp3",
+            "/home/abc/audio/vol2/song3.mp3"
+        ] ,
+        "callArguments" : [
+            "song3.mp3"
+        ]
+    } ,
+    "AudioPlaylist1" : {
+        "command" : "PlaylistAudio" ,
+        "expectedResult" : [
+            "/home/abc/audio/song1.mp3",
+            "/home/abc/audio/song2.mp3",
+            "/home/abc/audio/song3.mp3"
+        ] ,
+        "callArguments" : []
+    } ,
+    "VideoSearch1" : {
+        "command" : "SearchVideo" ,
+        "expectedResult" : [
+            "/home/abc/video/video.mp4"
+        ] ,
+        "callArguments" : [
+            "video.mp4"
+        ]
+    } ,
+    "ImagesSearch1" : {
+        "command" : "SearchImages" ,
+        "expectedResult" : [
+            "/home/abc/img/image.jpg"
+        ] ,
+        "callArguments" : [
+            "image.jpg"
+        ]
+    } ,
+    "MediaPathsAudio1" : {
+        "command" : "MediapathsAudio" ,
+        "expectedResult" : [
+            "/home/abc/audio"
+        ] , 
+        "callArguments" :[]
+    } ,
+    "MediaPathsVideo1" : {
+        "command" : "MediapathsVideo" ,
+        "expectedResult" : [
+            "/home/abc/video"
+        ] , 
+        "callArguments" :[]
+    } ,
+    "MediaPathsImages1" : {
+        "command" : "MediapathsImages" ,
+        "expectedResult" : [
+            "/home/abc/img"
+        ] , 
+        "callArguments" :[]
+    } ,
+    "UnsupportedCommand1" : {
+        "command" : "XYZ" ,
+        "expectedResult" : [
+            "WrongCmd"
+        ] , 
+        "callArguments" :[]
+    }
+    
+}

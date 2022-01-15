@@ -32,6 +32,8 @@ Window {
         }
     }
 
+    Component.onCompleted: console.log(env)
+
     QtObject{
         id: internal
 

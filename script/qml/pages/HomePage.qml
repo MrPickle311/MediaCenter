@@ -9,17 +9,13 @@ Item {
         color: "lightblue"//"#55aaff"
         anchors.fill: parent
 
-        //Label {
-        //    id: label
-        //    x: 196
-        //    y: 141
-        //    text: qsTr("Home page")
-        //    anchors.verticalCenter: parent.verticalCenter
-        //    horizontalAlignment: Text.AlignHCenter
-        //    verticalAlignment: Text.AlignVCenter
-        //    anchors.horizontalCenter: parent.horizontalCenter
-        //    font.pointSize: 16
-        //}
+        ItemsGrid{
+            id: recently
+
+            externalModel: ListModel{
+
+            }
+        }
 
     }
 }
