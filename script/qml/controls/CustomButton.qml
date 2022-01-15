@@ -12,7 +12,7 @@ Button {
     property color defaultColor: "#1c1d20"
     property color mouseOverColor: "#23273E"
     property color pressedColor: "#00a1f1"
-    property string   buttonIconSource: ""
+    property url   buttonIconSource: ""
 
     antialiasing: true
 

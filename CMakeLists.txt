@@ -1,10 +1,6 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.14)
 
 project(MediaCenter VERSION 0.1 LANGUAGES CXX)
-
-add_compile_definitions(PROJECT_FOLDER_NAME="${CMAKE_CURRENT_SOURCE_DIR}")
-add_compile_options(-Wall -Wextra)
-
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -15,13 +11,26 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Quick Multimedia SerialPort  REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Quick Multimedia SerialPort REQUIRED)
-find_package(Boost 1.71.0)
+# QtCreator supports the following variables for Android, which are identical to qmake Android variables.
+# Check https://doc.qt.io/qt/deployment-android.html for more information.
+# They need to be set before the find_package(...) calls below.
 
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-endif()
+#if(ANDROID)
+#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+#    if (ANDROID_ABI STREQUAL "armeabi-v7a")
+#        set(ANDROID_EXTRA_LIBS
+#            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libcrypto.so
+#            ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libssl.so)
+#    endif()
+#endif()
+
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Quick Multimedia  REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Quick Multimedia REQUIRED)
+
+set(PROJECT_SOURCES
+        main.cpp
+        qml.qrc
+)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(MediaCenter
@@ -51,23 +60,7 @@ set_target_properties(MediaCenter PROPERTIES
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    CXX_STANDARD 17
-    CMAKE_CXX_STANDARD_REQUIRED ON
-    )
-
-
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_import_qml_plugins(MediaCenter)
     qt_finalize_executable(MediaCenter)
 endif()
-
-set(HEADERS_DIRS 
-    ${PROJECT_SOURCE_DIR}/src
-    ${PROJECT_SOURCE_DIR}/src/utilities
-    )
-
-include_directories(${HEADERS_DIRS})
-
-add_subdirectory(src)
-add_subdirectory(tests)

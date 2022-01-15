@@ -9,7 +9,7 @@ CustomButton {
     implicitWidth: 250
     implicitHeight: 60
 
-    buttonIconSource: "home_icon.svg"
+    buttonIconSource: "../../../data/home_icon.svg"
 
     iconWidth:  18
     iconHeight: 18

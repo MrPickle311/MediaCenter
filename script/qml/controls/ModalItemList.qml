@@ -43,7 +43,7 @@ Item {
         anchors.bottom: parent.bottom
         defaultColor: "#00000000"
         anchors.bottomMargin: 10
-        buttonIconSource: "add.svg"
+        buttonIconSource: "qrc:/data/add.svg"
         onClicked: modalItemList.addRequested()
     }
 
@@ -56,7 +56,7 @@ Item {
         anchors.bottom: parent.bottom
         defaultColor: "#00000000"
         anchors.bottomMargin: 10
-        buttonIconSource: "minus.svg"
+        buttonIconSource: "qrc:/data/minus.svg"
         onClicked: modalItemList.removeRequested()
     }
 }

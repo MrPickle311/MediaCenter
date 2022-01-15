@@ -117,9 +117,9 @@ Rectangle {
 
         orientation: Qt.Vertical
 
-        //HomePage{
-        //
-        //}
+        HomePage{
+
+        }
 
         AudioPage{
             id: audioPage

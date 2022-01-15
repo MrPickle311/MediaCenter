@@ -24,7 +24,7 @@ Rectangle {
 
     signal settingsButtonClicked()
 
-    property var currentlySelectedButton: musicButton
+    property var currentlySelectedButton: homeButton
 
     function selectButton(button){
         currentlySelectedButton.isActiveMenu = false
@@ -48,37 +48,37 @@ Rectangle {
         spacing: 0
         anchors.bottomMargin: 70
 
-        //LeftMenuButton {
-        //    id: homeButton
-        //    text: qsTr("Home page")
-        //
-        //    isActiveMenu: true
-        //
-        //    onClicked: {
-        //        selectButton(homeButton)
-        //        buttonClicked(0)
-        //    }
-        //}
+        LeftMenuButton {
+            id: homeButton
+            text: qsTr("Home page")
+
+            isActiveMenu: true
+
+            onClicked: {
+                selectButton(homeButton)
+                buttonClicked(0)
+            }
+        }
 
         LeftMenuButton {
             id: musicButton
             text: qsTr("Play music")
-            buttonIconSource: "music.svg"
+            buttonIconSource: "qrc:/data/music.svg"
 
             onClicked: {
                 selectButton(musicButton)
-                buttonClicked(0)
+                buttonClicked(1)
             }
         }
 
         LeftMenuButton {
             id: videoButton
             text: qsTr("Play video")
-            buttonIconSource: "video.svg"
+            buttonIconSource: "qrc:/data/video.svg"
 
             onClicked: {
                 selectButton(videoButton)
-                buttonClicked(1)
+                buttonClicked(2)
             }
         }
 
@@ -87,11 +87,11 @@ Rectangle {
             text: qsTr("Browse photos")
             checkable: false
             checked: false
-            buttonIconSource: "image.svg"
+            buttonIconSource: "qrc:/data/image.svg"
 
             onClicked: {
                 selectButton(imagesButton)
-                buttonClicked(2)
+                buttonClicked(3)
             }
         }
     }
@@ -104,7 +104,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 20
         padding: 6
-        buttonIconSource: "settings_icon.svg"
+        buttonIconSource: "qrc:/data/settings_icon.svg"
 
         onClicked: {
             selectButton(settingsButton)
