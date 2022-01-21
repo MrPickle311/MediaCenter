@@ -118,7 +118,7 @@ QJsonDocument SystemNode::requestData(QString target_node, QJsonDocument command
 
 void SystemNode::registerThisNode(const QString& node_name)
 {
-    auto state = QDBusConnection::sessionBus().registerService(node_name);
+    QDBusConnection::sessionBus().registerService(node_name);
 }
 
 void SystemNode::makeNodeAvailable()

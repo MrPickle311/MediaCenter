@@ -2,6 +2,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQml.Models 2.12
 
+import "../logic/SvgGetter.js" as Logic
+
 Item {
     id: modalItemList
 
@@ -43,7 +45,7 @@ Item {
         anchors.bottom: parent.bottom
         defaultColor: "#00000000"
         anchors.bottomMargin: 10
-        buttonIconSource: "add.svg"
+        buttonIconSource: Logic.getControl("add.svg")
         onClicked: modalItemList.addRequested()
     }
 
@@ -56,7 +58,7 @@ Item {
         anchors.bottom: parent.bottom
         defaultColor: "#00000000"
         anchors.bottomMargin: 10
-        buttonIconSource: "minus.svg"
+        buttonIconSource: Logic.getControl("minus.svg")
         onClicked: modalItemList.removeRequested()
     }
 }

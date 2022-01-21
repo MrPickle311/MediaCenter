@@ -1,6 +1,8 @@
 import QtQuick 2.15
+import "../logic/SvgGetter.js" as Logic
+
 
 PlaylistDelegate {
     id: songDelegate
-    mediaIcon: "movie.svg"
+    mediaIcon: Logic.getControl("movie.svg")
 }

@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.14)
 
 project(MediaCenter VERSION 0.1 LANGUAGES CXX)
 
+set(QT_VERSION 6.2.2)
+
+set(CMAKE_PROJECT_INCLUDE_BEFORE /home/$ENV{USER}/Qt/Tools/QtCreator/share/qtcreator/package-manager/auto-setup.cmake)
+set(QT_QMAKE_EXECUTABLE /home/$ENV{USER}/Qt/${QT_VERSION}/gcc_64/bin/qmake )
+
+list(APPEND CMAKE_PREFIX_PATH /home/$ENV{USER}/Qt/${QT_VERSION}/gcc_64)
 add_compile_definitions(PROJECT_FOLDER_NAME="${CMAKE_CURRENT_SOURCE_DIR}")
 add_compile_options(-Wall -Wextra)
 

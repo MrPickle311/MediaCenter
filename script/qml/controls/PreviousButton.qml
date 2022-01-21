@@ -1,7 +1,9 @@
 import QtQuick 2.15
 
+import "../logic/SvgGetter.js" as Logic
+
 SquareButton {
     id: prevButton
-    buttonIconSource: "left-arrow.svg"
+    buttonIconSource: Logic.getControl("left-arrow.svg")
     defaultColor: "#00000000"
 }

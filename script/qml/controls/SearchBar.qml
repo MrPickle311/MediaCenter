@@ -1,6 +1,8 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtGraphicalEffects 1.15
+import Qt5Compat.GraphicalEffects
+
+import "../logic/SvgGetter.js" as Logic
 
 TextField{
     id: textField
@@ -80,7 +82,7 @@ TextField{
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 10
-            source: "search.svg"
+            source: Logic.getControl("search.svg")
             fillMode: Image.PreserveAspectFit
             sourceSize.height: 20
 
@@ -102,7 +104,7 @@ TextField{
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
             anchors.rightMargin: 10
-            source: "clear.svg"
+            source: Logic.getControl("clear.svg")
             fillMode: Image.PreserveAspectFit
             sourceSize.height: 20
             opacity: 0.5

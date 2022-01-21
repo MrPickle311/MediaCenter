@@ -1,8 +1,9 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtGraphicalEffects 1.15
+import Qt5Compat.GraphicalEffects
 
 import "../controls"
+import "../logic/SvgGetter.js" as Logic
 
 Rectangle {
     id: topBar
@@ -21,8 +22,8 @@ Rectangle {
     signal dragging(bool isActive)
     signal toggleButtonClicked()
 
-    property string restoreIcon:  "restore_icon.svg"
-    property string maximizeIcon: "maximize_icon.svg"
+    property string restoreIcon:  Logic.getControl("restore_icon.svg")
+    property string maximizeIcon: Logic.getControl("maximize_icon.svg")
 
     //theses 2 functions set top-left bar maximize icon
     function setRestoreIcon(){
@@ -42,7 +43,7 @@ Rectangle {
     SquareButton {
         id: toggleBtn
         onClicked: toggleButtonClicked()
-        buttonIconSource: "menu_icon.svg"
+        buttonIconSource: Logic.getControl("menu_icon.svg")
     }
 
     Rectangle {
@@ -67,7 +68,7 @@ Rectangle {
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            source: "media-center.svg"
+            source: Logic.getControl("media-center.svg")
             anchors.leftMargin: 0
             anchors.bottomMargin: 0
             anchors.topMargin: 0
@@ -118,7 +119,7 @@ Rectangle {
             id: minimizeButton
             onClicked: minimize()
 
-            buttonIconSource: "minimize_icon.svg"
+            buttonIconSource: Logic.getControl("minimize_icon.svg")
         }
 
         SquareButton{
@@ -140,7 +141,7 @@ Rectangle {
             implicitHeight: 35
             id: closeButton
             pressedColor: "#ff007f"
-            buttonIconSource: "close_icon.svg"
+            buttonIconSource: Logic.getControl("close_icon.svg")
             onClicked: closing()
         }
     }

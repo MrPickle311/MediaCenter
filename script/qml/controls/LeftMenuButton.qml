@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtGraphicalEffects 1.15
+import Qt5Compat.GraphicalEffects
+import "../logic/SvgGetter.js" as Logic
 
 CustomButton {
 
@@ -9,7 +10,7 @@ CustomButton {
     implicitWidth: 250
     implicitHeight: 60
 
-    buttonIconSource: "home_icon.svg"
+    buttonIconSource: Logic.getControl("home_icon.svg")
 
     iconWidth:  18
     iconHeight: 18

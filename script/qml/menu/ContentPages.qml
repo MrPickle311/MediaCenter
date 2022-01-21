@@ -1,6 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtGraphicalEffects 1.15
+import Qt5Compat.GraphicalEffects
 import QtMultimedia 5.15
 
 import "../controls"
@@ -117,9 +117,9 @@ Rectangle {
 
         orientation: Qt.Vertical
 
-        //HomePage{
-        //
-        //}
+        HomePage{
+
+        }
 
         AudioPage{
             id: audioPage

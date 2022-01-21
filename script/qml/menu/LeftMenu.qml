@@ -1,8 +1,9 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtGraphicalEffects 1.15
+import Qt5Compat.GraphicalEffects
 
 import "../controls"
+import "../logic/SvgGetter.js" as Logic
 
 Rectangle {
     id: leftMenu
@@ -63,7 +64,7 @@ Rectangle {
         LeftMenuButton {
             id: musicButton
             text: qsTr("Play music")
-            buttonIconSource: "music.svg"
+            buttonIconSource: Logic.getControl("music.svg")
 
             onClicked: {
                 selectButton(musicButton)
@@ -74,7 +75,7 @@ Rectangle {
         LeftMenuButton {
             id: videoButton
             text: qsTr("Play video")
-            buttonIconSource: "video.svg"
+            buttonIconSource: Logic.getControl("video.svg")
 
             onClicked: {
                 selectButton(videoButton)
@@ -87,7 +88,7 @@ Rectangle {
             text: qsTr("Browse photos")
             checkable: false
             checked: false
-            buttonIconSource: "image.svg"
+            buttonIconSource: Logic.getControl("image.svg")
 
             onClicked: {
                 selectButton(imagesButton)
@@ -104,7 +105,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 20
         padding: 6
-        buttonIconSource: "settings_icon.svg"
+        buttonIconSource: Logic.getControl("settings_icon.svg")
 
         onClicked: {
             selectButton(settingsButton)

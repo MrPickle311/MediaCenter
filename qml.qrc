@@ -63,5 +63,6 @@
         <file>script/qml/controls/ItemsGrid.qml</file>
         <file>script/qml/controls/RecentItem.qml</file>
         <file>script/qml/controls/patterns.js</file>
+        <file>script/qml/logic/SvgGetter.js</file>
     </qresource>
 </RCC>

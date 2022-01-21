@@ -1,6 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtMultimedia 5.15
+import QtMultimedia
 import QtQml.Models 2.12
 
 import "../delegates"
@@ -132,47 +132,77 @@ Rectangle {
         externalModel: temp
     }
 
-    Audio {
-            id: player;
-            playlist: Playlist {
-                id: playlist
-                //MAKE A WRAPPER FOR A LIST ELEMENT IN C++
-                PlaylistItem { source: "file:///home/damiano/Projects/MediaCenter/data/song2.mp3"; }
-                PlaylistItem { source: "file:///home/damiano/Projects/MediaCenter/data/song.mp3"; }
-                PlaylistItem { source: "song3.ogg"; }
-                PlaylistItem { source: "song1.ogg"; }
-                PlaylistItem { source: "song2.ogg"; }
-                PlaylistItem { source: "song3.ogg"; }
-                PlaylistItem { source: "song1.ogg"; }
-                PlaylistItem { source: "song2.ogg"; }
-                PlaylistItem { source: "song3.ogg"; }
-            }
+    MediaPlayer{
+        id: player
+        source: "song1.ogg"
 
-            signal millisChanged(int millis)
-            signal relativePositionChanged(real position)
+        signal millisChanged(int millis)
+        signal relativePositionChanged(real position)
 
-            onPositionChanged: {
-                millisChanged(position)
-                relativePositionChanged(position / duration)
-            }
+        onPositionChanged: {
+            millisChanged(position)
+            relativePositionChanged(position / duration)
+        }
 
-            function updateState(){
-                if(playbackState === Audio.PlayingState) pause()
-                else play()
-            }
+        function updateState(){
+            if(playbackState === Audio.PlayingState) pause()
+            else play()
+        }
 
-            function changeSongPosition(position){
-                seek(position * duration)
-            }
+        function changeSongPosition(position){
+            seek(position * duration)
+        }
 
-            function goNextSong(){
-                playlist.next()
-            }
+        function goNextSong(){
+            playlist.next()
+        }
 
-            function goPreviousSong(){
-                playlist.previous()
-            }
+        function goPreviousSong(){
+            playlist.previous()
+        }
     }
+
+//    Audio {
+//            id: player;
+//            playlist: Playlist {
+//                id: playlist
+//                //MAKE A WRAPPER FOR A LIST ELEMENT IN C++
+//                PlaylistItem { source: "file:///home/damiano/Projects/MediaCenter/data/song2.mp3"; }
+//                PlaylistItem { source: "file:///home/damiano/Projects/MediaCenter/data/song.mp3"; }
+//                PlaylistItem { source: "song3.ogg"; }
+//                PlaylistItem { source: "song1.ogg"; }
+//                PlaylistItem { source: "song2.ogg"; }
+//                PlaylistItem { source: "song3.ogg"; }
+//                PlaylistItem { source: "song1.ogg"; }
+//                PlaylistItem { source: "song2.ogg"; }
+//                PlaylistItem { source: "song3.ogg"; }
+//            }
+
+//            signal millisChanged(int millis)
+//            signal relativePositionChanged(real position)
+
+//            onPositionChanged: {
+//                millisChanged(position)
+//                relativePositionChanged(position / duration)
+//            }
+
+//            function updateState(){
+//                if(playbackState === Audio.PlayingState) pause()
+//                else play()
+//            }
+
+//            function changeSongPosition(position){
+//                seek(position * duration)
+//            }
+
+//            function goNextSong(){
+//                playlist.next()
+//            }
+
+//            function goPreviousSong(){
+//                playlist.previous()
+//            }
+//    }
 
     PlayButton{
         id: playButton

@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
-import QtGraphicalEffects 1.15
+// import QtGraphicalEffects 1.15
 
 import "controls"
 import "pages"
@@ -32,7 +32,7 @@ Window {
         }
     }
 
-    Component.onCompleted: console.log(env)
+//    Component.onCompleted: console.log(env)
 
     QtObject{
         id: internal
