@@ -46,7 +46,7 @@ private:
 protected:
     void runAll();
 
-    void simulateSystemNodeSignalCought(QJsonDocument message);
-    void simulateSystemNodeRequestedData(QJsonDocument message);
+    void simulateSystemNodeSignalCought(const QJsonDocument& message);
+    void simulateSystemNodeRequestedData(const QJsonDocument& message);
 };
 } // namespace tests

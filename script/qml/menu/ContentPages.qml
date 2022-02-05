@@ -5,6 +5,7 @@ import QtMultimedia
 
 import "../controls"
 import "../pages"
+import "ContentPages.js" as Logic
 
 Rectangle {
     id: contentPages
@@ -17,96 +18,29 @@ Rectangle {
     anchors.leftMargin: 0
     clip: true
 
+    //public methods
+
     function setCurrentPage(page_id){
-        swipeView.setCurrentIndex(page_id)
+        Logic.setCurrentPage(page_id)
     }
 
     function setSettingsPage(){
-        swipeView.setCurrentIndex(swipeView.count - 1)
+        Logic.setSettingsPage()
     }
 
     function increaseVolume(){
-        videoPage.increaseVolume()
-        audioPage.increaseVolume()
+        Logic.increaseVolume()
     }
 
     function decraseVolumne(){
-        videoPage.decreaseVolume()
-        audioPage.decreaseVolume()
+        Logic.decraseVolumne()
     }
 
-    Item{
+    VolumeArea{
         id: volumeArea
         anchors.fill: contentPages
         z: 1
-        property real volume: 0.5
-        property real realVolume: volume //QtMultimedia.convertVolume(volumeArea.volume,
-                                    //                         QtMultimedia.LinearVolumeScale,
-                                      //                       QtMultimedia.LogarithmicVolumeScale)
 
-        function increaseLinearVolume(){
-            if(volumeArea.volume < 1.0)
-                volumeArea.volume += 0.01
-        }
-
-        function decreaseLinearVolume(){
-            if(volumeArea.volume > 0.0)
-                volumeArea.volume -= 0.01
-        }
-
-        function showAndSet(){
-            timer.start()
-            volumeArea.show()
-            audioPage.setVolume(realVolume)
-        }
-
-        function increaseVolume(){
-            progressBar.increaseVolume()
-            volumeArea.increaseLinearVolume()
-            volumeArea.showAndSet()
-        }
-
-        function decraseVolumne(){
-            progressBar.decreaseVolume()
-            volumeArea.decreaseLinearVolume()
-            volumeArea.showAndSet()
-        }
-
-        function hide(){
-            volumeArea.visible = false
-        }
-
-        function show(){
-            volumeArea.visible = true
-        }
-
-        CircularProgressBar{
-            id: progressBar
-            Component.onCompleted: value = volumeArea.volume * 100
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.horizontalCenter: parent.horizontalCenter
-            z:2
-        }
-
-        Timer{
-            id: timer
-            repeat: false
-            interval: 800
-            onTriggered: {
-                volumeArea.hide()
-                progressBar.hide()
-            }
-        }
-
-        Shortcut {
-            sequence: "Ctrl+Shift+M"
-            onActivated: volumeArea.decraseVolumne()
-        }
-
-        Shortcut {
-            sequence: "Ctrl+Shift+L"
-            onActivated: volumeArea.increaseVolume()
-        }
     }
 
     SwipeView {
@@ -116,23 +50,24 @@ Rectangle {
 
         orientation: Qt.Vertical
 
-        HomePage{
+//        HomePage{
 
-        }
+//        }
 
         AudioPage{
             id: audioPage
         }
 
-        VideoPage{
-            id: videoPage
-        }
+//        VideoPage{
+//            id: videoPage
+//        }
 
-        ImagePage{
+//        ImagePage{
 
-        }
+//        }
 
         SettingsPage{
+            id: settingsPage
 
         }
     }

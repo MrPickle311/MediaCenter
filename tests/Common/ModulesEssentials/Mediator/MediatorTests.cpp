@@ -21,14 +21,14 @@ void MediatorTests::runAll()
     runner_.runAll();
 }
 
-void MediatorTests::simulateSystemNodeSignalCought(QJsonDocument message)
+void MediatorTests::simulateSystemNodeSignalCought(const QJsonDocument& message)
 {
     addCodeToRun([message, this]() {
         mediator_.onCoughtSignal(message);
     });
 }
 
-void MediatorTests::simulateSystemNodeRequestedData(QJsonDocument message)
+void MediatorTests::simulateSystemNodeRequestedData(const QJsonDocument& message)
 {
     addCodeToRun([message, this]() {
         mediator_.onRequestedData(message);

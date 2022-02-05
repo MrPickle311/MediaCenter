@@ -5,67 +5,37 @@ import QtQml.Models 2.12
 
 import "../delegates"
 import "../controls"
+import "audio_page"
+import "AudioPage.js" as Logic
 
 Rectangle {
     id: audioPage
     color: "#191919"
 
-    //public signals
+    // public signals
 
     //after emisission of this signal -> model update
     signal searchInPlaylist(string src)
+    signal nextSongRequested()
+    signal previousSongRequested()
 
-    //make Connections
-
-    function makePlayButtonConnections(){
-        playButton.clicked.connect(player.updateState)
-    }
-
-    function makeMusicSliderConnections(){
-        musicSlider.positionMoved.connect(player.changeSongPosition)
-    }
-
-    function makePlayerConnections(){
-        player.millisChanged.connect(musicTimeLabel.setTime)
-        player.relativePositionChanged.connect(musicSlider.changePosition)
-    }
-
-    function makeSearchBarConnections(){
-        searchBar.searchRequested.connect(searchInPlaylist)
-        searchBar.focusModified.connect(playListArea.hideShow)
-        searchBar.focusModified.connect(songsSearchResults.showHide)
-    }
-
-    function makeSongsSearchResultsConnections(){
-        songsSearchResults.playSongRequested.connect(searchBar.hide)
-        songsSearchResults.playSongRequested.connect(playButton.updateIconSource)
-        songsSearchResults.playSongRequested.connect(musicTitle.setTitle)
-    }
-
-    function makeNextButtonConnections(){
-        nextButton.clicked.connect(player.goNextSong)
-    }
-
-    function makePrevButtonConnections(){
-        prevButton.clicked.connect(player.goPreviousSong)
-    }
-
-    function makeInternalConnections(){
-        makePlayButtonConnections()
-        makeMusicSliderConnections()
-        makePlayerConnections()
-        makeSearchBarConnections()
-        makeSongsSearchResultsConnections()
-        makeNextButtonConnections()
-        makePrevButtonConnections()
-    }
+    // public methods
 
     function setVolume(vol){
-            player.volume = vol
+        Logic.setVolume(vol)
+    }
+
+    function setAudioSource(audioSource){
+
+    }
+
+    function pullSongsPlaylist(){
+        playListArea.updateSongs(AudioBackend.requestSongsPlaylist())
     }
 
     Component.onCompleted: {
-        makeInternalConnections()
+        Logic.makeInternalConnections()
+        audioPage.pullSongsPlaylist()
     }
 
     MediaSlider {
@@ -101,16 +71,16 @@ Rectangle {
         anchors.leftMargin: 30
         anchors.bottomMargin: 30
         anchors.topMargin: 30
-        externalModel: player.playlist
 
         //only revert the boolean argument and delegate to showHide ()
         function hideShow(predicate){
             showHide(!predicate)
         }
+
     }
 
     SongList{
-        id: songsSearchResults
+        id: audioSearchResults
         anchors.left: playListArea.left
         anchors.right: playListArea.right
         anchors.top: searchBar.bottom
@@ -120,56 +90,11 @@ Rectangle {
         anchors.bottomMargin: 0
         anchors.topMargin: 10
         visible: false
-        ListModel{
-            id: temp
-            ListElement{
-                source: "file:///home/damiano/Projects/MediaCenter/data/song2.mp3"
-            }
-            ListElement{
-                source: "song2"
-            }
-        }
-        externalModel: temp
+
     }
 
-    MediaPlayer{
-        id: player
-        source: "song1.ogg"
-        audioOutput: audioOutput
-
-        signal millisChanged(int millis)
-        signal relativePositionChanged(real position)
-
-        onPositionChanged: {
-            millisChanged(position)
-            relativePositionChanged(position / duration)
-        }
-
-        function updateState(){
-            if(playbackState === MediaPlayer.PlayingState){
-                pause()
-            }
-            else{
-                play()
-            }
-        }
-
-        function changeSongPosition(position){
-            seek(position * duration)
-        }
-
-        function goNextSong(){
-            playlist.next()
-        }
-
-        function goPreviousSong(){
-            playlist.previous()
-        }
-    }
-
-    AudioOutput{
-        id: audioOutput
-
+    AudioPlayer{
+        id: audioPlayer
     }
 
     PlayButton{

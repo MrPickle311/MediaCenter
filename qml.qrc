@@ -65,5 +65,11 @@
         <file>script/qml/controls/patterns.js</file>
         <file>script/qml/logic/SvgGetter.js</file>
         <file>script/qml/main.js</file>
+        <file>script/qml/menu/ContentPages.js</file>
+        <file>script/qml/menu/VolumeArea.qml</file>
+        <file>script/qml/menu/VolumeArea.js</file>
+        <file>script/qml/pages/AudioPage.js</file>
+        <file>script/qml/pages/audio_page/AudioPlayer.js</file>
+        <file>script/qml/pages/audio_page/AudioPlayer.qml</file>
     </qresource>
 </RCC>
