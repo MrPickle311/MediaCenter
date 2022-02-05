@@ -17,7 +17,7 @@ Rectangle {
     anchors.bottomMargin: 0
     anchors.leftMargin: 0
 
-    function runAnimation(){
+    function expandMenu(){
         animationMenu.running = true
     }
 

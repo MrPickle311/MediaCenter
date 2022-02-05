@@ -1,11 +1,11 @@
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
-// import QtGraphicalEffects 1.15
 
 import "controls"
 import "pages"
 import "menu"
+import "main.js" as Logic
 
 Window {
 
@@ -25,62 +25,8 @@ Window {
     property int windowStatus: 0
     property int windowMargin: 10
 
-    onHeightChanged: {
-        if(visibility !== Window.Maximized ){
-            topBar.setMaximizeIcon()
-            internal.setNormalState()
-        }
-    }
+    onHeightChanged: Logic.trySetNormalMainWindowState()
 
-//    Component.onCompleted: console.log(env)
-
-    QtObject{
-        id: internal
-
-        //it sets the following content to true or false at once
-        function resetResizeBorders(bool){
-            resizeLeft.visible = bool
-            resizeRight.visible = bool
-            resizeBottom.visible = bool
-            resizeRightCorner.visible = bool
-        }
-
-        //sets window to non maximized state
-        function setNormalState(){
-            windowStatus = 0
-            windowMargin = 10
-            resetResizeBorders(true)
-        }
-
-        //sets window to maximized state
-        function setMaximizedState(){
-            windowStatus = 1
-            windowMargin = 0
-            resetResizeBorders(false)
-        }
-
-        function maximizeRestore(){
-            if(windowStatus == 0){
-                mainWindow.showMaximized()
-                setMaximizedState()
-            }
-            else{
-                mainWindow.showNormal()
-                setNormalState()
-            }
-        }
-
-        function ifMaximizedWindowRestore(){
-            if(windowStatus == 1){
-                mainWindow.showNormal()
-                setNormalState()
-            }
-        }
-
-        function restoreMargins(){
-            setNormalState()
-        }
-    }
 
     Rectangle {
         id: background
@@ -105,20 +51,15 @@ Window {
 
             TopBar{
                 id: topBar
-                onToggleButtonClicked: leftMenu.runAnimation()
-                onDragging: if(isActive){
-                                mainWindow.startSystemMove()
-                                internal.ifMaximizedWindowRestore()
-                            }
-                onMinimize: {
-                    internal.restoreMargins()
-                    mainWindow.showMinimized()
+
+                Component.onCompleted: {
+                    topBar.dragging.connect(Logic.moveSystem)
                 }
-                onMaximizeRestore: internal.maximizeRestore()
-                onClosing: {
-                    console.log("closing")
-                    Qt.quit()
-                }
+
+                onToggleButtonClicked: leftMenu.expandMenu()
+                onMinimize: Logic.showMinimized()
+                onMaximizeRestore: Logic.maximizeRestore()
+                onClosing: Qt.quit()
             }
 
             Rectangle {
@@ -136,7 +77,11 @@ Window {
 
                 LeftMenu{
                     id: leftMenu
-                    onButtonClicked: contentPages.setCurrentPage(id)
+
+                    Component.onCompleted: {
+                        leftMenu.buttonClicked.connect(contentPages.setCurrentPage)
+                    }
+
                     onSettingsButtonClicked: contentPages.setSettingsPage()
                 }
 
@@ -148,17 +93,6 @@ Window {
         }
     }
 
-    //DropShadow{
-    //    anchors.fill: background
-    //    cached: true
-    //    horizontalOffset: 0
-    //    verticalOffset: 0
-    //    radius: 10
-    //    samples: 16
-    //    color: "#80000000"
-    //    source: background
-    //    z: 0
-    //}
 
     MouseDragHandler {
         id: resizeLeft

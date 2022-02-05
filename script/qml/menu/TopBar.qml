@@ -58,7 +58,8 @@ Rectangle {
         anchors.topMargin: 0
 
         DragHandler{
-            onActiveChanged: dragging(active)
+            id: dragHandler
+            onActiveChanged: dragging(dragHandler.active)
         }
 
         Image {

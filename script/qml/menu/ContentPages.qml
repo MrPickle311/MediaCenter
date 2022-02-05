@@ -1,7 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import Qt5Compat.GraphicalEffects
-import QtMultimedia 5.15
+import QtMultimedia
 
 import "../controls"
 import "../pages"
@@ -40,9 +40,9 @@ Rectangle {
         anchors.fill: contentPages
         z: 1
         property real volume: 0.5
-        property real realVolume: QtMultimedia.convertVolume(volumeArea.volume,
-                                                             QtMultimedia.LinearVolumeScale,
-                                                             QtMultimedia.LogarithmicVolumeScale)
+        property real realVolume: volume //QtMultimedia.convertVolume(volumeArea.volume,
+                                    //                         QtMultimedia.LinearVolumeScale,
+                                      //                       QtMultimedia.LogarithmicVolumeScale)
 
         function increaseLinearVolume(){
             if(volumeArea.volume < 1.0)
@@ -88,7 +88,6 @@ Rectangle {
             z:2
         }
 
-//242424
         Timer{
             id: timer
             repeat: false

@@ -135,6 +135,7 @@ Rectangle {
     MediaPlayer{
         id: player
         source: "song1.ogg"
+        audioOutput: audioOutput
 
         signal millisChanged(int millis)
         signal relativePositionChanged(real position)
@@ -145,8 +146,12 @@ Rectangle {
         }
 
         function updateState(){
-            if(playbackState === Audio.PlayingState) pause()
-            else play()
+            if(playbackState === MediaPlayer.PlayingState){
+                pause()
+            }
+            else{
+                play()
+            }
         }
 
         function changeSongPosition(position){
@@ -162,47 +167,10 @@ Rectangle {
         }
     }
 
-//    Audio {
-//            id: player;
-//            playlist: Playlist {
-//                id: playlist
-//                //MAKE A WRAPPER FOR A LIST ELEMENT IN C++
-//                PlaylistItem { source: "file:///home/damiano/Projects/MediaCenter/data/song2.mp3"; }
-//                PlaylistItem { source: "file:///home/damiano/Projects/MediaCenter/data/song.mp3"; }
-//                PlaylistItem { source: "song3.ogg"; }
-//                PlaylistItem { source: "song1.ogg"; }
-//                PlaylistItem { source: "song2.ogg"; }
-//                PlaylistItem { source: "song3.ogg"; }
-//                PlaylistItem { source: "song1.ogg"; }
-//                PlaylistItem { source: "song2.ogg"; }
-//                PlaylistItem { source: "song3.ogg"; }
-//            }
+    AudioOutput{
+        id: audioOutput
 
-//            signal millisChanged(int millis)
-//            signal relativePositionChanged(real position)
-
-//            onPositionChanged: {
-//                millisChanged(position)
-//                relativePositionChanged(position / duration)
-//            }
-
-//            function updateState(){
-//                if(playbackState === Audio.PlayingState) pause()
-//                else play()
-//            }
-
-//            function changeSongPosition(position){
-//                seek(position * duration)
-//            }
-
-//            function goNextSong(){
-//                playlist.next()
-//            }
-
-//            function goPreviousSong(){
-//                playlist.previous()
-//            }
-//    }
+    }
 
     PlayButton{
         id: playButton
