@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 
 project(MediaCenter VERSION 0.1 LANGUAGES CXX)
 
-set(QT_VERSION 6.2.2)
+set(QT_VERSION 6.2.3)
 
 set(CMAKE_PROJECT_INCLUDE_BEFORE /home/$ENV{USER}/Qt/Tools/QtCreator/share/qtcreator/package-manager/auto-setup.cmake)
 set(QT_QMAKE_EXECUTABLE /home/$ENV{USER}/Qt/${QT_VERSION}/gcc_64/bin/qmake )
@@ -22,7 +22,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 COMPONENTS Core Quick Multimedia SerialPort DBus  REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Quick Multimedia SerialPort DBus REQUIRED)
+find_package(Qt6 COMPONENTS Core Quick Multimedia SerialPort DBus REQUIRED)
 find_package(Boost 1.71.0)
 
 if(Boost_FOUND)
