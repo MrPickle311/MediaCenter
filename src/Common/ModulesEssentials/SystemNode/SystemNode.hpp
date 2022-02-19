@@ -96,7 +96,7 @@ class SystemNode : public ISystemNode
 {
     Q_OBJECT;
     friend class SystemNodeBuilder;
-
+public:
     using NodeEnvironmentType = std::shared_ptr<ISystemNodeEnvironment>;
     using BehaviourControllerType = std::shared_ptr<IBehaviourController>;
 
@@ -119,12 +119,12 @@ protected:
     INodeHandle& getNodeHandle(QString node_name);
 
 public slots:
-    virtual void coughtSignal(QByteArray message) override;
-    virtual QByteArray requestedData(QByteArray command) override;
+    void coughtSignal(QByteArray message) override;
+    QByteArray requestedData(QByteArray command) override;
 public slots:
-    virtual void sendSignal(QString target_node, QJsonDocument message) override;
-    virtual QJsonDocument requestData(QString target_node,
-                                      QJsonDocument command) override;
+    void sendSignal(QString target_node, QJsonDocument message) override;
+    QJsonDocument requestData(QString target_node,
+                              QJsonDocument command) override;
 };
 
 } // namespace common

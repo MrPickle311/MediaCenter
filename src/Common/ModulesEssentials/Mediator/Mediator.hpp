@@ -36,8 +36,8 @@ protected:
     QString redirectRequestAction(QJsonDocument& message);
 
 public:
-    virtual void onCoughtSignal(QJsonDocument message) override;
-    virtual QJsonDocument onRequestedData(QJsonDocument command) override;
+    void onCoughtSignal(QJsonDocument message) override;
+    QJsonDocument onRequestedData(QJsonDocument command) override;
 };
 
 using MediatorPtr = std::shared_ptr<Mediator>;
