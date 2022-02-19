@@ -1,19 +1,28 @@
+set(ExebutableName DataStorage)
+
 set(sources
-    MultimediaEngine.cpp
-    )
+        DataStorage.cpp
+        DataStorageNode.cpp
+        )
 
 set(headers
-    MultimediaEngine.hpp
-    )
+        DataStorageNode.hpp
+        )
 
-add_library(MULTIMEDIA_ENGINE STATIC
-            ${sources}
-            ${headers})
 
-add_subdirectory(audio)
-add_subdirectory(images)
-add_subdirectory(video)
+add_executable(${ExebutableName}
+        ${sources}
+        ${headers}
+        )
 
-target_link_libraries(MULTIMEDIA_ENGINE Qt5::Core )
+target_include_directories(${ExebutableName} PRIVATE ../../Common/ModulesEssentials/SystemNode)
+target_include_directories(${ExebutableName} PRIVATE ../../Common/ModulesEssentials/Mediator)
 
-set_target_properties(MULTIMEDIA_ENGINE PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(${ExebutableName} PROPERTIES LINKER_LANGUAGE CXX)
+
+target_link_libraries(${ExebutableName}
+        SystemNode
+        Mediator
+        Qt6::Core
+        Qt6::DBus
+        )
